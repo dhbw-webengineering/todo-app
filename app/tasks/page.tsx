@@ -4,6 +4,9 @@ import { useState } from "react";
 import { TaskCard } from "components/task/TaskCard";
 import { Task } from "@/types/task";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { MultiSelect } from "@/components/multiselect";
+import { Turtle } from "lucide-react";
+import { DateRangePicker } from "@/components/dateRangePicker";
 
 const initialTasks: Task[] = [
   {
@@ -49,19 +52,57 @@ export default function TasksPage() {
       prev.map((task) =>
         task.eintragID === id
           ? {
-              ...task,
-              abgeschlossen: task.abgeschlossen
-                ? null
-                : new Date().toISOString(),
-            }
+            ...task,
+            abgeschlossen: task.abgeschlossen
+              ? null
+              : new Date().toISOString(),
+          }
           : task
       )
     );
   };
 
+  const frameworksList = [
+    { value: "react", label: "React", icon: Turtle },
+    { value: "angular", label: "Angular", icon: Turtle },
+    { value: "vue", label: "Vue", icon: Turtle },
+    { value: "svelte", label: "Svelte", icon: Turtle },
+    { value: "ember", label: "Ember", icon: Turtle },
+  ];
+
+  const [selectedKategorie, setSelectedKategorie] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
+      <div className="flex items-center space-x-4 mb-6">
+        
+        <div className="w-1/6">
+          <MultiSelect
+            options={frameworksList}
+            onValueChange={setSelectedKategorie}
+            defaultValue={selectedKategorie}
+            placeholder="Kategorie"
+            variant="inverted"
+            maxCount={2}
+          />
+        </div>
+        <div className="w-1/6">
+          <MultiSelect
+            options={frameworksList}
+            onValueChange={setSelectedTags}
+            defaultValue={selectedTags}
+            placeholder="Tags"
+            variant="secondary"
+            maxCount={2}
+          />
+        </div>
+        <div className="w-1/6">
+          <DateRangePicker />
+        </div>
+      </div>
+
       <div className="space-y-4 max-w-3xl">
         {tasks.map((task) => (
           <TaskCard
