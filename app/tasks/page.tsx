@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TaskCard } from "components/task/TaskCard";
 import { Task } from "@/types/task";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const initialTasks: Task[] = [
   {
@@ -61,13 +62,16 @@ export default function TasksPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-3xl">
         {tasks.map((task) => (
           <TaskCard
             key={task.eintragID}
             task={task}
             onToggle={toggleErledigt}
             onUpdate={handleUpdate}
+            onDelete={(id) =>
+              setTasks((prev) => prev.filter((task) => task.eintragID !== id))
+            }
           />
         ))}
       </div>

@@ -1,22 +1,65 @@
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { format } from "date-fns"
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
-import { Task } from '@/types/task'
-import { EditTaskDialog } from "@/components/task/EditTaskDialog" // Pfad anpassen
+import { Task } from "@/types/task";
+import { EditTaskDialog } from "@/components/task/EditTaskDialog"; // Pfad anpassen
+
+import {
+  Menubar,
+  MenubarMenu,
+  MenubarTrigger,
+  MenubarContent,
+  MenubarItem,
+} from "@/components/ui/menubar";
+import { MoreVertical } from "lucide-react";
+import { useState } from "react";
+
+import { format, differenceInCalendarDays } from "date-fns";
+import { de } from "date-fns/locale";
 
 export function TaskCard({
   task,
   onToggle,
   onUpdate,
+  onDelete,
 }: {
-  task: Task
-  onToggle: (id: string) => void
-  onUpdate: (updatedTask: Task) => void
+  task: Task;
+  onToggle: (id: string) => void;
+  onUpdate: (updatedTask: Task) => void;
+  onDelete: (id: string) => void;
 }) {
+  const [editOpen, setEditOpen] = useState(false);
+
+  let faelligkeitLabel = "";
+  if (task.faelligkeit) {
+    const heute = new Date();
+    const faellig = new Date(task.faelligkeit);
+    const diff = differenceInCalendarDays(faellig, heute);
+
+    if (diff === 0) faelligkeitLabel = "heute fällig";
+    else if (diff === 1) faelligkeitLabel = "morgen fällig";
+    else if (diff > 1) faelligkeitLabel = `fällig in ${diff} Tagen`;
+    else if (diff === -1) faelligkeitLabel = "seit gestern fällig";
+    else faelligkeitLabel = `seit ${Math.abs(diff)} Tagen fällig`;
+  }
+
   return (
-    <div className="border rounded-xl p-4 shadow-sm bg-white dark:bg-zinc-900">
-      <div className="flex justify-between items-start">
+    <div className="border rounded-xl p-4 shadow-sm bg-white dark:bg-zinc-900 w-full flex flex-col">
+      <div>
+        <div className="flex justify-between items-start">
+          <p className="pb-3 text-sm text-muted-foreground">
+            {task.kategorie && <span>{task.kategorie.name}</span>}
+            {task.faelligkeit && (
+              <span>
+                {" "}
+                • {faelligkeitLabel} •{" "}
+                {format(new Date(task.faelligkeit), "dd.MM.yyyy")}
+              </span>
+            )}
+          </p>
+          {task.abgeschlossen && <Badge variant="default">Erledigt</Badge>}
+        </div>
+
         <div className="flex gap-3 items-start">
           <Checkbox
             checked={!!task.abgeschlossen}
@@ -38,28 +81,22 @@ export function TaskCard({
             )}
           </div>
         </div>
-        <div className="flex flex-col items-end gap-1">
-          {task.abgeschlossen && <Badge variant="default">Erledigt</Badge>}
-          <EditTaskDialog task={task} onSave={onUpdate} />
-        </div>
       </div>
 
-      <div className="mt-2 text-sm text-muted-foreground">
-        {task.faelligkeit && (
-          <p>Fällig: {format(new Date(task.faelligkeit), "dd.MM.yyyy")}</p>
-        )}
-        {task.kategorie && <p>Kategorie: {task.kategorie.name}</p>}
-      </div>
-
-      {task.tags && task.tags.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2">
+      {/* Container für Tags und Menubar */}
+      <div className="mt-3 flex flex-wrap justify-between items-start">
+        <div className="flex flex-wrap gap-2 max-w-[calc(100%-40px)] flex-grow">
           {task.tags.map((tag) => (
             <Badge key={tag.tagID} variant="secondary">
               {tag.name}
             </Badge>
           ))}
         </div>
-      )}
+
+        <div className="flex-shrink-0 ml-4 self-end">
+          <EditTaskDialog task={task} onSave={onUpdate} onDelete={onDelete} />
+        </div>
+      </div>
     </div>
-  )
+  );
 }
