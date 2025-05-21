@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Calendar,
   Home,
@@ -27,6 +29,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubItem,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 
 import {
@@ -83,19 +86,31 @@ const kat = [
     id: "3",
     url: "#kat3",
     icon: Home,
-  }
+  },
 ];
 
 export function AppSidebar() {
+  const handleAddCategory = () => {
+    console.log("Kategorie hinzufügen geklickt");
+  };
+
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center justify-between p-4">
           <h1 className="text-lg font-bold">Todo-Webapp</h1>
+          <SidebarTrigger />
         </div>
         <div className="border-b border-gray-200 dark:border-gray-700" />
       </SidebarHeader>
       <SidebarContent>
+        <div className="p-2">
+          <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20">
+            <Plus className="h-4 w-4" />
+            <span>Task erstellen</span>
+          </button>
+        </div>
+
         <SidebarGroup>
           <SidebarGroupLabel>Seiten</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -115,37 +130,57 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Kategorien</SidebarGroupLabel>
-          <SidebarGroupAction title="Kategorie hinzufügen">
-            <Plus />
-          </SidebarGroupAction>
+          <SidebarGroupLabel>Filter</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {kat.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuAction>
-                        <MoreHorizontal />
-                      </SidebarMenuAction>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="right" align="start">
-                      <DropdownMenuItem>
-                        <span>Kategorie bearbeiten</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <span>Kategorie löschen</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+              <Collapsible defaultOpen>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <FolderCheck className="h-4 w-4" />
+                      <span>Alle Kategorien</span>
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <SidebarMenuAction
+                    title="Kategorie hinzufügen"
+                    onClick={handleAddCategory}
+                  >
+                    <Plus />
+                  </SidebarMenuAction>
                 </SidebarMenuItem>
-              ))}
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {kat.map((item) => (
+                      <SidebarMenuSubItem key={item.id}>
+                        <SidebarMenuButton asChild>
+                          <a
+                            href={item.url}
+                            className="flex items-center gap-2"
+                          >
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.title}</span>
+                          </a>
+                        </SidebarMenuButton>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <SidebarMenuAction>
+                              <MoreHorizontal />
+                            </SidebarMenuAction>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent side="right" align="start">
+                            <DropdownMenuItem>
+                              <span>Kategorie bearbeiten</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <span>Kategorie löschen</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

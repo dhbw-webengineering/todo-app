@@ -20,11 +20,13 @@ export default function RootLayout({
     <html lang="de">
       <body className="flex min-h-screen bg-gray-50 dark:bg-zinc-900">
         <SidebarProvider>
+           <div className="absolute top-0 left-0 pt-12 pl-4 text-2xl">
+              <SidebarTrigger />
+            </div>
           <AppSidebar />
-          <div className="absolute top-1 left-1">
-            <SidebarTrigger />
-          </div>
-          <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6">{children}</main>
+          <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
+            {children}
+          </main>
         </SidebarProvider>
       </body>
     </html>
