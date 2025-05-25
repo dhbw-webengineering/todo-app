@@ -52,7 +52,7 @@ export function TaskCard({
           <Checkbox
             checked={isCompleted} 
             onCheckedChange={() => onToggle(task.eintragID)}
-            className="mt-1"
+            className="mt-1 cursor-pointer"
           />
           <div>
             <h2

@@ -161,7 +161,7 @@ export function TaskDialog({
     if (mode === "create") {
       return (
         <DialogTrigger asChild>
-          <Button variant="outline" className="w-full justify-start gap-2">
+          <Button variant="outline" className="w-full justify-start gap-2 cursor-pointer">
             <Plus className="w-4 h-4" />
             Neuen Task erstellen
           </Button>
@@ -174,14 +174,14 @@ export function TaskDialog({
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button aria-label="Mehr Optionen">
-              <MoreVertical className="w-5 h-5" />
+              <MoreVertical className="w-5 h-5 cursor-pointer" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setCurrentOpen(true)}>
+            <DropdownMenuItem onClick={() => setCurrentOpen(true)} className="cursor-pointer">
               Bearbeiten
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+            <DropdownMenuItem onClick={handleDelete} className="text-red-600 cursor-pointer">
               Löschen
             </DropdownMenuItem>
           </DropdownMenuContent>

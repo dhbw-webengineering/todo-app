@@ -87,6 +87,7 @@ export default function TasksPage() {
         
         <div className="w-1/6">
           <MultiSelect
+          className="cursor-pointer"
             options={frameworksList}
             onValueChange={setSelectedKategorie}
             defaultValue={selectedKategorie}
@@ -97,6 +98,7 @@ export default function TasksPage() {
         </div>
         <div className="w-1/6">
           <MultiSelect
+          className="cursor-pointer"
             options={frameworksList}
             onValueChange={setSelectedTags}
             defaultValue={selectedTags}
@@ -106,7 +108,7 @@ export default function TasksPage() {
           />
         </div>
         <div className="w-1/6">
-          <DateRangePicker />
+          <DateRangePicker className="cursor-pointer" />
         </div>
       </div>
 
