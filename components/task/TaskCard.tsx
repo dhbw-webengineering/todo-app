@@ -4,18 +4,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Task } from "@/types/task";
 import { EditTaskDialog } from "@/components/task/EditTaskDialog"; // Pfad anpassen
 
-import {
-  Menubar,
-  MenubarMenu,
-  MenubarTrigger,
-  MenubarContent,
-  MenubarItem,
-} from "@/components/ui/menubar";
-import { MoreVertical } from "lucide-react";
 import { useState } from "react";
 
 import { format, differenceInCalendarDays } from "date-fns";
-import { de } from "date-fns/locale";
 
 export function TaskCard({
   task,

@@ -7,13 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Task } from "@/types/task";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -22,33 +22,36 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { de } from "date-fns/locale";
-import { CalendarIcon, MoreVertical } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { CalendarIcon, Plus } from "lucide-react";
 
 type Props = {
-  task: Task;
-  onSave: (updatedTask: Task) => void;
-  onDelete: (id: string) => void;
+  onCreate: (newTask: any) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean; // Falls du den Trigger-Button verstecken willst
 };
 
-export function EditTaskDialog({ task, onSave, onDelete }: Props) {
-  const [open, setOpen] = useState(false);
+export function CreateTaskDialog({
+  onCreate,
+  open,
+  onOpenChange,
+  hideTrigger,
+}: Props) {
+  // interner Fallback-State (wenn open/onOpenChange nicht übergeben werden)
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = open !== undefined && onOpenChange !== undefined;
 
-  const [titel, setTitel] = useState(task.titel);
-  const [beschreibung, setBeschreibung] = useState(task.beschreibung || "");
+  const currentOpen = isControlled ? open : internalOpen;
+  const setCurrentOpen = isControlled ? onOpenChange! : setInternalOpen;
+
+  const [titel, setTitel] = useState("");
+  const [beschreibung, setBeschreibung] = useState("");
   const [faelligkeitDate, setFaelligkeitDate] = useState<Date | undefined>(
-    task.faelligkeit ? new Date(task.faelligkeit) : undefined
+    undefined
   );
-  const [kategorie, setKategorie] = useState(task.kategorie?.name || "");
-  const [tags, setTags] = useState(
-    task.tags?.map((t) => t.name).join(", ") || ""
-  );
-  const [abgeschlossen, setAbgeschlossen] = useState(!!task.abgeschlossen);
+  const [kategorie, setKategorie] = useState("");
+  const [tags, setTags] = useState("");
+  const [abgeschlossen, setAbgeschlossen] = useState(false);
 
   const [errors, setErrors] = useState<{
     titel?: boolean;
@@ -62,7 +65,7 @@ export function EditTaskDialog({ task, onSave, onDelete }: Props) {
     setFaelligkeitDate(date);
   };
 
-  const handleSave = () => {
+  const handleCreate = () => {
     const newErrors = {
       titel: !titel.trim(),
       faelligkeit: !faelligkeitDate,
@@ -70,60 +73,59 @@ export function EditTaskDialog({ task, onSave, onDelete }: Props) {
     };
 
     setErrors(newErrors);
-
     if (Object.values(newErrors).some(Boolean)) return;
 
-    onSave({
-      ...task,
+    onCreate({
       titel,
       beschreibung,
       abgeschlossen: abgeschlossen ? "true" : "false",
-      faelligkeit: faelligkeitDate ? faelligkeitDate.toISOString() : "null",
+      faelligkeit: faelligkeitDate?.toISOString(),
       kategorie: { name: kategorie },
       tags: tags
         ? tags.split(",").map((name, i) => ({
             name: name.trim(),
-            tagID: task.tags?.[i]?.tagID || `temp-${i}`,
+            tagID: `temp-${i}`,
           }))
         : [],
     });
 
-    setOpen(false);
+    // Reset
+    setTitel("");
+    setBeschreibung("");
+    setFaelligkeitDate(undefined);
+    setKategorie("");
+    setTags("");
+    setAbgeschlossen(false);
+    setErrors({});
+    setCurrentOpen(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button aria-label="Mehr Optionen">
-            <MoreVertical className="w-5 h-5" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setOpen(true)}>
-            Bearbeiten
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => onDelete(task.eintragID)}
-            className="text-red-600"
-          >
-            Löschen
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          <Button variant="outline" className="w-full justify-start gap-2">
+            <Plus className="w-4 h-4" />
+            Neuen Task erstellen
+          </Button>
+        </DialogTrigger>
+      )}
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Task bearbeiten</DialogTitle>
+          <DialogTitle>Task erstellen</DialogTitle>
+          <DialogDescription>
+            Fülle die folgenden Felder aus, um einen neuen Task zu erstellen.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           {/* Titel */}
           <div className="space-y-1">
-            <label htmlFor="edit-titel" className="text-sm font-medium">
+            <label htmlFor="create-titel" className="text-sm font-medium">
               Titel *
             </label>
             <Input
-              id="edit-titel"
+              id="create-titel"
               value={titel}
               onChange={(e) => setTitel(e.target.value)}
               placeholder="Titel"
@@ -133,11 +135,14 @@ export function EditTaskDialog({ task, onSave, onDelete }: Props) {
           </div>
           {/* Beschreibung */}
           <div className="space-y-1">
-            <label htmlFor="edit-beschreibung" className="text-sm font-medium">
+            <label
+              htmlFor="create-beschreibung"
+              className="text-sm font-medium"
+            >
               Beschreibung (optional)
             </label>
             <Textarea
-              id="edit-beschreibung"
+              id="create-beschreibung"
               value={beschreibung}
               onChange={(e) => setBeschreibung(e.target.value)}
               placeholder="Beschreibung (optional)"
@@ -145,13 +150,13 @@ export function EditTaskDialog({ task, onSave, onDelete }: Props) {
           </div>
           {/* Fälligkeitsdatum */}
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="edit-faelligkeit">
+            <label className="text-sm font-medium" htmlFor="create-faelligkeit">
               Fälligkeitsdatum *
             </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  id="edit-faelligkeit"
+                  id="create-faelligkeit"
                   variant="outline"
                   className={`w-full justify-start text-left font-normal ${
                     errors.faelligkeit ? "border-red-500" : ""
@@ -164,15 +169,23 @@ export function EditTaskDialog({ task, onSave, onDelete }: Props) {
                     : "Datum wählen"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={faelligkeitDate}
-                  onSelect={setFaelligkeitDate}
-                  initialFocus
-                  locale={de}
-                  defaultMonth={faelligkeitDate ?? new Date()}
-                />
+              <PopoverContent
+                className="w-auto p-0 z-[1000]"
+                align="start"
+                sideOffset={4}
+                tabIndex={0}
+                forceMount
+              >
+                <div className="pointer-events-auto">
+                  <Calendar
+                    mode="single"
+                    selected={faelligkeitDate}
+                    onSelect={(date) => setFaelligkeitDate(date)}
+                    locale={de}
+                    defaultMonth={faelligkeitDate ?? new Date()}
+                  />
+                </div>
+
                 <div className="flex justify-between p-2 border-t">
                   <Button
                     variant="ghost"
@@ -201,11 +214,11 @@ export function EditTaskDialog({ task, onSave, onDelete }: Props) {
           </div>
           {/* Kategorie */}
           <div className="space-y-1">
-            <label htmlFor="edit-kategorie" className="text-sm font-medium">
+            <label htmlFor="create-kategorie" className="text-sm font-medium">
               Kategorie *
             </label>
             <Input
-              id="edit-kategorie"
+              id="create-kategorie"
               value={kategorie}
               onChange={(e) => setKategorie(e.target.value)}
               placeholder="Kategorie"
@@ -215,11 +228,11 @@ export function EditTaskDialog({ task, onSave, onDelete }: Props) {
           </div>
           {/* Tags */}
           <div className="space-y-1">
-            <label htmlFor="edit-tags" className="text-sm font-medium">
+            <label htmlFor="create-tags" className="text-sm font-medium">
               Tags (Kommagetrennt, optional)
             </label>
             <Input
-              id="edit-tags"
+              id="create-tags"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="Tags (Kommagetrennt, optional)"
@@ -230,15 +243,15 @@ export function EditTaskDialog({ task, onSave, onDelete }: Props) {
             <Checkbox
               checked={abgeschlossen}
               onCheckedChange={() => setAbgeschlossen(!abgeschlossen)}
-              id="abgeschlossen"
+              id="create-abgeschlossen"
             />
-            <label htmlFor="abgeschlossen" className="text-sm">
+            <label htmlFor="create-abgeschlossen" className="text-sm">
               Erledigt
             </label>
           </div>
         </div>
         <DialogFooter className="mt-4">
-          <Button onClick={handleSave}>Speichern</Button>
+          <Button onClick={handleCreate}>Erstellen</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

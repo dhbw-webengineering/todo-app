@@ -44,16 +44,19 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
+import { useState } from "react";
+import { CreateTaskDialog } from "../task/CreateTaskDialog";
+
 // Menu items.
 const items = [
   {
     title: "Dashboard",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
     title: "Alle Tasks",
-    url: "#",
+    url: "/tasks",
     icon: SquareCheckBig,
   },
   {
@@ -72,26 +75,31 @@ const kat = [
   {
     title: "Kategorie 1",
     id: "1",
-    url: "#kat1",
+    url: `/tasks?kat=${"1"}`,
     icon: Home,
   },
   {
     title: "Kategorie 2",
     id: "2",
-    url: "#kat2",
+    url: `/tasks?kat=${"2"}`,
     icon: Home,
   },
   {
     title: "Kategorie 3",
     id: "3",
-    url: "#kat3",
+    url: `/tasks?kat=${"3"}`,
     icon: Home,
   },
 ];
 
 export function AppSidebar() {
   const handleAddCategory = () => {
-    console.log("Kategorie hinzufügen geklickt");
+    alert("Kategorie hinzufügen geklickt");
+  };
+
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const handleCreateTask = () => {
+    setOpenCreateDialog(true);
   };
 
   return (
@@ -105,7 +113,10 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <div className="p-2">
-          <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20">
+          <button
+            onClick={handleCreateTask}
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
+          >
             <Plus className="h-4 w-4" />
             <span>Task erstellen</span>
           </button>
@@ -211,6 +222,12 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      <CreateTaskDialog
+        open={openCreateDialog}
+        onOpenChange={setOpenCreateDialog}
+        onCreate={handleCreateTask}
+        hideTrigger // Trigger wird nicht doppelt angezeigt
+      />
     </Sidebar>
   );
 }
