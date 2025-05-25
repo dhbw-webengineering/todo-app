@@ -14,7 +14,7 @@ const initialTasks: Task[] = [
     titel: "React-Komponenten bauen",
     beschreibung: "Task-UI mit shadcn/ui gestalten",
     faelligkeit: "2025-06-01",
-    abgeschlossen: null,
+    abgeschlossen: null, 
     created_at: "2025-05-18T12:00:00Z",
     updated_at: "2025-05-18T12:00:00Z",
     kategorie: { name: "Entwicklung" },
@@ -42,7 +42,12 @@ export default function TasksPage() {
   const handleUpdate = (updatedTask: Task) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.eintragID === updatedTask.eintragID ? updatedTask : task
+        task.eintragID === updatedTask.eintragID 
+          ? {
+              ...updatedTask,
+              updated_at: new Date().toISOString(), // Updated timestamp setzen
+            }
+          : task
       )
     );
   };
@@ -52,11 +57,13 @@ export default function TasksPage() {
       prev.map((task) =>
         task.eintragID === id
           ? {
-            ...task,
-            abgeschlossen: task.abgeschlossen
-              ? null
-              : new Date().toISOString(),
-          }
+              ...task,
+              abgeschlossen: 
+                task.abgeschlossen && task.abgeschlossen !== "null"
+                  ? null  // Task als nicht erledigt markieren
+                  : new Date().toISOString(), // Task als erledigt markieren mit Timestamp
+              updated_at: new Date().toISOString(), // Updated timestamp setzen
+            }
           : task
       )
     );

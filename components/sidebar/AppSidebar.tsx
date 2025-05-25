@@ -6,8 +6,6 @@ import {
   Search,
   FolderCheck,
   SquareCheckBig,
-  Settings,
-  FolderPen,
   User2,
   ChevronUp,
   Plus,
@@ -45,7 +43,7 @@ import {
 } from "../ui/dropdown-menu";
 
 import { useState } from "react";
-import { CreateTaskDialog } from "../task/CreateTaskDialog";
+import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
 
 // Menu items.
 const items = [
@@ -75,19 +73,19 @@ const kat = [
   {
     title: "Kategorie 1",
     id: "1",
-    url: `/tasks?kat=${"1"}`,
+    url: `/tasks?kat=1`,
     icon: Home,
   },
   {
     title: "Kategorie 2",
     id: "2",
-    url: `/tasks?kat=${"2"}`,
+    url: `/tasks?kat=2`,
     icon: Home,
   },
   {
     title: "Kategorie 3",
     id: "3",
-    url: `/tasks?kat=${"3"}`,
+    url: `/tasks?kat=3`,
     icon: Home,
   },
 ];
@@ -98,8 +96,17 @@ export function AppSidebar() {
   };
 
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  const handleCreateTask = () => {
-    setOpenCreateDialog(true);
+  
+  const handleCreateTask = async (taskData: any) => {
+    try {
+      console.log("Neuer Task erstellt:", taskData);
+      // Hier würdest du normalerweise eine API-Anfrage machen
+      // await createTask(taskData);
+      
+      // Dialog wird automatisch durch TaskDialog geschlossen
+    } catch (error) {
+      console.error("Fehler beim Erstellen des Tasks:", error);
+    }
   };
 
   return (
@@ -114,7 +121,7 @@ export function AppSidebar() {
       <SidebarContent>
         <div className="p-2">
           <button
-            onClick={handleCreateTask}
+            onClick={() => setOpenCreateDialog(true)}
             className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
@@ -172,7 +179,7 @@ export function AppSidebar() {
                             <span>{item.title}</span>
                           </a>
                         </SidebarMenuButton>
-                        <DropdownMenu>
+                        <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <SidebarMenuAction>
                               <MoreHorizontal />
@@ -196,11 +203,10 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
                   <User2 /> Username
@@ -222,11 +228,14 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <CreateTaskDialog
+      
+      {/* TaskDialog mit mode="create" außerhalb der Sidebar-Struktur */}
+      <TaskDialog
+        mode="create"
         open={openCreateDialog}
         onOpenChange={setOpenCreateDialog}
-        onCreate={handleCreateTask}
-        hideTrigger // Trigger wird nicht doppelt angezeigt
+        onSave={handleCreateTask}
+        hideTrigger={true} // Button ist bereits in der Sidebar implementiert
       />
     </Sidebar>
   );

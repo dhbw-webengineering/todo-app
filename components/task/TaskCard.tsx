@@ -1,11 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-
 import { Task } from "@/types/task";
-import { EditTaskDialog } from "@/components/task/EditTaskDialog"; // Pfad anpassen
-
-import { useState } from "react";
-
+import { TaskDialog } from "@/components/task/TaskDialog";
 import { format, differenceInCalendarDays } from "date-fns";
 
 export function TaskCard({
@@ -19,8 +15,6 @@ export function TaskCard({
   onUpdate: (updatedTask: Task) => void;
   onDelete: (id: string) => void;
 }) {
-  const [editOpen, setEditOpen] = useState(false);
-
   let faelligkeitLabel = "";
   if (task.faelligkeit) {
     const heute = new Date();
@@ -33,6 +27,8 @@ export function TaskCard({
     else if (diff === -1) faelligkeitLabel = "seit gestern fällig";
     else faelligkeitLabel = `seit ${Math.abs(diff)} Tagen fällig`;
   }
+
+  const isCompleted = !!(task.abgeschlossen && task.abgeschlossen !== "null");
 
   return (
     <div className="border rounded-xl p-4 shadow-sm bg-white dark:bg-zinc-900 w-full flex flex-col">
@@ -48,20 +44,21 @@ export function TaskCard({
               </span>
             )}
           </p>
-          {task.abgeschlossen && <Badge variant="default">Erledigt</Badge>}
+          
+          {isCompleted && <Badge variant="default">Erledigt</Badge>}
         </div>
 
         <div className="flex gap-3 items-start">
           <Checkbox
-            checked={!!task.abgeschlossen}
+            checked={isCompleted} 
             onCheckedChange={() => onToggle(task.eintragID)}
             className="mt-1"
           />
           <div>
             <h2
               className={`text-lg font-semibold ${
-                task.abgeschlossen ? "line-through text-muted-foreground" : ""
-              }`}
+                isCompleted ? "line-through text-muted-foreground" : ""
+              }`} 
             >
               {task.titel}
             </h2>
@@ -85,7 +82,14 @@ export function TaskCard({
         </div>
 
         <div className="flex-shrink-0 ml-4 self-end">
-          <EditTaskDialog task={task} onSave={onUpdate} onDelete={onDelete} />
+          <TaskDialog 
+            mode="edit" 
+            task={task} 
+            onSave={onUpdate} 
+            onDelete={onDelete}
+            triggerVariant="dropdown"
+            hideTrigger={false}
+          />
         </div>
       </div>
     </div>
