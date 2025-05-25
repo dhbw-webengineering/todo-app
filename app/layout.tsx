@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-
 import "./globals.css";
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarMenu } from "@/components/sidebar/SidebarMenu";
 
 export const metadata: Metadata = {
   title: "Todo-Webapp",
@@ -18,11 +18,10 @@ export default function RootLayout({
     <html lang="de">
       <body className="flex min-h-screen bg-gray-50 dark:bg-zinc-900">
         <SidebarProvider>
-           <div className="absolute top-0 left-0 pt-12 pl-4 text-2xl">
-              <SidebarTrigger />
-            </div>
           <AppSidebar />
           <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
+            <SidebarMenu />
+            
             {children}
           </main>
         </SidebarProvider>
