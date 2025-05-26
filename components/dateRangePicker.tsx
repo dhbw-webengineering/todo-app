@@ -16,9 +16,9 @@ import {
 
 export function DateRangePicker({
   className,
-  onChange, // <-- hinzugefügt
+  onChange, 
 }: React.HTMLAttributes<HTMLDivElement> & {
-  onChange?: (range: DateRange | undefined) => void; // <-- hinzugefügt
+  onChange?: (range: DateRange | undefined) => void; 
 }) {
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(2022, 0, 20),
@@ -27,7 +27,7 @@ export function DateRangePicker({
 
   const handleSelect = (range: DateRange | undefined) => {
     setDate(range)
-    if (onChange) onChange(range) // <-- hier aufgerufen
+    if (onChange) onChange(range) 
   }
 
   return (
@@ -63,7 +63,7 @@ export function DateRangePicker({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={handleSelect} // <-- geändert
+            onSelect={handleSelect}
             numberOfMonths={2}
           />
         </PopoverContent>
