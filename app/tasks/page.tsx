@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import { TaskCard } from "components/task/TaskCard";
-import { Task } from "@/types/task";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { MultiSelect } from "@/components/multiselect";
+import { Task } from "@/types/task";
 import { Turtle } from "lucide-react";
 import { DateRangePicker } from "@/components/dateRangePicker";
-//import { useSearchParams } from "react-router-dom";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 
 
@@ -65,35 +64,56 @@ export default function TasksPage() {
     );
   };
 
-  const frameworksList = [
-    { value: "react", label: "React", icon: Turtle },
-    { value: "angular", label: "Angular", icon: Turtle },
-    { value: "vue", label: "Vue", icon: Turtle },
-    { value: "svelte", label: "Svelte", icon: Turtle },
-    { value: "ember", label: "Ember", icon: Turtle },
+  const kategorielist = [
+    { value: "react", label: "Kategorie1", icon: Turtle },
+    { value: "angular", label: "Kategorie2", icon: Turtle },
+     { value: "was", label: "Kategorie3", icon: Turtle },
   ];
+  const taglsit = [
+    { value: "react", label: "Tag1", icon: Turtle },
+    { value: "angular", label: "Tag2", icon: Turtle },
+    { value: "ade", label: "Tag3", icon: Turtle }
+  ];
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [selectedKategorie, setSelectedKategorie] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const handleCategoriesChange = (newCategories: string[]) => {
+    setSelectedKategorie(newCategories);
+
+    // Query-Parameter aktualisieren  
+    const params = new URLSearchParams(searchParams);
+    if (newCategories.length > 0) {
+      params.set('categories', newCategories.join(','));
+    } else {
+      params.delete('categories');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
       <div className="flex items-center space-x-4 mb-6">
         
-        <div className="w-1/6">
+        <div className="w-1/5">
           <MultiSelect
-            options={frameworksList}
-            onValueChange={setSelectedKategorie}
+            options={kategorielist}
+            onValueChange={handleCategoriesChange}
             defaultValue={selectedKategorie}
             placeholder="Kategorie"
             variant="inverted"
             maxCount={2}
           />
         </div>
-        <div className="w-1/6">
+        <div className="w-1/5">
           <MultiSelect
-            options={frameworksList}
+            options={taglsit}
             onValueChange={setSelectedTags}
             defaultValue={selectedTags}
             placeholder="Tags"
