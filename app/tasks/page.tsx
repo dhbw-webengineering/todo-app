@@ -7,6 +7,7 @@ import { Task } from "@/types/task";
 import { Turtle } from "lucide-react";
 import { DateRangePicker } from "@/components/dateRangePicker";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { DateRange } from "react-day-picker";
 
 
 
@@ -108,7 +109,22 @@ export default function TasksPage() {
     }
     router.replace(`${pathname}?${params.toString()}`);
   };
+  
+  const handleDateChange = (range: DateRange | undefined) => {
 
+    console.log("Selected date range:", range);
+    const params = new URLSearchParams(searchParams);
+    if (range?.from && range?.to) { 
+      params.set('startDate', String(range.from.getTime()));
+      params.set('endDate', String(range.to.getTime()));
+    }
+    else {
+      params.delete('startDate');
+      params.delete('endDate');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+    
+  }
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
@@ -136,7 +152,7 @@ export default function TasksPage() {
         </div>
         <div className="w-1/6">
           <DateRangePicker 
-            onChange={(range) => console.log(range)} />
+            onChange={handleDateChange} />
         </div>
       </div>
 
