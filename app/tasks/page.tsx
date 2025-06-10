@@ -64,26 +64,25 @@ export default function TasksPage() {
     );
   };
 
-  const kategorielist = [
-    { value: "react", label: "Kategorie1", icon: Turtle },
-    { value: "angular", label: "Kategorie2", icon: Turtle },
-     { value: "was", label: "Kategorie3", icon: Turtle },
+  const categorielist = [
+    { value: "Kategorie1", label: "Kategorie1", icon: Turtle },
+    { value: "Kategorie2", label: "Kategorie2", icon: Turtle },
+     { value: "Kategorie3", label: "Kategorie3", icon: Turtle },
   ];
   const taglsit = [
-    { value: "react", label: "Tag1", icon: Turtle },
-    { value: "angular", label: "Tag2", icon: Turtle },
-    { value: "ade", label: "Tag3", icon: Turtle }
+    { value: "Tag1", label: "Tag1", icon: Turtle },
+    { value: "Tag2", label: "Tag2", icon: Turtle },
+    { value: "Tag3", label: "Tag3", icon: Turtle }
   ];
 
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [selectedKategorie, setSelectedKategorie] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
+  const [selectedCategorie, setSelectedCategorie] = useState<string[]>([]);
+  
   const handleCategoriesChange = (newCategories: string[]) => {
-    setSelectedKategorie(newCategories);
+    setSelectedCategorie(newCategories);
 
     // Query-Parameter aktualisieren  
     const params = new URLSearchParams(searchParams);
@@ -95,6 +94,20 @@ export default function TasksPage() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+   const handleTagsChange = (newTags: string[]) => {
+    setSelectedTags(newTags);
+
+    // Query-Parameter aktualisieren  
+    const params = new URLSearchParams(searchParams);
+    if (newTags.length > 0) {
+      params.set('tags', newTags.join(','));
+    } else {
+      params.delete('tags');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <div className="p-6">
@@ -103,9 +116,9 @@ export default function TasksPage() {
         
         <div className="w-1/5">
           <MultiSelect
-            options={kategorielist}
+            options={categorielist}
             onValueChange={handleCategoriesChange}
-            defaultValue={selectedKategorie}
+            defaultValue={selectedCategorie}
             placeholder="Kategorie"
             variant="inverted"
             maxCount={2}
@@ -114,7 +127,7 @@ export default function TasksPage() {
         <div className="w-1/5">
           <MultiSelect
             options={taglsit}
-            onValueChange={setSelectedTags}
+            onValueChange={handleTagsChange}
             defaultValue={selectedTags}
             placeholder="Tags"
             variant="secondary"
