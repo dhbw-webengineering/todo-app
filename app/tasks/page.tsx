@@ -68,7 +68,7 @@ export default function TasksPage() {
   const categorielist = [
     { value: "Kategorie1", label: "Kategorie1", icon: Turtle },
     { value: "Kategorie2", label: "Kategorie2", icon: Turtle },
-     { value: "Kategorie3", label: "Kategorie3", icon: Turtle },
+    { value: "Kategorie3", label: "Kategorie3", icon: Turtle },
   ];
   const taglsit = [
     { value: "Tag1", label: "Tag1", icon: Turtle },
@@ -81,11 +81,10 @@ export default function TasksPage() {
   const searchParams = useSearchParams();
 
   const [selectedCategorie, setSelectedCategorie] = useState<string[]>([]);
-  
+
   const handleCategoriesChange = (newCategories: string[]) => {
     setSelectedCategorie(newCategories);
-
-    // Query-Parameter aktualisieren  
+  
     const params = new URLSearchParams(searchParams);
     if (newCategories.length > 0) {
       params.set('categories', newCategories.join(','));
@@ -97,10 +96,10 @@ export default function TasksPage() {
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-   const handleTagsChange = (newTags: string[]) => {
+  const handleTagsChange = (newTags: string[]) => {
     setSelectedTags(newTags);
 
-    // Query-Parameter aktualisieren  
+   
     const params = new URLSearchParams(searchParams);
     if (newTags.length > 0) {
       params.set('tags', newTags.join(','));
@@ -109,12 +108,12 @@ export default function TasksPage() {
     }
     router.replace(`${pathname}?${params.toString()}`);
   };
-  
+
   const handleDateChange = (range: DateRange | undefined) => {
 
     console.log("Selected date range:", range);
     const params = new URLSearchParams(searchParams);
-    if (range?.from && range?.to) { 
+    if (range?.from && range?.to) {
       params.set('startDate', String(range.from.getTime()));
       params.set('endDate', String(range.to.getTime()));
     }
@@ -123,13 +122,13 @@ export default function TasksPage() {
       params.delete('endDate');
     }
     router.replace(`${pathname}?${params.toString()}`);
-    
+
   }
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
       <div className="flex items-center space-x-4 mb-6">
-        
+
         <div className="w-1/5">
           <MultiSelect
             options={categorielist}
@@ -151,7 +150,7 @@ export default function TasksPage() {
           />
         </div>
         <div className="w-1/6">
-          <DateRangePicker 
+          <DateRangePicker
             onChange={handleDateChange} />
         </div>
       </div>
