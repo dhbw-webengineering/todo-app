@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { TaskCard } from "components/task/TaskCard";
-import { Task } from "@/types/task";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { MultiSelect } from "@/components/multiselect";
+import { Task } from "@/types/task";
 import { Turtle } from "lucide-react";
 import { DateRangePicker } from "@/components/dateRangePicker";
-//import { useSearchParams } from "react-router-dom";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { DateRange } from "react-day-picker";
 
 
 
@@ -65,36 +65,84 @@ export default function TasksPage() {
     );
   };
 
-  const frameworksList = [
-    { value: "react", label: "React", icon: Turtle },
-    { value: "angular", label: "Angular", icon: Turtle },
-    { value: "vue", label: "Vue", icon: Turtle },
-    { value: "svelte", label: "Svelte", icon: Turtle },
-    { value: "ember", label: "Ember", icon: Turtle },
+  const categorielist = [
+    { value: "Kategorie1", label: "Kategorie1", icon: Turtle },
+    { value: "Kategorie2", label: "Kategorie2", icon: Turtle },
+    { value: "Kategorie3", label: "Kategorie3", icon: Turtle },
+  ];
+  const taglsit = [
+    { value: "Tag1", label: "Tag1", icon: Turtle },
+    { value: "Tag2", label: "Tag2", icon: Turtle },
+    { value: "Tag3", label: "Tag3", icon: Turtle }
   ];
 
-  const [selectedKategorie, setSelectedKategorie] = useState<string[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [selectedCategorie, setSelectedCategorie] = useState<string[]>([]);
+
+  const handleCategoriesChange = (newCategories: string[]) => {
+    setSelectedCategorie(newCategories);
+  
+    const params = new URLSearchParams(searchParams);
+    if (newCategories.length > 0) {
+      params.set('categories', newCategories.join(','));
+    } else {
+      params.delete('categories');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+  const handleTagsChange = (newTags: string[]) => {
+    setSelectedTags(newTags);
+
+   
+    const params = new URLSearchParams(searchParams);
+    if (newTags.length > 0) {
+      params.set('tags', newTags.join(','));
+    } else {
+      params.delete('tags');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const handleDateChange = (range: DateRange | undefined) => {
+
+    console.log("Selected date range:", range);
+    const params = new URLSearchParams(searchParams);
+    if (range?.from && range?.to) {
+      params.set('startDate', String(range.from.getTime()));
+      params.set('endDate', String(range.to.getTime()));
+    }
+    else {
+      params.delete('startDate');
+      params.delete('endDate');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+
+  }
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
       <div className="flex items-center space-x-4 mb-6">
-        
-        <div className="w-1/6">
+
+        <div className="w-1/5">
           <MultiSelect
-            options={frameworksList}
-            onValueChange={setSelectedKategorie}
-            defaultValue={selectedKategorie}
+            options={categorielist}
+            onValueChange={handleCategoriesChange}
+            defaultValue={selectedCategorie}
             placeholder="Kategorie"
             variant="inverted"
             maxCount={2}
           />
         </div>
-        <div className="w-1/6">
+        <div className="w-1/5">
           <MultiSelect
-            options={frameworksList}
-            onValueChange={setSelectedTags}
+            options={taglsit}
+            onValueChange={handleTagsChange}
             defaultValue={selectedTags}
             placeholder="Tags"
             variant="secondary"
@@ -102,8 +150,8 @@ export default function TasksPage() {
           />
         </div>
         <div className="w-1/6">
-          <DateRangePicker 
-            onChange={(range) => console.log(range)} />
+          <DateRangePicker
+            onChange={handleDateChange} />
         </div>
       </div>
 
