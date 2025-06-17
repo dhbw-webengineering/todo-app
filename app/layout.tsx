@@ -16,7 +16,7 @@ export default function RootLayout({ children, }: {
 }) {
   
   const pathname = usePathname();
-  const showSidebar = pathname !== "/login" && pathname !== "/signup";
+  const showSidebar = ! pathname.includes("/auth");
   
   return (
     <html lang="de">

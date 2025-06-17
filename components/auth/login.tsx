@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,7 +18,7 @@ export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
-
+    const [email, setEmail] = useState("")
 
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -29,6 +30,7 @@ export function LoginForm({
         console.log("Passwort:", password)
         console.log("Login form submitted")
     }
+
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
@@ -49,17 +51,19 @@ export function LoginForm({
                                     name="email"
                                     placeholder="max@mustermann.com"
                                     required
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
                                 />
                             </div>
                             <div className="grid gap-3">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">Passwort</Label>
-                                    <a
-                                        href="#"
+                                    <Link
+                                        href={`/auth/request-password-reset?email=${encodeURIComponent(email)}`}
                                         className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                                     >
-                                        Passwort vergessen?
-                                    </a>
+                                        Passwort zurücksetzen
+                                    </Link>
                                 </div>
                                 <Input id="password" type="password" name="password" required />
                             </div>
@@ -71,7 +75,7 @@ export function LoginForm({
                         </div>
                         <div className="mt-4 text-center text-sm">
                             Haben sie keinen Account?{" "}
-                            <Link href="/signup" className="underline underline-offset-4">
+                            <Link href="/auth/signup" className="underline underline-offset-4">
                                 registrieren
                             </Link>
                         </div>
