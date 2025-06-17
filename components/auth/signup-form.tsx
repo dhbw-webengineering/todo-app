@@ -34,7 +34,7 @@ export function SignupForm({
         <CardHeader>
           <CardTitle>Registrieren</CardTitle>
           <CardDescription>
-            Gib diene Email und Passort ein um dich zu registrieren
+            Gib diene Email und Passwort ein um dich zu registrieren
           </CardDescription>
         </CardHeader>
         <CardContent>
