@@ -44,6 +44,7 @@ import {
 
 import { useState } from "react";
 import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
+import  ThemeChanger  from "@/components/themeChanger";
 
 // Menu items.
 const items = [
@@ -205,6 +206,9 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <ThemeChanger />
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
