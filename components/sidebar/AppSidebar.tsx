@@ -46,6 +46,8 @@ import { useState } from "react";
 import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
 import  ThemeChanger  from "@/components/themeChanger";
 
+import { useRouter } from "next/navigation"
+
 // Menu items.
 const items = [
   {
@@ -91,11 +93,15 @@ const kat = [
   },
 ];
 
+
+
 export function AppSidebar() {
   const handleAddCategory = () => {
     alert("Kategorie hinzufügen geklickt");
   };
 
+  const router = useRouter()
+  
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   
   const handleCreateTask = async (taskData: any) => {
@@ -108,6 +114,15 @@ export function AppSidebar() {
     } catch (error) {
       console.error("Fehler beim Erstellen des Tasks:", error);
     }
+  };
+
+  const handleLogout = async () => {
+    /*await fetch('http://localhost:3001/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });*/
+    fetch('http://localhost:3001/logout', { method: 'POST', credentials: "include" }).then(() => window.location.href = '/auth/login')
+    //router.push("/auth/login");
   };
 
   return (
@@ -224,7 +239,8 @@ export function AppSidebar() {
                 <DropdownMenuItem>
                   <span>Account</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogout}>
                   <span>Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
