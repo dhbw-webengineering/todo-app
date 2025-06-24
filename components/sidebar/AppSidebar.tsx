@@ -44,8 +44,7 @@ import {
 
 import { useState } from "react";
 import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
-import { useRouter } from 'next/navigation';
-import { TaskCreateData } from "@/types/Task";
+import { TaskCreateData } from "@/types/task";
 import Link from "next/link";
 
 
@@ -102,8 +101,6 @@ export function AppSidebar() {
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  const router = useRouter();
-
   const handleCreateTask = async (taskData: TaskCreateData) => {
     try {
         const response = await fetch('http://localhost:3001/api/entry/create', {
@@ -112,7 +109,7 @@ export function AppSidebar() {
             body: JSON.stringify(taskData),
         });
         if (response.ok) {
-            router.refresh();
+            window.location.reload();
         } else {
             console.error('Error creating task');
             alert("Error creating task")

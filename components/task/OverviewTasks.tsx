@@ -1,6 +1,6 @@
 'use client'
 
-import { Task } from "@/types/Task";
+import { Task } from "@/types/task";
 import TasksDisplay from "./TasksDisplay";
 import React, { createRef, Ref, RefObject, useState } from "react";
 import { TasksContainerRef } from "./TasksContainer";

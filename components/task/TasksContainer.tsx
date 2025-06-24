@@ -6,7 +6,7 @@ import { useState, useEffect, Dispatch, SetStateAction, useImperativeHandle, for
 import { TaskCard } from "./TaskCard";
 
 import { ApiRoute } from "@/ApiRoute";
-import { Task, TaskForJson } from "@/types/Task";
+import { Task, TaskForJson } from "@/types/task";
 import moment from "moment";
 
 export type TasksContainerRef = {

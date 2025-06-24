@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect, ChangeEvent } from "react";
-import { Task, TaskCreateData } from "@/types/Task";
+import { Task, TaskCreateData } from "@/types/task";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {

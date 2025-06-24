@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, Ref, RefObject } from 'react';
+import { useState, RefObject } from 'react';
 
 import styles from "./TasksDisplay.module.css";
 
 import TasksContainer, { TasksContainerRef } from "./TasksContainer";
 
 import { ApiRoute } from "@/ApiRoute";
-import { Task } from '@/types/Task';
+import { Task } from '@/types/task';
 
 
 interface TasksDisplayProps {

@@ -11,12 +11,12 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 export default function TasksPage() {
 
-  const categorielist = [
+  const categoriesList = [
     { value: 0, label: "Kategorie1", icon: Turtle },
     { value: 1, label: "Kategorie2", icon: Turtle },
     { value: 2, label: "Kategorie3", icon: Turtle },
   ];
-  const taglsit = [
+  const tagsList = [
     { value: 0, label: "Tag1", icon: Turtle },
     { value: 1, label: "Tag2", icon: Turtle },
     { value: 2, label: "Tag3", icon: Turtle }
@@ -44,8 +44,7 @@ export default function TasksPage() {
 
   const handleTagsChange = (newTags: number[]) => {
     setSelectedTags(newTags);
-
-   
+    
     const params = new URLSearchParams(searchParams);
     if (newTags.length > 0) {
       params.set('tags', newTags.join(','));
@@ -77,7 +76,7 @@ export default function TasksPage() {
 
         <div className="w-1/5">
           <MultiSelect
-            options={categorielist}
+            options={categoriesList}
             onValueChange={handleCategoriesChange}
             defaultValue={selectedCategories}
             placeholder="Kategorie"
@@ -87,7 +86,7 @@ export default function TasksPage() {
         </div>
         <div className="w-1/5">
           <MultiSelect
-            options={taglsit}
+            options={tagsList}
             onValueChange={handleTagsChange}
             defaultValue={selectedTags}
             placeholder="Tags"

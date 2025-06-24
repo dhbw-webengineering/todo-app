@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Task, TaskCreateData } from "@/types/Task";
+import { Task } from "@/types/task";
 import { TaskDialog } from "@/components/task/TaskDialog";
 import { format } from "date-fns";
 import moment from 'moment'

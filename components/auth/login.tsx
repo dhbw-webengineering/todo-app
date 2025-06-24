@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { ChangeEvent, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -52,7 +52,7 @@ export function LoginForm({
                                     placeholder="max@mustermann.com"
                                     required
                                     value={email}
-                                    onChange={e => setEmail(e.target.value)}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                                 />
                             </div>
                             <div className="grid gap-3">
