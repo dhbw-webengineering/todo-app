@@ -1,3 +1,4 @@
+
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
