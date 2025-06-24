@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 
 export function SignupForm({
@@ -26,11 +27,6 @@ const router = useRouter()
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email")
     const password = formData.get("password")
-    // Hier kannst du die Authentifizierung oder weitere Logik einbauen
-    console.log("E-Mail:", email)
-    console.log("Passwort:", password)
-    console.log("Signup form submitted")
-    
 
     
     const api = fetch("http://localhost:3001/register", {
@@ -43,11 +39,16 @@ const router = useRouter()
         api.then(response => {
             if (response.ok) {
                 console.log("Signup successful")
-                 router.push("/auth/login")
+                 router.push("/auth/login?email=" + encodeURIComponent(email as string))
+                 toast.success("Erfolgreich registriert", {
+                   duration: 3000,
+                 });
               } else {
                 console.error("Signup failed")
                 console.log("Response status:", response.status)
-                // Hier kannst du eine Fehlermeldung anzeigen
+                toast.error("Fehler bei der Registrierung", {
+                   duration: 3000,
+                 });
             }
         })
 

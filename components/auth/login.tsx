@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export function LoginForm({ 
     className,
@@ -22,7 +22,9 @@ export function LoginForm({
 
     const router = useRouter()  
 
-    const [email, setEmail] = useState("")
+    const searchParams = useSearchParams()
+    const emailFromQuery = searchParams.get("email") || ""
+    const [email, setEmail] = useState(emailFromQuery)
 
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()

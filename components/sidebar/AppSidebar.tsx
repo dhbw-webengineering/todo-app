@@ -47,6 +47,7 @@ import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
 import  ThemeChanger  from "@/components/themeChanger";
 
 import { useRouter } from "next/navigation"
+import { toast, Toaster } from "sonner";
 
 // Menu items.
 const items = [
@@ -117,12 +118,12 @@ export function AppSidebar() {
   };
 
   const handleLogout = async () => {
-    /*await fetch('http://localhost:3001/logout', {
-      method: 'POST',
-      credentials: 'include',
-    });*/
-    fetch('http://localhost:3001/logout', { method: 'POST', credentials: "include" }).then(() => window.location.href = '/auth/login')
-    //router.push("/auth/login");
+    fetch('http://localhost:3001/logout', { method: 'POST', credentials: "include" }).then(() => {
+      router.push("/auth/login");
+      toast.success("Erfolgreich abgemeldet", {
+        duration: 3000,
+      });
+    });
   };
 
   return (

@@ -6,6 +6,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { SidebarMenu } from "@/components/sidebar/SidebarMenu";
 import { ReactNode } from "react";
 import { usePathname }  from "next/navigation";
+import { Toaster } from "sonner"
 
 export default function RootLayout({ children }: { children: ReactNode }) {
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
             {showSidebar && <SidebarMenu />}
               {children}
+              <Toaster />
             </main>
           </SidebarProvider>
         </ThemeProvider>
