@@ -11,12 +11,15 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useRouter } from "next/navigation"
+
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
 
+const router = useRouter()
 
   const handleSignup = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -26,7 +29,28 @@ export function SignupForm({
     // Hier kannst du die Authentifizierung oder weitere Logik einbauen
     console.log("E-Mail:", email)
     console.log("Passwort:", password)
-    console.log("Login form submitted")
+    console.log("Signup form submitted")
+    
+
+    
+    const api = fetch("http://localhost:3001/register", {
+            method: "POST",
+            headers: {  
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        })
+        api.then(response => {
+            if (response.ok) {
+                console.log("Signup successful")
+                 router.push("/auth/login")
+              } else {
+                console.error("Signup failed")
+                console.log("Response status:", response.status)
+                // Hier kannst du eine Fehlermeldung anzeigen
+            }
+        })
+
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

@@ -14,18 +14,27 @@ export async function middleware(req: NextRequest) {
 
   // Prüfe, ob Route geschützt ist
   if (PROTECTED_PREFIXES.some(prefix => pathname.startsWith(prefix))) {
+    
+    // middleware.ts (temporär zum Debuggen)
+    console.log("Cookies:", req.cookies.getAll());
+    console.log("Path:", pathname);
     const token = req.cookies.get("authToken")?.value;
     if (!token) {
+      console.log("Kein Token gefunden, Weiterleitung zum Login");
       return NextResponse.redirect(new URL("/auth/login", req.url));
     }
     try {
       // JWT prüfen (nutze deinen JWT_SECRET!)
+      
       await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
+      console.log("Token ist gültig:", token);
       return NextResponse.next();
-    } catch {
+    } catch (error) {
       // Ungültiges Token: Weiterleitung zum Login
       const response = NextResponse.redirect(new URL("/auth/login", req.url));
       response.cookies.delete("authToken");
+      console.error("Ungültiges Token, Weiterleitung zum Login:", error);
+
       return response;
     }
   }
