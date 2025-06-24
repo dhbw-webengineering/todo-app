@@ -1,0 +1,11 @@
+.taskList {
+  display: grid;
+  gap: 20px;
+}
+
+.loading,
+.error {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 50px;
+}

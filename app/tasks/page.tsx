@@ -1,80 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { TaskCard } from "components/task/TaskCard";
-import { Task } from "@/types/task";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { MultiSelect } from "@/components/multiselect";
 import { Turtle } from "lucide-react";
 import { DateRangePicker } from "@/components/dateRangePicker";
-//import { useSearchParams } from "react-router-dom";
-
-
-
-const initialTasks: Task[] = [
-  {
-    eintragID: "1",
-    titel: "React-Komponenten bauen",
-    beschreibung: "Task-UI mit shadcn/ui gestalten",
-    faelligkeit: "2025-06-01",
-    abgeschlossen: null,
-    created_at: "2025-05-18T12:00:00Z",
-    updated_at: "2025-05-18T12:00:00Z",
-    kategorie: { name: "Entwicklung" },
-    tags: [
-      { tagID: "a", name: "Frontend" },
-      { tagID: "b", name: "UI" },
-    ],
-  },
-  {
-    eintragID: "2",
-    titel: "API anbinden",
-    beschreibung: "Daten vom Express-Backend laden",
-    faelligkeit: "2025-06-05",
-    abgeschlossen: "2025-05-19T08:00:00Z",
-    created_at: "2025-05-18T12:00:00Z",
-    updated_at: "2025-05-19T08:00:00Z",
-    kategorie: { name: "Backend" },
-    tags: [{ tagID: "c", name: "API" }],
-  },
-];
+import TasksContainer from "@/components/task/TasksContainer";
+import { ApiRoute } from "@/ApiRoute";
+import { DateRange } from "react-day-picker";
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState(initialTasks);
-
-  const handleUpdate = (updatedTask: Task) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.eintragID === updatedTask.eintragID ? updatedTask : task
-      )
-    );
-  };
-
-  const toggleErledigt = (id: string) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.eintragID === id
-          ? {
-            ...task,
-            abgeschlossen: task.abgeschlossen
-              ? null
-              : new Date().toISOString(),
-          }
-          : task
-      )
-    );
-  };
 
   const frameworksList = [
-    { value: "react", label: "React", icon: Turtle },
-    { value: "angular", label: "Angular", icon: Turtle },
-    { value: "vue", label: "Vue", icon: Turtle },
-    { value: "svelte", label: "Svelte", icon: Turtle },
-    { value: "ember", label: "Ember", icon: Turtle },
+    { value: 0, label: "React", icon: Turtle },
+    { value: 1, label: "Angular", icon: Turtle },
+    { value: 2, label: "Vue", icon: Turtle },
+    { value: 3, label: "Svelte", icon: Turtle },
+    { value: 4, label: "Ember", icon: Turtle },
   ];
 
-  const [selectedKategorie, setSelectedKategorie] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedTags, setSelectedTags] = useState<number[]>([]);
 
   return (
     <div className="p-6">
@@ -84,8 +29,8 @@ export default function TasksPage() {
         <div className="w-1/6">
           <MultiSelect
             options={frameworksList}
-            onValueChange={setSelectedKategorie}
-            defaultValue={selectedKategorie}
+            onValueChange={setSelectedCategories}
+            defaultValue={selectedCategories}
             placeholder="Kategorie"
             variant="inverted"
             maxCount={2}
@@ -103,22 +48,12 @@ export default function TasksPage() {
         </div>
         <div className="w-1/6">
           <DateRangePicker 
-            onChange={(range) => console.log(range)} />
+            onChange={(range: DateRange | undefined) => console.log(range)} />
         </div>
       </div>
 
       <div className="space-y-4 max-w-3xl">
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.eintragID}
-            task={task}
-            onToggle={toggleErledigt}
-            onUpdate={handleUpdate}
-            onDelete={(id) =>
-              setTasks((prev) => prev.filter((task) => task.eintragID !== id))
-            }
-          />
-        ))}
+        <TasksContainer apiRoute={ApiRoute.ENTRY_LIST} showTasksDone={true}/>
       </div>
     </div>
   );

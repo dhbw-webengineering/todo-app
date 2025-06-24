@@ -1,70 +1,77 @@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Task } from "@/types/task";
+import { Task, TaskCreateData } from "@/types/Task";
 import { TaskDialog } from "@/components/task/TaskDialog";
-import { format, differenceInCalendarDays } from "date-fns";
+import { format } from "date-fns";
+import moment from 'moment'
+
+moment.locale("de")
 
 export function TaskCard({
   task,
-  onToggle,
   onUpdate,
-  onDelete,
+  onDelete
 }: {
   task: Task;
-  onToggle: (id: string) => void;
   onUpdate: (updatedTask: Task) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
 }) {
-  let faelligkeitLabel = "";
-  if (task.faelligkeit) {
-    const heute = new Date();
-    const faellig = new Date(task.faelligkeit);
-    const diff = differenceInCalendarDays(faellig, heute);
+  let dueDateLabel = "";
+  if (task.dueDate) {
+    const today = moment().startOf("day");
+    const diff = task.dueDate.startOf("day").diff(today, "days");
 
-    if (diff === 0) faelligkeitLabel = "heute fällig";
-    else if (diff === 1) faelligkeitLabel = "morgen fällig";
-    else if (diff > 1) faelligkeitLabel = `fällig in ${diff} Tagen`;
-    else if (diff === -1) faelligkeitLabel = "seit gestern fällig";
-    else faelligkeitLabel = `seit ${Math.abs(diff)} Tagen fällig`;
+    if (diff === 0) dueDateLabel = "heute fällig";
+    else if (diff === 1) dueDateLabel = "morgen fällig";
+    else if (diff > 1) dueDateLabel = `fällig in ${diff} Tagen`;
+    else if (diff === -1) dueDateLabel = "seit gestern fällig";
+    else dueDateLabel = `seit ${Math.abs(diff)} Tagen fällig`;
   }
-
-  const isCompleted = !!(task.abgeschlossen && task.abgeschlossen !== "null");
 
   return (
     <div className="border rounded-xl p-4 shadow-sm bg-white dark:bg-zinc-900 w-full flex flex-col">
       <div>
         <div className="flex justify-between items-start">
           <p className="pb-3 text-sm text-muted-foreground">
-            {task.kategorie && <span>{task.kategorie.name}</span>}
-            {task.faelligkeit && (
+            {task.categoryId !== undefined && <span>{"CatId:" + task.categoryId}</span>}
+            {task.dueDate && (
               <span>
                 {" "}
-                • {faelligkeitLabel} •{" "}
-                {format(new Date(task.faelligkeit), "dd.MM.yyyy")}
+                • {dueDateLabel} •{" "}
+                {format(task.dueDate.toDate(), "dd.MM.yyyy")}
               </span>
             )}
           </p>
           
-          {isCompleted && <Badge variant="default">Erledigt</Badge>}
+          {task.done && <Badge variant="default">Erledigt</Badge>}
         </div>
 
         <div className="flex gap-3 items-start">
           <Checkbox
-            checked={isCompleted} 
-            onCheckedChange={() => onToggle(task.eintragID)}
+            checked={task.done} 
+            onCheckedChange={(checkedState: boolean | 'indeterminate') => {
+              if (checkedState === "indeterminate") {
+                return;
+              }
+              task = {
+                ...task,
+                done: checkedState
+              }
+              onUpdate(task);
+            }}
             className="mt-1 cursor-pointer"
           />
           <div>
             <h2
               className={`text-lg font-semibold ${
-                isCompleted ? "line-through text-muted-foreground" : ""
+                task.done ? "line-through text-muted-foreground" : ""
               }`} 
             >
-              {task.titel}
+              {task.title}
             </h2>
-            {task.beschreibung && (
+            {task.description && (
               <p className="text-sm text-muted-foreground">
-                {task.beschreibung}
+                {task.description}
               </p>
             )}
           </div>
@@ -75,8 +82,8 @@ export function TaskCard({
       <div className="mt-3 flex flex-wrap justify-between items-start">
         <div className="flex flex-wrap gap-2 max-w-[calc(100%-40px)] flex-grow">
           {task.tags.map((tag) => (
-            <Badge key={tag.tagID} variant="secondary">
-              {tag.name}
+            <Badge key={tag} variant="secondary">
+              {tag}
             </Badge>
           ))}
         </div>
@@ -85,7 +92,10 @@ export function TaskCard({
           <TaskDialog 
             mode="edit" 
             task={task} 
-            onSave={onUpdate} 
+            onSave={updatedTask => {
+              // bei mode 'edit' ist der Typ immer 'Task'
+              onUpdate(updatedTask as Task);
+            }} 
             onDelete={onDelete}
             triggerVariant="dropdown"
             hideTrigger={false}

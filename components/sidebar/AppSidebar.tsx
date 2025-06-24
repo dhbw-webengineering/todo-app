@@ -44,6 +44,10 @@ import {
 
 import { useState } from "react";
 import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
+import { useRouter } from 'next/navigation';
+import { TaskCreateData } from "@/types/Task";
+import Link from "next/link";
+
 
 // Menu items.
 const items = [
@@ -96,8 +100,30 @@ export function AppSidebar() {
   };
 
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
   
-  const handleCreateTask = async (taskData: any) => {
+  const router = useRouter();
+
+  const handleCreateTask = async (taskData: TaskCreateData) => {
+    try {
+        const response = await fetch('http://localhost:3001/api/entry/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(taskData),
+        });
+        if (response.ok) {
+            router.refresh();
+        } else {
+            console.error('Error creating task');
+            alert("Error creating task")
+        }
+    } catch (error) {
+        console.error('Request failed', error);
+        alert("Error creating task")
+    } finally {
+        setLoading(false);
+    }
+
     try {
       console.log("Neuer Task erstellt:", taskData);
       // Hier würdest du normalerweise eine API-Anfrage machen
@@ -122,6 +148,7 @@ export function AppSidebar() {
         <div className="p-2">
           <button
             onClick={() => setOpenCreateDialog(true)}
+            disabled={loading}
             className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
@@ -136,10 +163,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
+                    <Link href={item.url} className="flex items-center gap-2">
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -171,13 +198,13 @@ export function AppSidebar() {
                     {kat.map((item) => (
                       <SidebarMenuSubItem key={item.id}>
                         <SidebarMenuButton asChild>
-                          <a
+                          <Link
                             href={item.url}
                             className="flex items-center gap-2"
                           >
                             <item.icon className="h-4 w-4" />
                             <span>{item.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuButton>
                         <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>

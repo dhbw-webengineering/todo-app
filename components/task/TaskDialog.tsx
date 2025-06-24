@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState, useEffect } from "react";
-import { Task } from "@/types/task";
+import { useState, useEffect, ChangeEvent } from "react";
+import { Task, TaskCreateData } from "@/types/Task";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -30,14 +30,18 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { MultiSelect } from "../multiselect";
+import { Turtle } from "lucide-react";
+import moment, { Moment } from "moment";
+
 
 type TaskDialogProps = {
   mode: "create" | "edit";
   task?: Task;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSave: (task: Task | any) => void;
-  onDelete?: (id: string) => void;
+  onSave: (task: Task | TaskCreateData) => void;
+  onDelete?: (id: number) => void;
   hideTrigger?: boolean;
   triggerVariant?: "button" | "dropdown";
 };
@@ -59,49 +63,40 @@ export function TaskDialog({
   const setCurrentOpen = isControlled ? onOpenChange! : setInternalOpen;
 
   // Form State
-  const [titel, setTitel] = useState("");
-  const [beschreibung, setBeschreibung] = useState("");
-  const [faelligkeitDate, setFaelligkeitDate] = useState<Date | undefined>(
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState<Moment | undefined>(
     undefined
   );
-  const [kategorie, setKategorie] = useState("");
-  const [tags, setTags] = useState("");
-  const [abgeschlossen, setAbgeschlossen] = useState(false);
+  const [categoryId, setCategoryId] = useState<number[]>([0]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [done, setDone] = useState(false);
 
   const [errors, setErrors] = useState<{
-    titel?: boolean;
-    faelligkeit?: boolean;
-    kategorie?: boolean;
+    title?: boolean;
+    dueDate?: boolean;
+    category?: boolean;
   }>({});
 
   // In TaskDialog.tsx - handleSave Funktion anpassen
   const handleSave = async () => {
     const newErrors = {
-      titel: !titel.trim(),
-      faelligkeit: !faelligkeitDate,
-      kategorie: !kategorie.trim(),
+      title: !title.trim(),
+      dueDate: !dueDate,
     };
 
     setErrors(newErrors);
     if (Object.values(newErrors).some(Boolean)) return;
 
     try {
-      const taskData = {
+      const taskData: TaskCreateData = {
         ...(mode === "edit" && task ? task : {}),
-        titel,
-        beschreibung,
-        abgeschlossen: abgeschlossen ? new Date().toISOString() : null,
-        faelligkeit: faelligkeitDate ? faelligkeitDate.toISOString() : "null",
-        kategorie: { name: kategorie },
+        title: title,
+        description: description,
+        done: done,
+        dueDate: dueDate,
+        categoryId: categoryId[0],
         tags: tags
-          ? tags.split(",").map((name, i) => ({
-              name: name.trim(),
-              tagID:
-                mode === "edit" && task?.tags?.[i]?.tagID
-                  ? task.tags[i].tagID
-                  : `temp-${i}`,
-            }))
-          : [],
       };
 
       await onSave(taskData);
@@ -121,36 +116,32 @@ export function TaskDialog({
   // Initialize form - Edit Mode korrigieren
   useEffect(() => {
     if (mode === "edit" && task) {
-      setTitel(task.titel);
-      setBeschreibung(task.beschreibung || "");
-      setFaelligkeitDate(
-        task.faelligkeit ? new Date(task.faelligkeit) : undefined
-      );
-      setKategorie(task.kategorie?.name || "");
-      setTags(task.tags?.map((t) => t.name).join(", ") || "");
-      setAbgeschlossen(!!task.abgeschlossen && task.abgeschlossen !== "null");
+      setTitle(task.title);
+      setDescription(task.description || "");
+      setDueDate(task.dueDate);
+      setCategoryId([task.categoryId || 0]);
+      setTags(task.tags || []);
+      setDone(task.done);
     }
   }, [mode, task]);
 
   const resetForm = () => {
-    setTitel("");
-    setBeschreibung("");
-    setFaelligkeitDate(undefined);
-    setKategorie("");
-    setTags("");
-    setAbgeschlossen(false);
+    setTitle("");
+    setDescription("");
+    setDueDate(undefined);
+    setCategoryId([0]);
+    setTags([]);
+    setDone(false);
     setErrors({});
   };
 
   const setRelativeDate = (daysFromToday: number) => {
-    const date = new Date();
-    date.setDate(date.getDate() + daysFromToday);
-    setFaelligkeitDate(date);
+    setDueDate(moment().add(daysFromToday, "days"));
   };
 
   const handleDelete = () => {
     if (mode === "edit" && task && onDelete) {
-      onDelete(task.eintragID);
+      onDelete(task.id);
       setCurrentOpen(false);
     }
   };
@@ -192,6 +183,16 @@ export function TaskDialog({
     return null;
   };
 
+  const frameworksList = [
+    { value: 0, label: "React", icon: Turtle },
+    { value: 1, label: "Angular", icon: Turtle },
+    { value: 2, label: "Vue", icon: Turtle },
+    { value: 3, label: "Svelte", icon: Turtle },
+    { value: 4, label: "Ember", icon: Turtle },
+  ];
+
+  const [selectedCategory, setSelectedCategory] = useState<number>();
+
   return (
     <>
       {renderTrigger()}
@@ -217,11 +218,11 @@ export function TaskDialog({
               </label>
               <Input
                 id="task-titel"
-                value={titel}
-                onChange={(e) => setTitel(e.target.value)}
+                value={title}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
                 placeholder="Titel"
-                aria-invalid={errors.titel}
-                className={errors.titel ? "border-red-500" : ""}
+                aria-invalid={errors.title}
+                className={errors.title ? "border-red-500" : ""}
               />
             </div>
 
@@ -235,8 +236,8 @@ export function TaskDialog({
               </label>
               <Textarea
                 id="task-beschreibung"
-                value={beschreibung}
-                onChange={(e) => setBeschreibung(e.target.value)}
+                value={description}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
                 placeholder="Beschreibung (optional)"
               />
             </div>
@@ -252,13 +253,13 @@ export function TaskDialog({
                     id="task-faelligkeit"
                     variant="outline"
                     className={`w-full justify-start text-left font-normal ${
-                      errors.faelligkeit ? "border-red-500" : ""
+                      errors.dueDate ? "border-red-500" : ""
                     }`}
-                    aria-invalid={errors.faelligkeit}
+                    aria-invalid={errors.dueDate}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {faelligkeitDate
-                      ? format(faelligkeitDate, "dd.MM.yyyy")
+                    {dueDate !== undefined
+                      ? format(dueDate.toDate(), "dd.MM.yyyy")
                       : "Datum wählen"}
                   </Button>
                 </PopoverTrigger>
@@ -270,55 +271,51 @@ export function TaskDialog({
                   <div className="pointer-events-auto">
                     <Calendar
                       mode="single"
-                      selected={faelligkeitDate}
-                      onSelect={setFaelligkeitDate}
+                      selected={dueDate}
+                      onSelect={(date: Date) => {
+                          setDueDate(moment(date));
+                        }
+                      }
                       locale={de}
-                      defaultMonth={faelligkeitDate ?? new Date()}
+                      defaultMonth={dueDate ?? moment().toDate()}
                       initialFocus
                     />
-                  </div>
-
-                  <div className="flex justify-between p-2 border-t">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setRelativeDate(0)}
-                    >
-                      Heute
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setRelativeDate(1)}
-                    >
-                      Morgen
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setRelativeDate(7)}
-                    >
-                      In 7 Tagen
-                    </Button>
+                    <div className="flex justify-between p-2 border-t">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setRelativeDate(0)}
+                      >
+                        Heute
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setRelativeDate(1)}
+                      >
+                        Morgen
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setRelativeDate(7)}
+                      >
+                        In 7 Tagen
+                      </Button>
+                    </div>
                   </div>
                 </PopoverContent>
               </Popover>
             </div>
 
             {/* Kategorie */}
-            <div className="space-y-1">
-              <label htmlFor="task-kategorie" className="text-sm font-medium">
-                Kategorie *
-              </label>
-              <Input
-                id="task-kategorie"
-                value={kategorie}
-                onChange={(e) => setKategorie(e.target.value)}
-                placeholder="Kategorie"
-                aria-invalid={errors.kategorie}
-                className={errors.kategorie ? "border-red-500" : ""}
+            <MultiSelect
+              options={frameworksList}
+              onValueChange={setCategoryId}
+              defaultValue={[0]}
+              maxSelectable={1}
+              placeholder="Kategorie"
               />
-            </div>
 
             {/* Tags */}
             <div className="space-y-1">
@@ -328,7 +325,7 @@ export function TaskDialog({
               <Input
                 id="task-tags"
                 value={tags}
-                onChange={(e) => setTags(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setTags(e.target.value.replace(" ", "").split(","))}
                 placeholder="Tags (Kommagetrennt, optional)"
               />
             </div>
@@ -336,8 +333,8 @@ export function TaskDialog({
             {/* Erledigt */}
             <div className="flex items-center gap-2">
               <Checkbox
-                checked={abgeschlossen}
-                onCheckedChange={() => setAbgeschlossen(!abgeschlossen)}
+                checked={done}
+                onCheckedChange={() => setDone(!done)}
                 id="task-abgeschlossen"
               />
               <label htmlFor="task-abgeschlossen" className="text-sm">
@@ -347,7 +344,13 @@ export function TaskDialog({
           </div>
 
           <DialogFooter className="mt-4">
-            <Button onClick={handleSave}>
+            <Button onClick={() => {
+              handleSave();
+              // bei Datumsänderung muss neu geladen werden
+              if (task && task.dueDate !== dueDate) {
+                window.location.reload();
+              }
+            }}>
               {mode === "create" ? "Erstellen" : "Speichern"}
             </Button>
           </DialogFooter>
