@@ -14,13 +14,21 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
+<<<<<<< feature/-middleware
+import { toast } from "sonner"
+=======
+>>>>>>> main
 
-export function LoginForm({ 
+export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
 
+<<<<<<< feature/-middleware
+    const router = useRouter()
+=======
     const router = useRouter()  
+>>>>>>> main
 
     const searchParams = useSearchParams()
     const emailFromQuery = searchParams.get("email") || ""
@@ -31,6 +39,28 @@ export function LoginForm({
         const formData = new FormData(event.currentTarget)
         const email = formData.get("email")
         const password = formData.get("password")
+<<<<<<< feature/-middleware
+
+        const api = fetch("http://localhost:3001/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password }),
+            credentials: "include"
+        })
+        api.then(async response => {
+            if (response.ok) {
+                router.push("/")
+            } else {
+                const data = await response.json();
+                toast.error("Login fehlgeschlagen", {
+                    duration: 3000,
+                    description: data.message || "Unbekannter Fehler"
+                });
+
+
+=======
         // Hier kannst du die Authentifizierung oder weitere Logik einbauen
         console.log("E-Mail:", email)
         console.log("Passwort:", password)
@@ -52,6 +82,7 @@ export function LoginForm({
                 console.error("Login failed")
                 console.log("Response status:", response.status)
                 // Hier kannst du eine Fehlermeldung anzeigen
+>>>>>>> main
             }
         })
     }
