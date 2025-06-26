@@ -294,7 +294,6 @@ const MultiSelectInner =<T,>
         align="start"
         onEscapeKeyDown={() => setIsPopoverOpen(false)}
       >
-        <div className="pointer-events-auto">
         <Command>
           <CommandInput
             placeholder="Search..."
@@ -377,7 +376,6 @@ const MultiSelectInner =<T,>
             </CommandGroup>
           </CommandList>
         </Command>
-        </div>
       </PopoverContent>
       {animation > 0 && selectedValues.length > 0 && (
         <WandSparkles

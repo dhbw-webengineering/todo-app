@@ -268,41 +268,39 @@ export function TaskDialog({
                   align="start"
                   sideOffset={4}
                 >
-                  <div className="pointer-events-auto">
-                    <Calendar
-                      mode="single"
-                      selected={dueDate}
-                      onSelect={(date: Date) => {
-                          setDueDate(moment(date));
-                        }
+                  <Calendar
+                    mode="single"
+                    selected={dueDate}
+                    onSelect={(date: Date) => {
+                        setDueDate(moment(date));
                       }
-                      locale={de}
-                      defaultMonth={dueDate ?? moment().toDate()}
-                      initialFocus
-                    />
-                    <div className="flex justify-between p-2 border-t">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setRelativeDate(0)}
-                      >
-                        Heute
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setRelativeDate(1)}
-                      >
-                        Morgen
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setRelativeDate(7)}
-                      >
-                        In 7 Tagen
-                      </Button>
-                    </div>
+                    }
+                    locale={de}
+                    defaultMonth={dueDate ?? moment().toDate()}
+                    initialFocus
+                  />
+                  <div className="flex justify-between p-2 border-t">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRelativeDate(0)}
+                    >
+                      Heute
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRelativeDate(1)}
+                    >
+                      Morgen
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRelativeDate(7)}
+                    >
+                      In 7 Tagen
+                    </Button>
                   </div>
                 </PopoverContent>
               </Popover>
