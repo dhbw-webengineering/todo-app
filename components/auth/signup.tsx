@@ -13,17 +13,26 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+<<<<<<< feature/-middleware
+=======
+
+>>>>>>> main
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
 
+<<<<<<< feature/-middleware
   const router = useRouter()
+=======
+const router = useRouter()
+>>>>>>> main
 
   const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
+<<<<<<< feature/-middleware
     const email = formData.get("email") as string
     const password = formData.get("password") as string
     const password2 = formData.get("password2") as string
@@ -68,6 +77,35 @@ export function SignupForm({
     } catch (error) {
       toast.error("Netzwerkfehler", { duration: 3000 })
     }
+=======
+    const email = formData.get("email")
+    const password = formData.get("password")
+
+    
+    const api = fetch("http://localhost:3001/register", {
+            method: "POST",
+            headers: {  
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        })
+        api.then(response => {
+            if (response.ok) {
+                console.log("Signup successful")
+                 router.push("/auth/login?email=" + encodeURIComponent(email as string))
+                 toast.success("Erfolgreich registriert", {
+                   duration: 3000,
+                 });
+              } else {
+                console.error("Signup failed")
+                console.log("Response status:", response.status)
+                toast.error("Fehler bei der Registrierung", {
+                   duration: 3000,
+                 });
+            }
+        })
+
+>>>>>>> main
   }
 
   return (
