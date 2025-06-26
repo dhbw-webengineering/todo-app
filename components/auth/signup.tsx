@@ -11,22 +11,47 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
 
+const router = useRouter()
 
   const handleSignup = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email")
     const password = formData.get("password")
-    // Hier kannst du die Authentifizierung oder weitere Logik einbauen
-    console.log("E-Mail:", email)
-    console.log("Passwort:", password)
-    console.log("Login form submitted")
+
+    
+    const api = fetch("http://localhost:3001/register", {
+            method: "POST",
+            headers: {  
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        })
+        api.then(response => {
+            if (response.ok) {
+                console.log("Signup successful")
+                 router.push("/auth/login?email=" + encodeURIComponent(email as string))
+                 toast.success("Erfolgreich registriert", {
+                   duration: 3000,
+                 });
+              } else {
+                console.error("Signup failed")
+                console.log("Response status:", response.status)
+                toast.error("Fehler bei der Registrierung", {
+                   duration: 3000,
+                 });
+            }
+        })
+
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

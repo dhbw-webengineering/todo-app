@@ -47,6 +47,10 @@ import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
 import { TaskCreateData } from "@/types/task";
 import Link from "next/link";
 
+import  ThemeChanger  from "@/components/themeChanger";
+
+import { useRouter } from "next/navigation"
+import { toast, Toaster } from "sonner";
 
 // Menu items.
 const items = [
@@ -93,11 +97,15 @@ const kat = [
   },
 ];
 
+
+
 export function AppSidebar() {
   const handleAddCategory = () => {
     alert("Kategorie hinzufügen geklickt");
   };
 
+  const router = useRouter()
+  
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   
@@ -130,6 +138,15 @@ export function AppSidebar() {
     } catch (error) {
       console.error("Fehler beim Erstellen des Tasks:", error);
     }
+  };
+
+  const handleLogout = async () => {
+    fetch('http://localhost:3001/logout', { method: 'POST', credentials: "include" }).then(() => {
+      router.push("/auth/login");
+      toast.success("Erfolgreich abgemeldet", {
+        duration: 3000,
+      });
+    });
   };
 
   return (
@@ -230,6 +247,9 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
+            <ThemeChanger />
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
@@ -244,7 +264,8 @@ export function AppSidebar() {
                 <DropdownMenuItem>
                   <span>Account</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogout}>
                   <span>Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
