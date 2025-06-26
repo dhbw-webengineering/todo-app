@@ -14,52 +14,69 @@ import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
-
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
 
-const router = useRouter()
+  const router = useRouter()
 
-  const handleSignup = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
-    const email = formData.get("email")
-    const password = formData.get("password")
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+    const password2 = formData.get("password2") as string
 
-    
-    const api = fetch("http://localhost:3001/register", {
-            method: "POST",
-            headers: {  
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ email, password })
-        })
-        api.then(response => {
-            if (response.ok) {
-                console.log("Signup successful")
-                 router.push("/auth/login?email=" + encodeURIComponent(email as string))
-                 toast.success("Erfolgreich registriert", {
-                   duration: 3000,
-                 });
-              } else {
-                console.error("Signup failed")
-                console.log("Response status:", response.status)
-                toast.error("Fehler bei der Registrierung", {
-                   duration: 3000,
-                 });
-            }
-        })
+    // Passwort-Länge prüfen
+    if (!password || password.length < 6) {
+      toast.error("Das Passwort muss mindestens 6 Zeichen lang sein", {
+        duration: 3000,
+      })
+      return
+    }
 
+    // Passwort-Wiederholung prüfen
+    if (password !== password2) {
+      toast.error("Die Passwörter stimmen nicht überein", {
+        duration: 3000,
+      })
+      return
+    }
+
+
+    try {
+      const response = await fetch("http://localhost:3001/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      })
+
+      if (response.ok) {
+        router.push("/auth/login?email=" + encodeURIComponent(email))
+        toast.success("Erfolgreich registriert", { duration: 3000 })
+      } else {
+          const data = await response.json();
+          toast.error("Fehler bei der Registrierung", {
+            duration: 3000,
+            description: data.message || "Unbekannter Fehler"
+          });
+
+      }
+    } catch (error) {
+      toast.error("Netzwerkfehler", { duration: 3000 })
+    }
   }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>Registrieren</CardTitle>
           <CardDescription>
-            Gib diene Email und Passwort ein um dich zu registrieren
+            Gib deine Email und Passwort ein um dich zu registrieren
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,9 +93,7 @@ const router = useRouter()
                 />
               </div>
               <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Passwort</Label>
-                </div>
+                <Label htmlFor="password">Passwort</Label>
                 <Input id="password" type="password" name="password" required placeholder="Passwort" />
               </div>
               <div>
