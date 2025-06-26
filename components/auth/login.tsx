@@ -13,12 +13,18 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export function LoginForm({ 
     className,
     ...props
 }: React.ComponentProps<"div">) {
-    const [email, setEmail] = useState("")
+
+    const router = useRouter()  
+
+    const searchParams = useSearchParams()
+    const emailFromQuery = searchParams.get("email") || ""
+    const [email, setEmail] = useState(emailFromQuery)
 
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -29,6 +35,25 @@ export function LoginForm({
         console.log("E-Mail:", email)
         console.log("Passwort:", password)
         console.log("Login form submitted")
+        
+        const api = fetch("http://localhost:3001/login", {
+            method: "POST",
+            headers: {  
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password }),
+            credentials: "include" // Wichtig für Cookies
+        })
+        api.then(async response => {
+            if (response.ok) {
+                console.log("Login successful")
+                router.push("/") 
+            } else {
+                console.error("Login failed")
+                console.log("Response status:", response.status)
+                // Hier kannst du eine Fehlermeldung anzeigen
+            }
+        })
     }
 
     return (
