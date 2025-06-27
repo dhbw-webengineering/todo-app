@@ -14,14 +14,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 import { ApiRoute } from "@/ApiRoute"
 
-export function LoginForm({ 
+export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
 
-    const router = useRouter()  
+    const router = useRouter()
 
     const searchParams = useSearchParams()
     const emailFromQuery = searchParams.get("email") || ""
@@ -32,27 +33,26 @@ export function LoginForm({
         const formData = new FormData(event.currentTarget)
         const email = formData.get("email")
         const password = formData.get("password")
-        // Hier kannst du die Authentifizierung oder weitere Logik einbauen
-        console.log("E-Mail:", email)
-        console.log("Passwort:", password)
-        console.log("Login form submitted")
-        
+
         const api = fetch(ApiRoute.LOGIN, {
             method: "POST",
-            headers: {  
+            headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ email, password }),
-            credentials: "include" // Wichtig für Cookies
+            credentials: "include"
         })
         api.then(async response => {
             if (response.ok) {
-                console.log("Login successful")
-                router.push("/") 
+                router.push("/")
             } else {
-                console.error("Login failed")
-                console.log("Response status:", response.status)
-                // Hier kannst du eine Fehlermeldung anzeigen
+                const data = await response.json();
+                toast.error("Login fehlgeschlagen", {
+                    duration: 3000,
+                    description: data.message || "Unbekannter Fehler"
+                });
+
+
             }
         })
     }
@@ -61,9 +61,9 @@ export function LoginForm({
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
+                    <CardTitle>Login</CardTitle>
                     <CardDescription>
-                        Enter your email below to login to your account
+                        Gib deine Email-Adresse und dein Passwort ein, um dich anzumelden.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -102,7 +102,7 @@ export function LoginForm({
                         <div className="mt-4 text-center text-sm">
                             Haben sie keinen Account?{" "}
                             <Link href="/auth/signup" className="underline underline-offset-4">
-                                registrieren
+                                Registrieren
                             </Link>
                         </div>
                     </form>

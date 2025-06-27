@@ -262,8 +262,10 @@ export function AppSidebar() {
                 side="top"
                 className="w-[--radix-popper-anchor-width]"
               >
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => router.push("/account")}>
                   <span>Account</span>
+
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleLogout}>
