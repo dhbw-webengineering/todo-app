@@ -1,11 +1,20 @@
-export type Task = {
-  eintragID: string;
-  titel: string;
-  beschreibung: string;
-  faelligkeit: string;
-  abgeschlossen: string | null;
-  created_at: string;
-  updated_at: string;
-  kategorie: { name: string };
-  tags: { tagID: string; name: string }[];
-};
+export interface TOdoApiResponse {
+  id: number;
+  userId: number;
+  title: string;
+  description?: string;
+  dueDate: string;
+  categoryId: number;
+  completedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  category: {
+    id: number;
+    userId: number;
+    name: string;
+  };
+  tags?: {
+    id: number;
+    name: string;
+  }[];
+}

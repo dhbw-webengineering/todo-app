@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { TaskCard } from "components/task/TaskCard";
 import { MultiSelect } from "@/components/multiselect";
-import { Task } from "@/types/task";
+import { TOdoApiResponse } from "@/types/task";
 import { Turtle } from "lucide-react";
 import { DateRangePicker } from "@/components/dateRangePicker";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -11,52 +11,53 @@ import { DateRange } from "react-day-picker";
 
 
 
-const initialTasks: Task[] = [
+const initialTasks: TOdoApiResponse[] = [
   {
-    eintragID: "1",
-    titel: "React-Komponenten bauen",
-    beschreibung: "Task-UI mit shadcn/ui gestalten",
-    faelligkeit: "2025-06-01",
-    abgeschlossen: null,
-    created_at: "2025-05-18T12:00:00Z",
-    updated_at: "2025-05-18T12:00:00Z",
-    kategorie: { name: "Entwicklung" },
+    id: 1,
+    userId: 2,
+    title: "Justin muss Eier lecken",
+    description: "Leck Eier\n",
+    dueDate: "2025-07-03T17:00:00.000Z",
+    categoryId: 2,
+    completedAt: null,
+    createdAt: "2025-07-03T17:00:00.000Z",
+    updatedAt: "2025-07-03T17:00:00.000Z",
+    category: {
+      id: 2,
+      userId: 4,
+      name: "Allgemein"
+    },
     tags: [
-      { tagID: "a", name: "Frontend" },
-      { tagID: "b", name: "UI" },
-    ],
-  },
-  {
-    eintragID: "2",
-    titel: "API anbinden",
-    beschreibung: "Daten vom Express-Backend laden",
-    faelligkeit: "2025-06-05",
-    abgeschlossen: "2025-05-19T08:00:00Z",
-    created_at: "2025-05-18T12:00:00Z",
-    updated_at: "2025-05-19T08:00:00Z",
-    kategorie: { name: "Backend" },
-    tags: [{ tagID: "c", name: "API" }],
-  },
-];
+      {
+        id: 3,
+        name: "tag1"
+      },
+      {
+        id: 1,
+        name: "tag3"
+      }
+    ]
+  }
+]
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState(initialTasks);
 
-  const handleUpdate = (updatedTask: Task) => {
+  const handleUpdate = (updatedTask: TOdoApiResponse) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.eintragID === updatedTask.eintragID ? updatedTask : task
+        task.id === updatedTask.id ? updatedTask : task
       )
     );
   };
 
-  const toggleErledigt = (id: string) => {
+  const toggleErledigt = (id: number) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.eintragID === id
+        task.id === Number (id)
           ? {
             ...task,
-            abgeschlossen: task.abgeschlossen
+            abgeschlossen: task.completedAt
               ? null
               : new Date().toISOString(),
           }
@@ -158,12 +159,12 @@ export default function TasksPage() {
       <div className="space-y-4 max-w-3xl">
         {tasks.map((task) => (
           <TaskCard
-            key={task.eintragID}
+            key={task.id}
             task={task}
             onToggle={toggleErledigt}
             onUpdate={handleUpdate}
             onDelete={(id) =>
-              setTasks((prev) => prev.filter((task) => task.eintragID !== id))
+              setTasks((prev) => prev.filter((task) => task.id !== id))
             }
           />
         ))}
