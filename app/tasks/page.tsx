@@ -101,7 +101,7 @@ export default function TasksPage() {
       </div>
 
       <div className="space-y-4 max-w-3xl">
-        <TasksContainer apiRoute={ApiRoute.ENTRY_LIST} showTasksDone={true}/>
+        <TasksContainer apiRoute={ApiRoute.TODOS} showTasksDone={true}/>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { ApiRoute } from "@/ApiRoute"
 
 
 export function SignupForm({
@@ -29,7 +30,7 @@ const router = useRouter()
     const password = formData.get("password")
 
     
-    const api = fetch("http://localhost:3001/register", {
+    const api = fetch(ApiRoute.REGISTER, {
             method: "POST",
             headers: {  
                 "Content-Type": "application/json"

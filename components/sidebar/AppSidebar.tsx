@@ -51,6 +51,7 @@ import  ThemeChanger  from "@/components/themeChanger";
 
 import { useRouter } from "next/navigation"
 import { toast, Toaster } from "sonner";
+import { ApiRoute } from "@/ApiRoute";
 
 // Menu items.
 const items = [
@@ -111,7 +112,7 @@ export function AppSidebar() {
   
   const handleCreateTask = async (taskData: TaskCreateData) => {
     try {
-        const response = await fetch('http://localhost:3001/api/entry/create', {
+        const response = await fetch(ApiRoute.TODOS, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(taskData),
@@ -141,7 +142,7 @@ export function AppSidebar() {
   };
 
   const handleLogout = async () => {
-    fetch('http://localhost:3001/logout', { method: 'POST', credentials: "include" }).then(() => {
+    fetch(ApiRoute.LOGOUT, { method: 'POST', credentials: "include" }).then(() => {
       router.push("/auth/login");
       toast.success("Erfolgreich abgemeldet", {
         duration: 3000,

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
+import { ApiRoute } from "@/ApiRoute"
 
 export function LoginForm({ 
     className,
@@ -36,7 +37,7 @@ export function LoginForm({
         console.log("Passwort:", password)
         console.log("Login form submitted")
         
-        const api = fetch("http://localhost:3001/login", {
+        const api = fetch(ApiRoute.LOGIN, {
             method: "POST",
             headers: {  
                 "Content-Type": "application/json"
