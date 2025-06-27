@@ -48,7 +48,7 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
       }
 
       try {
-        const query = (apiRoute == ApiRoute.ENTRY_LIST_NEXT) ? `${apiRoute}?start=${start}&end=${end}` : apiRoute;
+        const query = (day !== undefined || range !== undefined) ? `${apiRoute}?start=${start}&end=${end}` : apiRoute;
         const response = await fetch(query);
         if (!response.ok) {
           throw new Error(`HTTP error: Status ${response.status}`);
