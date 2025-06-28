@@ -1,49 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TaskCard } from "components/task/TaskCard";
 import { MultiSelect } from "@/components/multiselect";
-import { TOdoApiResponse } from "@/types/task";
+import { TodoApiResponse } from "@/types/task";
 import { Turtle } from "lucide-react";
 import { DateRangePicker } from "@/components/dateRangePicker";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { DateRange } from "react-day-picker";
-
-
-
-const initialTasks: TOdoApiResponse[] = [
-  {
-    id: 1,
-    userId: 2,
-    title: "Justin muss Eier lecken",
-    description: "Leck Eier\n",
-    dueDate: "2025-07-03T17:00:00.000Z",
-    categoryId: 2,
-    completedAt: null,
-    createdAt: "2025-07-03T17:00:00.000Z",
-    updatedAt: "2025-07-03T17:00:00.000Z",
-    category: {
-      id: 2,
-      userId: 4,
-      name: "Allgemein"
-    },
-    tags: [
-      {
-        id: 3,
-        name: "tag1"
-      },
-      {
-        id: 1,
-        name: "tag3"
-      }
-    ]
-  }
-]
+import { toast } from "sonner";
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const handleUpdate = (updatedTask: TOdoApiResponse) => {
+  // Initiales Laden der Tasks mit Fehlerbehandlung
+  useEffect(() => {
+    const fetchInitialTasks = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/todos", { credentials: "include" });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTasks(data);
+      } catch (error) {
+        setFetchError("Fehler beim Laden der Aufgaben.");
+        toast.error("Fehler beim Laden der Aufgaben", {
+          description: error instanceof Error ? error.message : "Unbekannter Fehler",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitialTasks();
+  }, []);
+
+  const handleUpdate = (updatedTask: TodoApiResponse) => {
     setTasks((prev) =>
       prev.map((task) =>
         task.id === updatedTask.id ? updatedTask : task
@@ -51,19 +45,44 @@ export default function TasksPage() {
     );
   };
 
-  const toggleErledigt = (id: number) => {
+  const toggleErledigt = async (id: number) => {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+
+    const newCompletedAt = task.completedAt ? null : new Date().toISOString();
     setTasks((prev) =>
-      prev.map((task) =>
-        task.id === Number (id)
-          ? {
-            ...task,
-            abgeschlossen: task.completedAt
-              ? null
-              : new Date().toISOString(),
-          }
-          : task
+      prev.map((t) =>
+        t.id === id ? { ...t, completedAt: newCompletedAt } : t
       )
     );
+
+    try {
+      const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completedAt: newCompletedAt, id: task.id }),
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Fehler beim Speichern im Backend.");
+      // Optional: Backend-Task holen und im State ersetzen, falls Backend weitere Felder setzt
+      // const updated = await response.json();
+      // setTasks((prev) => prev.map((t) => t.id === id ? updated : t));
+    } catch (error) {
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === id ? { ...t, completedAt: task.completedAt } : t
+        )
+      );
+      toast.error("Fehler beim Aktualisieren der Aufgabe", {
+        duration: 3000,
+        description: error instanceof Error ? error.message : "Unbekannter Fehler",
+      });
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+    // Optional: Backend-Delete-Call ergänzen
   };
 
   const categorielist = [
@@ -82,10 +101,10 @@ export default function TasksPage() {
   const searchParams = useSearchParams();
 
   const [selectedCategorie, setSelectedCategorie] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const handleCategoriesChange = (newCategories: string[]) => {
     setSelectedCategorie(newCategories);
-  
     const params = new URLSearchParams(searchParams);
     if (newCategories.length > 0) {
       params.set('categories', newCategories.join(','));
@@ -95,12 +114,8 @@ export default function TasksPage() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
   const handleTagsChange = (newTags: string[]) => {
     setSelectedTags(newTags);
-
-   
     const params = new URLSearchParams(searchParams);
     if (newTags.length > 0) {
       params.set('tags', newTags.join(','));
@@ -111,25 +126,24 @@ export default function TasksPage() {
   };
 
   const handleDateChange = (range: DateRange | undefined) => {
-
-    console.log("Selected date range:", range);
     const params = new URLSearchParams(searchParams);
     if (range?.from && range?.to) {
       params.set('startDate', String(range.from.getTime()));
       params.set('endDate', String(range.to.getTime()));
-    }
-    else {
+    } else {
       params.delete('startDate');
       params.delete('endDate');
     }
     router.replace(`${pathname}?${params.toString()}`);
+  };
 
-  }
+  if (loading) return <div className="p-6">Lade Aufgaben...</div>;
+  if (fetchError) return <div className="p-6 text-red-600">{fetchError}</div>;
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
       <div className="flex items-center space-x-4 mb-6">
-
         <div className="w-1/5">
           <MultiSelect
             options={categorielist}
@@ -151,11 +165,9 @@ export default function TasksPage() {
           />
         </div>
         <div className="w-1/6">
-          <DateRangePicker
-            onChange={handleDateChange} />
+          <DateRangePicker onChange={handleDateChange} />
         </div>
       </div>
-
       <div className="space-y-4 max-w-3xl">
         {tasks.map((task) => (
           <TaskCard
@@ -163,9 +175,7 @@ export default function TasksPage() {
             task={task}
             onToggle={toggleErledigt}
             onUpdate={handleUpdate}
-            onDelete={(id) =>
-              setTasks((prev) => prev.filter((task) => task.id !== id))
-            }
+            onDelete={handleDelete}
           />
         ))}
       </div>

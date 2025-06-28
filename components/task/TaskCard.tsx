@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TOdoApiResponse } from "@/types/task"; 
+import { TodoApiResponse, TodoApiEdit } from "@/types/task"; 
 import { TaskDialog } from "@/components/task/TaskDialog";
 import { format, differenceInCalendarDays } from "date-fns";
 
@@ -10,9 +10,9 @@ export function TaskCard({
   onUpdate,
   onDelete,
 }: {
-  task: TOdoApiResponse;
+  task: TodoApiResponse;
   onToggle: (id: number) => void;
-  onUpdate: (updatedTask: TOdoApiResponse) => void;
+  onUpdate: (updatedTask: TodoApiResponse) => void;
   onDelete: (id: number) => void;
 }) {
   let faelligkeitLabel = "";
@@ -28,7 +28,7 @@ export function TaskCard({
     else faelligkeitLabel = `seit ${Math.abs(diff)} Tagen fällig`;
   }
 
-  const isCompleted = !!task.completedAt;
+  const isCompleted = !task.completedAt;
 
   return (
     <div className="border rounded-xl p-4 shadow-sm bg-white dark:bg-zinc-900 w-full flex flex-col">
@@ -86,6 +86,7 @@ export function TaskCard({
             mode="edit"
             task={task}
             onSave={onUpdate}
+            onDelete={onDelete}
             triggerVariant="dropdown"
             hideTrigger={false}
           />

@@ -1,4 +1,4 @@
-export interface TOdoApiResponse {
+export interface TodoApiResponse {
   id: number;
   userId: number;
   title: string;
@@ -17,4 +17,22 @@ export interface TOdoApiResponse {
     id: number;
     name: string;
   }[];
+}
+export interface TodoApiCreate {
+  title: string;
+  dueDate: string; // ISO-String
+  description?: string;
+  categoryId: number;
+  tags?: string[]; // Tag-Namen als Array (wie in deinem Backend erwartet)
+  completedAt: string | null; // Für das Erledigt-Toggling, optional
+}
+
+export interface TodoApiEdit {
+  id: number; // Die ID des zu bearbeitenden Todos
+  title?: string;
+  dueDate?: string;
+  description?: string;
+  categoryId?: number;
+  tags?: string[]; // Tag-Namen als Array (wie in deinem Backend erwartet)
+  completedAt?: string | null; // Für das Erledigt-Toggling
 }
