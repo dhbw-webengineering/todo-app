@@ -108,10 +108,6 @@ export function AppSidebar() {
   const handleCreateTask = async (taskData: any) => {
     try {
       console.log("Neuer Task erstellt:", taskData);
-      // Hier würdest du normalerweise eine API-Anfrage machen
-      // await createTask(taskData);
-      
-      // Dialog wird automatisch durch TaskDialog geschlossen
     } catch (error) {
       console.error("Fehler beim Erstellen des Tasks:", error);
     }
