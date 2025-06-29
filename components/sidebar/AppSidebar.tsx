@@ -171,7 +171,7 @@ export function AppSidebar() {
     try {
       const updatedCategory = await updateCategory(editingCategory.id, newCategoryName);
       setCategories(
-        categories.map((cat) => 
+        categories.map((cat) =>
           cat.id === updatedCategory.id ? updatedCategory : cat
         )
       );
@@ -222,10 +222,6 @@ export function AppSidebar() {
   const handleCreateTask = async (taskData: any) => {
     try {
       console.log("Neuer Task erstellt:", taskData);
-      // Hier würdest du normalerweise eine API-Anfrage machen
-      // await createTask(taskData);
-
-      // Dialog wird automatisch durch TaskDialog geschlossen
     } catch (error) {
       console.error("Fehler beim Erstellen des Tasks:", error);
     }
@@ -332,14 +328,14 @@ export function AppSidebar() {
                             className="flex-1 px-2 py-1 text-sm border rounded"
                             autoFocus
                           />
-                          <button 
+                          <button
                             onClick={handleCreateCategory}
                             className="p-1 text-green-600 hover:text-green-800"
                             title="Speichern"
                           >
                             <CheckCircle2 className="h-4 w-4" />
                           </button>
-                          <button 
+                          <button
                             onClick={handleCancelCategoryAction}
                             className="p-1 text-red-600 hover:text-red-800"
                             title="Abbrechen"
@@ -363,14 +359,14 @@ export function AppSidebar() {
                               className="flex-1 px-2 py-1 text-sm border rounded"
                               autoFocus
                             />
-                            <button 
+                            <button
                               onClick={handleUpdateCategory}
                               className="p-1 text-green-600 hover:text-green-800"
                               title="Speichern"
                             >
                               <CheckCircle2 className="h-4 w-4" />
                             </button>
-                            <button 
+                            <button
                               onClick={handleCancelCategoryAction}
                               className="p-1 text-red-600 hover:text-red-800"
                               title="Abbrechen"
@@ -397,13 +393,13 @@ export function AppSidebar() {
                                 </SidebarMenuAction>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="right" align="start">
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                   onClick={() => handleEditCategory(category)}
                                   className="cursor-pointer"
                                 >
                                   <span>Kategorie bearbeiten</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                   onClick={() => handleConfirmDelete(category)}
                                   className="cursor-pointer text-red-600"
                                 >
@@ -453,7 +449,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-
+      
       {/* TaskDialog mit mode="create" außerhalb der Sidebar-Struktur */}
       <TaskDialog
         mode="create"
