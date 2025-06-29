@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import Link from "next/link"
 import { CheckCircle2, ArrowRight } from "lucide-react"
+import { createCategory } from "@/lib/categoryApi"
 
 export function SignupForm({
   className,
@@ -58,6 +59,14 @@ export function SignupForm({
       })
 
       if (response.ok) {
+        // Create default "Allgemein" category for the new user
+        try {
+          await createCategory("Allgemein");
+        } catch (error) {
+          console.error("Failed to create default category:", error);
+          // Continue with registration even if category creation fails
+        }
+
         setSuccess(true)
         setEmail(emailValue)
         toast.success("Erfolgreich registriert", { duration: 3000 })
