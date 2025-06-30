@@ -81,31 +81,34 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     } else {
       updateTask(task);
     }
+    const updateAPI = async () => {
+      const editData: TodoApiEdit = {
+        id: task.id,
+        title: task.title,
+        dueDate: task.dueDate,
+        description: task.description,
+        categoryId: task.categoryId,
+        tags: task.tags ?
+          task.tags.map((tag) => tag.name.trim()).filter(Boolean)
+          : undefined,
+        completedAt: task.completedAt
+      };
+      const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editData),
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Fehler beim Aktualisieren");
+    };
+    updateAPI();
   }
 
   const updateTask = (task: TodoApiResponse) => {
     modifyTaskAndSetHasData(
       task,
       task.completedAt ? -1 : 1,
-      async () => {
-        const editData: TodoApiEdit = {
-          id: task.id,
-          title: task.title,
-          dueDate: task.dueDate,
-          description: task.description,
-          categoryId: task.categoryId,
-          tags: task.tags ?
-            task.tags.map((tag) => tag.name.trim()).filter(Boolean)
-            : undefined,
-          completedAt: task.completedAt
-        };
-        const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(editData),
-          credentials: "include",
-        });
-        if (!response.ok) throw new Error("Fehler beim Aktualisieren");
+      () => {
         updateTasks(prevTasks => prevTasks.map(oldTask =>
           oldTask.id === task.id ? task : oldTask
         ));
@@ -119,27 +122,28 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     } else {
       deleteTask(task);
     }
+    const deleteAPI = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+        if (!response.ok) throw new Error("Fehler beim Löschen im Backend.");
+      } catch (error) {
+        toast.error("Fehler beim Löschen der Aufgabe", {
+          duration: 3000,
+          description: error instanceof Error ? error.message : "Unbekannter Fehler",
+        });
+      }
+    };
+    deleteAPI();
   }
 
   const deleteTask = (task: TodoApiResponse) => {
     modifyTaskAndSetHasData(
       task,
       -1,
-      async () => {
-        try {
-          const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
-            method: "DELETE",
-            credentials: "include",
-          });
-          if (!response.ok) throw new Error("Fehler beim Löschen im Backend.");
-          setTasks(prevTasks => prevTasks.filter(oTask => oTask.id !== task.id));
-        } catch (error) {
-          toast.error("Fehler beim Löschen der Aufgabe", {
-            duration: 3000,
-            description: error instanceof Error ? error.message : "Unbekannter Fehler",
-          });
-        }
-      }
+      () => setTasks(prevTasks => prevTasks.filter(oTask => oTask.id !== task.id))
     );
   }
 

@@ -29,7 +29,7 @@ export function TaskCard({
     else dueDateLabel = `seit ${Math.abs(diff)} Tagen fällig`;
   }
 
-  const isCompleted = !task.completedAt;
+  const isCompleted = task.completedAt;
 
   return (
     <div className="border rounded-xl p-4 shadow-sm bg-white dark:bg-zinc-900 w-full flex flex-col">
