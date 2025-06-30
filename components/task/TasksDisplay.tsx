@@ -7,15 +7,15 @@ import styles from "./TasksDisplay.module.css";
 import TasksContainer, { TasksContainerRef } from "./TasksContainer";
 
 import { ApiRoute } from "@/ApiRoute";
-import { Task } from '@/types/task';
+import { TodoApiResponse } from '@/types/task';
 
 
 interface TasksDisplayProps {
   header: string,
   day?: number,
   range?: [number, number],
-  sendTaskUpdate: (task: Task) => void,
-  sendTaskDelete: (task: Task) => void,
+  sendTaskUpdate: (task: TodoApiResponse) => void,
+  sendTaskDelete: (task: TodoApiResponse) => void,
   tasksUpdateRef: RefObject<TasksContainerRef>,
   sendHasDataChanged: (ref: RefObject<TasksContainerRef>, hasData: boolean) => void;
 }

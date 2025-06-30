@@ -6,12 +6,11 @@ import { useState, useEffect, Dispatch, SetStateAction, useImperativeHandle, for
 import { TaskCard } from "./TaskCard";
 
 import { ApiRoute } from "@/ApiRoute";
-import { Task, TaskForJson } from "@/types/task";
-import moment from "moment";
+import { TodoApiResponse } from "@/types/task";
 
 export type TasksContainerRef = {
-  updateTask: (task: Task) => void;
-  deleteTask: (task: Task) => void;
+  updateTask: (task: TodoApiResponse) => void;
+  deleteTask: (task: TodoApiResponse) => void;
 };
 
 interface TasksContainerProps {
@@ -20,13 +19,13 @@ interface TasksContainerProps {
   range?: [number, number];
   setHasData?: (hasData: boolean) => void;
   showTasksDone: boolean;
-  sendTaskUpdate?: (task: Task) => void;
-  sendTaskDelete?: (task: Task) => void;
+  sendTaskUpdate?: (task: TodoApiResponse) => void;
+  sendTaskDelete?: (task: TodoApiResponse) => void;
 }
 
 function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>) {
   const {apiRoute, day, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete} = props;
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,13 +52,14 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
         if (!response.ok) {
           throw new Error(`HTTP error: Status ${response.status}`);
         }
-        const dataForJson: TaskForJson[] = await response.json();
-        const data: Task[] = dataForJson.map(entry => {
-          return {
+        //const dataForJson: TaskForJson[] = await response.json();
+        //const data: Task[] = dataForJson.map(entry => {
+        /*  return {
             ...entry,
             dueDate: entry.dueDate !== undefined ? moment(entry.dueDate * 1000) : undefined
           }
-        });
+        });*/
+        const data: TodoApiResponse[] = await response.json();
         updateTasks(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -70,14 +70,14 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     fetchTasks();
   }, []);
 
-  const updateTasks = (newTasks: SetStateAction<Task[]>) => {
+  const updateTasks = (newTasks: SetStateAction<TodoApiResponse[]>) => {
     setTasks(newTasks);
     if (setHasData !== undefined) {
       setHasData(newTasks.length > 0);
     }
   }
 
-  const sendOrUpdateTask = (task: Task) => {
+  const sendOrUpdateTask = (task: TodoApiResponse) => {
     if (sendTaskUpdate !== undefined) {
       sendTaskUpdate(task);
     } else {
@@ -85,10 +85,10 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     }
   }
 
-  const updateTask = (task: Task) => {
+  const updateTask = (task: TodoApiResponse) => {
     modifyTaskAndSetHasData(
       task,
-      task.done ? -1 : 1,
+      task.completedAt ? -1 : 1,
       () => {
         updateTasks(prevTasks => prevTasks.map(oldTask =>
           oldTask.id === task.id ? task : oldTask
@@ -97,7 +97,7 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     );
   }
 
-  const sendOrDeleteTask = (task: Task) => {
+  const sendOrDeleteTask = (task: TodoApiResponse) => {
     if (sendTaskDelete !== undefined) {
       sendTaskDelete(task);
     } else {
@@ -105,7 +105,7 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     }
   }
 
-  const deleteTask = (task: Task) => {
+  const deleteTask = (task: TodoApiResponse) => {
     modifyTaskAndSetHasData(
       task,
       -1,
@@ -115,8 +115,8 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     );
   }
 
-  const modifyTaskAndSetHasData = (task: Task, increaseValue: number, runnable: () => void) => {
-    let count = tasks.filter(cTask => !cTask.done).length;
+  const modifyTaskAndSetHasData = (task: TodoApiResponse, increaseValue: number, runnable: () => void) => {
+    let count = tasks.filter(cTask => !cTask.completedAt).length;
     if (tasks.filter(fTask => fTask.id === task.id).length !== 1) {
       return;
     }
@@ -129,12 +129,12 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     }
   }
 
-  const filteredTasks = showTasksDone ? tasks : [...tasks].filter(task => !task.done);
+  const filteredTasks = showTasksDone ? tasks : [...tasks].filter(task => !task.completedAt);
 
   // Sort tasks: offene tasks zuerst, dabei frühestes fälligkeitsdatum zuerst
   const sortedTasks = [...filteredTasks].sort((a, b) => {
-    if (a.done !== b.done) {
-      return a.done ? 1 : -1;
+    if ((a.completedAt === null) !== (b.completedAt === null)) {
+      return a.completedAt ? 1 : -1;
     }
     if (a.dueDate === undefined) {
       return -1;
@@ -142,7 +142,7 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     if (b.dueDate === undefined) {
       return 1;
     }
-    return a.dueDate.toDate().getDate() - b.dueDate.toDate().getDate();
+    return new Date(a.dueDate).getDate() - new Date(b.dueDate).getDate();
   });
 
 
@@ -151,7 +151,7 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
 
   return (
       <div className={styles.taskList}>
-          {sortedTasks.map((task: Task) => (
+          {sortedTasks.map((task: TodoApiResponse) => (
                     <TaskCard onDelete={() => sendOrDeleteTask(task)} onUpdate={sendOrUpdateTask} key={task.id} task={task} />
                   ))}
       </div>

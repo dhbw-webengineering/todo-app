@@ -44,7 +44,7 @@ import {
 
 import { useState } from "react";
 import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
-import { TaskCreateData } from "@/types/task";
+import { TodoApiCreate, TodoApiResponse } from "@/types/task";
 import Link from "next/link";
 
 import  ThemeChanger  from "@/components/themeChanger";
@@ -110,26 +110,7 @@ export function AppSidebar() {
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  const handleCreateTask = async (taskData: TaskCreateData) => {
-    try {
-        const response = await fetch(ApiRoute.TODOS, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(taskData),
-        });
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            console.error('Error creating task');
-            alert("Error creating task")
-        }
-    } catch (error) {
-        console.error('Request failed', error);
-        alert("Error creating task")
-    } finally {
-        setLoading(false);
-    }
-
+  const handleCreateTask = async (taskData: any) => {
     try {
       console.log("Neuer Task erstellt:", taskData);
     } catch (error) {

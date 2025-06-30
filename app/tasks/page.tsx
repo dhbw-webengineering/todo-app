@@ -13,61 +13,7 @@ import { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
 
-
-const initialTasks: Task[] = [
-  {
-    eintragID: "1",
-    titel: "React-Komponenten bauen",
-    beschreibung: "Task-UI mit shadcn/ui gestalten",
-    faelligkeit: "2025-06-01",
-    abgeschlossen: null,
-    created_at: "2025-05-18T12:00:00Z",
-    updated_at: "2025-05-18T12:00:00Z",
-    kategorie: { name: "Entwicklung" },
-    tags: [
-      { tagID: "a", name: "Frontend" },
-      { tagID: "b", name: "UI" },
-    ],
-  },
-  {
-    eintragID: "2",
-    titel: "API anbinden",
-    beschreibung: "Daten vom Express-Backend laden",
-    faelligkeit: "2025-06-05",
-    abgeschlossen: "2025-05-19T08:00:00Z",
-    created_at: "2025-05-18T12:00:00Z",
-    updated_at: "2025-05-19T08:00:00Z",
-    kategorie: { name: "Backend" },
-    tags: [{ tagID: "c", name: "API" }],
-  },
-];
-
 export default function TasksPage() {
-  const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
-
-  const handleUpdate = (updatedTask: Task) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task
-      )
-    );
-  };
-
-  //TODO: noch benötigt?
-  const toggleErledigt = (id: string) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.eintragID === id
-          ? {
-            ...task,
-            abgeschlossen: task.abgeschlossen
-              ? null
-              : new Date().toISOString(),
-          }
-          : task
-      )
-    );
-  };
 
   const categorielist = [
     { value: "Kategorie1", label: "Kategorie1", icon: Turtle },
@@ -75,9 +21,9 @@ export default function TasksPage() {
     { value: "Kategorie3", label: "Kategorie3", icon: Turtle },
   ];
   const tagsList = [
-    { value: 0, label: "Tag1", icon: Turtle },
-    { value: 1, label: "Tag2", icon: Turtle },
-    { value: 2, label: "Tag3", icon: Turtle }
+    { value: "Tag1", label: "Tag1", icon: Turtle },
+    { value: "Tag2", label: "Tag2", icon: Turtle },
+    { value: "Tag3", label: "Tag3", icon: Turtle }
   ];
 
   const router = useRouter();

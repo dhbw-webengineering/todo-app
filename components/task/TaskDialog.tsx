@@ -100,6 +100,7 @@ type TaskDialogProps = {
 
     // API Call für Delete
     const deleteTodo = async (id: number) => {
+      //TODO: überall mit ApiRoute ersetzten
       const response = await fetch(`http://localhost:3001/todos/${id}`, {
         method: "DELETE",
         credentials: "include",
@@ -123,7 +124,7 @@ type TaskDialogProps = {
             title,
             dueDate: dueDate!.toISOString(),
             description: description || undefined,
-            categoryId,
+            categoryId: categoryId[0],
             completedAt: completed ? null : new Date().toISOString(),
             tags: tagsStr
               ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
@@ -137,7 +138,7 @@ type TaskDialogProps = {
             title,
             dueDate: dueDate ? dueDate.toISOString() : undefined,
             description: description || undefined,
-            categoryId,
+            categoryId: categoryId[0],
             tags: tagsStr
               ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
               : undefined,
@@ -401,10 +402,6 @@ type TaskDialogProps = {
             {//TODO: reload?
             <Button onClick={() => {
               handleSave();
-              // bei Datumsänderung muss neu geladen werden
-              if (task && task.dueDate !== dueDate) {
-                window.location.reload();
-              }
             }}></Button>
             }
           </DialogFooter>

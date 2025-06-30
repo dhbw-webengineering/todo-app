@@ -1,6 +1,6 @@
 'use client'
 
-import { Task } from "@/types/task";
+import { TodoApiResponse } from "@/types/task";
 import TasksDisplay from "./TasksDisplay";
 import React, { createRef, Ref, RefObject, useState } from "react";
 import { TasksContainerRef } from "./TasksContainer";
@@ -21,13 +21,13 @@ export default function OverviewTasks() {
         [createRef<TasksContainerRef>(), undefined]
     ]);
 
-    function updateTask(task: Task) {
+    function updateTask(task: TodoApiResponse) {
         taskListRefs.forEach(entry => {
             entry[0].current?.updateTask(task);
         });
     }
 
-    function deleteTask(task: Task) {
+    function deleteTask(task: TodoApiResponse) {
         taskListRefs.forEach(entry => {
             entry[0].current?.deleteTask(task);
         });
@@ -41,7 +41,8 @@ export default function OverviewTasks() {
         <>
 
         {taskListRefs.filter(entry => entry[1]).length === 0 &&
-            <p>Keine Daten verfügbar.</p>}
+            <p>Keine Daten verfügbar.</p>
+        }
         
         <TasksDisplay header="Heute" day={0} sendTaskUpdate={updateTask} sendTaskDelete={deleteTask} tasksUpdateRef={taskListRefs[0][0] as RefObject<TasksContainerRef>} sendHasDataChanged={onDisplayHasDataChanged} />
         
