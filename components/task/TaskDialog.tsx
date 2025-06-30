@@ -280,21 +280,21 @@ type TaskDialogProps = {
               />
             </div>
 
-            {/* Beschreibung */}
-            <div className="space-y-1">
-              <label
-                htmlFor="task-description"
-                className="text-sm font-medium"
-              >
-                Beschreibung (optional)
-              </label>
-              <Textarea
-                id="task-description"
-                value={description}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
-                placeholder="Beschreibung (optional)"
-              />
-            </div>
+              {/* Beschreibung */}
+              <div className="space-y-1">
+                <label
+                  htmlFor="task-description"
+                  className="text-sm font-medium"
+                >
+                  Beschreibung (optional)
+                </label>
+                <Textarea
+                  id="task-description"
+                  value={description}
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+                  placeholder="Beschreibung (optional)"
+                />
+              </div>
 
             {/* Fälligkeitsdatum */}
             <div className="space-y-2">
