@@ -291,7 +291,7 @@ type TaskDialogProps = {
               <Textarea
                 id="task-description"
                 value={description}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
                 placeholder="Beschreibung (optional)"
               />
             </div>
