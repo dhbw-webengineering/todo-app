@@ -12,7 +12,8 @@ export function useCategories() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3001/category")
+    fetch("http://localhost:3001/category",
+      {credentials: "include"})
       .then((res) => res.json())
       .then((data) => setCategories(data.map((c: Category) => ({
         ...c,
