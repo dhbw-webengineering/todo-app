@@ -1,20 +1,78 @@
 "use client";
 
-import { useState } from "react";
+import { useState,  useEffect } from "react";
+import { TaskCard } from "components/task/TaskCard";
 import { MultiSelect } from "@/components/multiselect";
+import { TodoApiResponse } from "@/types/task";
 import { Turtle } from "lucide-react";
 import { DateRangePicker } from "@/components/dateRangePicker";
 import TasksContainer from "@/components/task/TasksContainer";
 import { ApiRoute } from "@/ApiRoute";
-import { DateRange } from "react-day-picker";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { DateRange } from "react-day-picker";
+import { toast } from "sonner";
+
+
+
+const initialTasks: Task[] = [
+  {
+    eintragID: "1",
+    titel: "React-Komponenten bauen",
+    beschreibung: "Task-UI mit shadcn/ui gestalten",
+    faelligkeit: "2025-06-01",
+    abgeschlossen: null,
+    created_at: "2025-05-18T12:00:00Z",
+    updated_at: "2025-05-18T12:00:00Z",
+    kategorie: { name: "Entwicklung" },
+    tags: [
+      { tagID: "a", name: "Frontend" },
+      { tagID: "b", name: "UI" },
+    ],
+  },
+  {
+    eintragID: "2",
+    titel: "API anbinden",
+    beschreibung: "Daten vom Express-Backend laden",
+    faelligkeit: "2025-06-05",
+    abgeschlossen: "2025-05-19T08:00:00Z",
+    created_at: "2025-05-18T12:00:00Z",
+    updated_at: "2025-05-19T08:00:00Z",
+    kategorie: { name: "Backend" },
+    tags: [{ tagID: "c", name: "API" }],
+  },
+];
 
 export default function TasksPage() {
+  const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
 
-  const categoriesList = [
-    { value: 0, label: "Kategorie1", icon: Turtle },
-    { value: 1, label: "Kategorie2", icon: Turtle },
-    { value: 2, label: "Kategorie3", icon: Turtle },
+  const handleUpdate = (updatedTask: Task) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    );
+  };
+
+  //TODO: noch benötigt?
+  const toggleErledigt = (id: string) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.eintragID === id
+          ? {
+            ...task,
+            abgeschlossen: task.abgeschlossen
+              ? null
+              : new Date().toISOString(),
+          }
+          : task
+      )
+    );
+  };
+
+  const categorielist = [
+    { value: "Kategorie1", label: "Kategorie1", icon: Turtle },
+    { value: "Kategorie2", label: "Kategorie2", icon: Turtle },
+    { value: "Kategorie3", label: "Kategorie3", icon: Turtle },
   ];
   const tagsList = [
     { value: 0, label: "Tag1", icon: Turtle },
@@ -26,10 +84,10 @@ export default function TasksPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedCategorie, setSelectedCategorie] = useState<string[]>([]);
 
-  const handleCategoriesChange = (newCategories: number[]) => {
-    setSelectedCategories(newCategories);
+  const handleCategoriesChange = (newCategories: string[]) => {
+    setSelectedCategorie(newCategories);
   
     const params = new URLSearchParams(searchParams);
     if (newCategories.length > 0) {
@@ -40,11 +98,12 @@ export default function TasksPage() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const [selectedTags, setSelectedTags] = useState<number[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const handleTagsChange = (newTags: number[]) => {
+  const handleTagsChange = (newTags: string[]) => {
     setSelectedTags(newTags);
-    
+
+   
     const params = new URLSearchParams(searchParams);
     if (newTags.length > 0) {
       params.set('tags', newTags.join(','));
@@ -55,30 +114,26 @@ export default function TasksPage() {
   };
 
   const handleDateChange = (range: DateRange | undefined) => {
-
-    console.log("Selected date range:", range);
     const params = new URLSearchParams(searchParams);
     if (range?.from && range?.to) {
       params.set('startDate', String(range.from.getTime()));
       params.set('endDate', String(range.to.getTime()));
-    }
-    else {
+    } else {
       params.delete('startDate');
       params.delete('endDate');
     }
     router.replace(`${pathname}?${params.toString()}`);
+  };
 
-  }
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
       <div className="flex items-center space-x-4 mb-6">
-
         <div className="w-1/5">
           <MultiSelect
-            options={categoriesList}
+            options={categorielist}
             onValueChange={handleCategoriesChange}
-            defaultValue={selectedCategories}
+            defaultValue={selectedCategorie}
             placeholder="Kategorie"
             variant="inverted"
             maxCount={2}
@@ -95,11 +150,9 @@ export default function TasksPage() {
           />
         </div>
         <div className="w-1/6">
-          <DateRangePicker 
-            onChange={handleDateChange} />
+          <DateRangePicker onChange={handleDateChange} />
         </div>
       </div>
-
       <div className="space-y-4 max-w-3xl">
         <TasksContainer apiRoute={ApiRoute.TODOS} showTasksDone={true}/>
       </div>

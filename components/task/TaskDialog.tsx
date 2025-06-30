@@ -1,4 +1,4 @@
-"use client";
+  "use client";
 
 import {
   Dialog,
@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect, ChangeEvent } from "react";
-import { Task, TaskCreateData } from "@/types/task";
+import { TodoApiResponse, TodoApiCreate, TodoApiEdit } from "@/types/task";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -32,158 +32,213 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MultiSelect } from "../multiselect";
 import { Turtle } from "lucide-react";
-import moment, { Moment } from "moment";
-
 
 type TaskDialogProps = {
   mode: "create" | "edit";
-  task?: Task;
+  task?: TodoApiResponse | null;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSave: (task: Task | TaskCreateData) => void;
+  onSave: (task: TodoApiResponse) => void;
   onDelete?: (id: number) => void;
   hideTrigger?: boolean;
   triggerVariant?: "button" | "dropdown";
 };
 
-export function TaskDialog({
-  mode,
-  task,
-  open,
-  onOpenChange,
-  onSave,
-  onDelete,
-  hideTrigger = false,
-  triggerVariant = "button",
-}: TaskDialogProps) {
-  // State Management
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isControlled = open !== undefined && onOpenChange !== undefined;
-  const currentOpen = isControlled ? open : internalOpen;
-  const setCurrentOpen = isControlled ? onOpenChange! : setInternalOpen;
+  export function TaskDialog({
+    mode,
+    task,
+    open,
+    onOpenChange,
+    onSave,
+    onDelete,
+    hideTrigger = false,
+    triggerVariant = "button",
+  }: TaskDialogProps) {
+    // State Management
+    const [internalOpen, setInternalOpen] = useState(false);
+    const isControlled = open !== undefined && onOpenChange !== undefined;
+    const currentOpen = isControlled ? open : internalOpen;
+    const setCurrentOpen = isControlled ? onOpenChange! : setInternalOpen;
 
-  // Form State
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState<Moment | undefined>(
-    undefined
-  );
-  const [categoryId, setCategoryId] = useState<number[]>([0]);
-  const [tags, setTags] = useState<string[]>([]);
-  const [done, setDone] = useState(false);
+    // Form State
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+    const [categoryId, setCategoryId] = useState<number[]>([0]);
+    const [tagsStr, setTagsStr] = useState("");
+    const [completed, setCompleted] = useState(false);
 
-  const [errors, setErrors] = useState<{
-    title?: boolean;
-    dueDate?: boolean;
-    category?: boolean;
-  }>({});
+    const [errors, setErrors] = useState<{
+      title?: boolean;
+      dueDate?: boolean;
+      category?: boolean;
+    }>({});
 
-  // In TaskDialog.tsx - handleSave Funktion anpassen
-  const handleSave = async () => {
-    const newErrors = {
-      title: !title.trim(),
-      dueDate: !dueDate,
+    // API Call für Create
+    const createTodo = async (data: TodoApiCreate) => {
+      const response = await fetch("http://localhost:3001/todos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Fehler beim Erstellen");
+      return (await response.json()) as TodoApiResponse;
     };
 
-    setErrors(newErrors);
-    if (Object.values(newErrors).some(Boolean)) return;
+    // API Call für Update
+    const updateTodo = async (data: TodoApiEdit) => {
+      const response = await fetch(`http://localhost:3001/todos/${data.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Fehler beim Aktualisieren");
+      return (await response.json()) as TodoApiResponse;
+    };
 
-    try {
-      const taskData: TaskCreateData = {
-        ...(mode === "edit" && task ? task : {}),
-        title: title,
-        description: description,
-        done: done,
-        dueDate: dueDate,
-        categoryId: categoryId[0],
-        tags: tags
+    // API Call für Delete
+    const deleteTodo = async (id: number) => {
+      const response = await fetch(`http://localhost:3001/todos/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Fehler beim Löschen");
+    };
+
+    const handleSave = async () => {
+      const newErrors = {
+        title: !title.trim(),
+        dueDate: !dueDate,
+        category: !categoryId,
       };
 
-      await onSave(taskData);
+      setErrors(newErrors);
+      if (Object.values(newErrors).some(Boolean)) return;
 
+      try {
+        if (mode === "create") {
+          const createData: TodoApiCreate = {
+            title,
+            dueDate: dueDate!.toISOString(),
+            description: description || undefined,
+            categoryId,
+            completedAt: completed ? null : new Date().toISOString(),
+            tags: tagsStr
+              ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
+              : undefined,
+          };
+          const created = await createTodo(createData);
+          await onSave(created);
+        } else if (mode === "edit" && task) {
+          const editData: TodoApiEdit = {
+            id: task.id,
+            title,
+            dueDate: dueDate ? dueDate.toISOString() : undefined,
+            description: description || undefined,
+            categoryId,
+            tags: tagsStr
+              ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
+              : undefined,
+            completedAt: completed ? (task.completedAt ? task.completedAt : new Date().toISOString()) : null,
+          };
+          const updated = await updateTodo(editData);
+          await onSave(updated);
+        }
+        
+        if (mode === "create") {
+          resetForm();
+        }
+        setCurrentOpen(false);
+      } catch (error) {
+        console.error(
+          `Fehler beim ${mode === "create" ? "Erstellen" : "Speichern"}:`,
+          error
+        );
+      }
+    };
+
+    useEffect(() => {
+      if (mode === "edit" && task) {
+        setTitle(task.title);
+        setDescription(task.description || "");
+        setDueDate(task.dueDate ? new Date(task.dueDate) : undefined);
+        setCategoryId([task.categoryId]);
+        setTagsStr(task.tags?.map((t) => t.name).join(", ") || "");
+        setCompleted(!!task.completedAt);
+      }
       if (mode === "create") {
         resetForm();
       }
-      setCurrentOpen(false);
-    } catch (error) {
-      console.error(
-        `Fehler beim ${mode === "create" ? "Erstellen" : "Speichern"}:`,
-        error
-      );
-    }
-  };
+    }, [mode, task]);
 
-  // Initialize form - Edit Mode korrigieren
-  useEffect(() => {
-    if (mode === "edit" && task) {
-      setTitle(task.title);
-      setDescription(task.description || "");
-      setDueDate(task.dueDate);
-      setCategoryId([task.categoryId || 0]);
-      setTags(task.tags || []);
-      setDone(task.done);
-    }
-  }, [mode, task]);
+    const resetForm = () => {
+      setTitle("");
+      setDescription("");
+      setDueDate(undefined);
+      setCategoryId([0]);
+      setTagsStr("");
+      setCompleted(false);
+      setErrors({});
+    };
 
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setDueDate(undefined);
-    setCategoryId([0]);
-    setTags([]);
-    setDone(false);
-    setErrors({});
-  };
+    const setRelativeDate = (daysFromToday: number) => {
+      const date = new Date();
+      date.setDate(date.getDate() + daysFromToday);
+      setDueDate(date);
+    };
 
-  const setRelativeDate = (daysFromToday: number) => {
-    setDueDate(moment().add(daysFromToday, "days"));
-  };
+    const handleDelete = async () => {
+      if (mode === "edit" && task && onDelete) {
+        try {
+          await deleteTodo(task.id);
+          onDelete(task.id);
+          setCurrentOpen(false);
+        } catch (error) {
+          console.error("Fehler beim Löschen:", error);
+        }
+      }
+    };
 
-  const handleDelete = () => {
-    if (mode === "edit" && task && onDelete) {
-      onDelete(task.id);
-      setCurrentOpen(false);
-    }
-  };
+    const renderTrigger = () => {
+      if (hideTrigger) return null;
 
-  const renderTrigger = () => {
-    if (hideTrigger) return null;
+      if (mode === "create") {
+        return (
+          <DialogTrigger asChild>
+            <Button variant="outline" className="w-full justify-start gap-2 cursor-pointer">
+              <Plus className="w-4 h-4" />
+              Neuen Task erstellen
+            </Button>
+          </DialogTrigger>
+        );
+      }
 
-    if (mode === "create") {
-      return (
-        <DialogTrigger asChild>
-          <Button variant="outline" className="w-full justify-start gap-2 cursor-pointer">
-            <Plus className="w-4 h-4" />
-            Neuen Task erstellen
-          </Button>
-        </DialogTrigger>
-      );
-    }
+      if (mode === "edit" && triggerVariant === "dropdown") {
+        return (
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button aria-label="Mehr Optionen">
+                <MoreVertical className="w-5 h-5 cursor-pointer" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setCurrentOpen(true)} className="cursor-pointer">
+                Bearbeiten
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete} className="text-red-600 cursor-pointer">
+                Löschen
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      }
 
-    if (mode === "edit" && triggerVariant === "dropdown") {
-      return (
-        <DropdownMenu modal={false}>
-          <DropdownMenuTrigger asChild>
-            <button aria-label="Mehr Optionen">
-              <MoreVertical className="w-5 h-5 cursor-pointer" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setCurrentOpen(true)} className="cursor-pointer">
-              Bearbeiten
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-red-600 cursor-pointer">
-              Löschen
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
+      return null;
+    };
 
-    return null;
-  };
-
-  const frameworksList = [
+    const frameworksList = [
     { value: 0, label: "React", icon: Turtle },
     { value: 1, label: "Angular", icon: Turtle },
     { value: 2, label: "Vue", icon: Turtle },
@@ -191,33 +246,31 @@ export function TaskDialog({
     { value: 4, label: "Ember", icon: Turtle },
   ];
 
-  const [selectedCategory, setSelectedCategory] = useState<number>();
+    return (
+      <>
+        {renderTrigger()}
 
-  return (
-    <>
-      {renderTrigger()}
-
-      <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {mode === "create" ? "Task erstellen" : "Task bearbeiten"}
-            </DialogTitle>
-            <DialogDescription>
-              {mode === "create"
-                ? "Felder ausfüllen um Task zu erstellen"
-                : "Felder editieren um Task zu bearbeiten"}
-            </DialogDescription>
-          </DialogHeader>
+        <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {mode === "create" ? "Task erstellen" : "Task bearbeiten"}
+              </DialogTitle>
+              <DialogDescription>
+                {mode === "create"
+                  ? "Felder ausfüllen um Task zu erstellen"
+                  : "Felder editieren um Task zu bearbeiten"}
+              </DialogDescription>
+            </DialogHeader>
 
           <div className="space-y-4">
             {/* Titel */}
             <div className="space-y-1">
-              <label htmlFor="task-titel" className="text-sm font-medium">
+              <label htmlFor="task-title" className="text-sm font-medium">
                 Titel *
               </label>
               <Input
-                id="task-titel"
+                id="task-title"
                 value={title}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
                 placeholder="Titel"
@@ -229,13 +282,13 @@ export function TaskDialog({
             {/* Beschreibung */}
             <div className="space-y-1">
               <label
-                htmlFor="task-beschreibung"
+                htmlFor="task-description"
                 className="text-sm font-medium"
               >
                 Beschreibung (optional)
               </label>
               <Textarea
-                id="task-beschreibung"
+                id="task-description"
                 value={description}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
                 placeholder="Beschreibung (optional)"
@@ -244,13 +297,13 @@ export function TaskDialog({
 
             {/* Fälligkeitsdatum */}
             <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="task-faelligkeit">
+              <label className="text-sm font-medium" htmlFor="task-dueDate">
                 Fälligkeitsdatum *
               </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
-                    id="task-faelligkeit"
+                    id="task-dueDate"
                     variant="outline"
                     className={`w-full justify-start text-left font-normal ${
                       errors.dueDate ? "border-red-500" : ""
@@ -258,8 +311,8 @@ export function TaskDialog({
                     aria-invalid={errors.dueDate}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dueDate !== undefined
-                      ? format(dueDate.toDate(), "dd.MM.yyyy")
+                    {dueDate
+                      ? format(dueDate, "dd.MM.yyyy")
                       : "Datum wählen"}
                   </Button>
                 </PopoverTrigger>
@@ -271,14 +324,12 @@ export function TaskDialog({
                   <Calendar
                     mode="single"
                     selected={dueDate}
-                    onSelect={(date: Date) => {
-                        setDueDate(moment(date));
-                      }
-                    }
+                    onSelect={setDueDate}
                     locale={de}
-                    defaultMonth={dueDate ?? moment().toDate()}
+                    defaultMonth={dueDate ?? new Date()}
                     initialFocus
                   />
+
                   <div className="flex justify-between p-2 border-t">
                     <Button
                       variant="ghost"
@@ -306,9 +357,11 @@ export function TaskDialog({
               </Popover>
             </div>
 
-            {/* Kategorie */}
+            
+            {//TODO: Kategorie select merge
+            /* Kategorie */}
             <MultiSelect
-              options={frameworksList}
+              options={[]}
               onValueChange={setCategoryId}
               defaultValue={[0]}
               maxSelectable={1}
@@ -322,8 +375,8 @@ export function TaskDialog({
               </label>
               <Input
                 id="task-tags"
-                value={tags}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setTags(e.target.value.replace(" ", "").split(","))}
+                value={tagsStr}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setTagsStr(e.target.value)}
                 placeholder="Tags (Kommagetrennt, optional)"
               />
             </div>
@@ -331,26 +384,29 @@ export function TaskDialog({
             {/* Erledigt */}
             <div className="flex items-center gap-2">
               <Checkbox
-                checked={done}
-                onCheckedChange={() => setDone(!done)}
-                id="task-abgeschlossen"
+                checked={!completed}
+                onCheckedChange={() => setCompleted(!completed)}
+                id="task-completed"
               />
-              <label htmlFor="task-abgeschlossen" className="text-sm">
+              <label htmlFor="task-completed" className="text-sm">
                 Erledigt
               </label>
             </div>
           </div>
 
           <DialogFooter className="mt-4">
+            <Button onClick={handleSave}>
+              {mode === "create" ? "Erstellen" : "Speichern"}
+            </Button>
+            {//TODO: reload?
             <Button onClick={() => {
               handleSave();
               // bei Datumsänderung muss neu geladen werden
               if (task && task.dueDate !== dueDate) {
                 window.location.reload();
               }
-            }}>
-              {mode === "create" ? "Erstellen" : "Speichern"}
-            </Button>
+            }}></Button>
+            }
           </DialogFooter>
         </DialogContent>
       </Dialog>

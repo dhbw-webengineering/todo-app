@@ -1,17 +1,38 @@
-import moment from "moment";
-
-export type Task = {
+export interface TodoApiResponse {
   id: number;
+  userId: number;
   title: string;
-  description: string;
-  dueDate: moment.Moment | undefined;
-  done: boolean;
-  tags: string[];
+  description?: string;
+  dueDate: string;
   categoryId: number;
+  completedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  category: {
+    id: number;
+    userId: number;
+    name: string;
+  };
+  tags?: {
+    id: number;
+    name: string;
+  }[];
+}
+export interface TodoApiCreate {
+  title: string;
+  dueDate: string; // ISO-String
+  description?: string;
+  categoryId: number;
+  tags?: string[]; // Tag-Namen als Array (wie in deinem Backend erwartet)
+  completedAt: string | null; // Für das Erledigt-Toggling, optional
 }
 
-export type TaskForJson = Omit<Task, 'dueDate'> & {
-  dueDate: number | undefined;
+export interface TodoApiEdit {
+  id: number; // Die ID des zu bearbeitenden Todos
+  title?: string;
+  dueDate?: string;
+  description?: string;
+  categoryId?: number;
+  tags?: string[]; // Tag-Namen als Array (wie in deinem Backend erwartet)
+  completedAt?: string | null; // Für das Erledigt-Toggling
 }
-
-export type TaskCreateData = Omit<Task, 'id'>;
