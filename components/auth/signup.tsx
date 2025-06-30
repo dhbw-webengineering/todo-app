@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import Link from "next/link"
 import { CheckCircle2, ArrowRight } from "lucide-react"
+import { ApiRoute } from "@/ApiRoute"
+
 
 export function SignupForm({
   className,
@@ -49,7 +51,7 @@ export function SignupForm({
     }
 
     try {
-      const response = await fetch("http://localhost:3001/register", {
+      const response = await fetch(ApiRoute.REGISTER, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

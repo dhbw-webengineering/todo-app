@@ -2,30 +2,31 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TodoApiResponse, TodoApiEdit } from "@/types/task"; 
 import { TaskDialog } from "@/components/task/TaskDialog";
-import { format, differenceInCalendarDays } from "date-fns";
+import { differenceInCalendarDays, format } from "date-fns";
+import moment from 'moment'
+
+moment.locale("de")
 
 export function TaskCard({
   task,
-  onToggle,
   onUpdate,
-  onDelete,
+  onDelete
 }: {
   task: TodoApiResponse;
-  onToggle: (id: number) => void;
   onUpdate: (updatedTask: TodoApiResponse) => void;
   onDelete: (id: number) => void;
 }) {
-  let faelligkeitLabel = "";
+  let dueDateLabel = "";
   if (task.dueDate) {
     const heute = new Date();
     const faellig = new Date(task.dueDate);
     const diff = differenceInCalendarDays(faellig, heute);
 
-    if (diff === 0) faelligkeitLabel = "heute fällig";
-    else if (diff === 1) faelligkeitLabel = "morgen fällig";
-    else if (diff > 1) faelligkeitLabel = `fällig in ${diff} Tagen`;
-    else if (diff === -1) faelligkeitLabel = "seit gestern fällig";
-    else faelligkeitLabel = `seit ${Math.abs(diff)} Tagen fällig`;
+    if (diff === 0) dueDateLabel = "heute fällig";
+    else if (diff === 1) dueDateLabel = "morgen fällig";
+    else if (diff > 1) dueDateLabel = `fällig in ${diff} Tagen`;
+    else if (diff === -1) dueDateLabel = "seit gestern fällig";
+    else dueDateLabel = `seit ${Math.abs(diff)} Tagen fällig`;
   }
 
   const isCompleted = !task.completedAt;
@@ -39,7 +40,7 @@ export function TaskCard({
             {task.dueDate && (
               <span>
                 {" "}
-                • {faelligkeitLabel} •{" "}
+                • {dueDateLabel} •{" "}
                 {format(new Date(task.dueDate), "dd.MM.yyyy")}
               </span>
             )}
@@ -51,7 +52,10 @@ export function TaskCard({
         <div className="flex gap-3 items-start">
           <Checkbox
             checked={isCompleted}
-            onCheckedChange={() => onToggle(task.id)}
+            onCheckedChange={() => {
+              task.completedAt = task.completedAt ? null : new Date().toISOString();
+              onUpdate(task);
+            }}
             className="mt-1 cursor-pointer"
           />
           <div>
@@ -82,10 +86,10 @@ export function TaskCard({
         </div>
 
         <div className="flex-shrink-0 ml-4 self-end">
-          <TaskDialog
-            mode="edit"
-            task={task}
-            onSave={onUpdate}
+          <TaskDialog 
+            mode="edit" 
+            task={task} 
+            onSave={onUpdate} 
             onDelete={onDelete}
             triggerVariant="dropdown"
             hideTrigger={false}

@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react"
+import React, { ChangeEvent, useState } from "react"
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,7 +30,7 @@ export default function AccountCard({ user }: { user: { email: string } }) {
               <Input
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 className="flex-1"
                 required
               />
@@ -40,7 +40,7 @@ export default function AccountCard({ user }: { user: { email: string } }) {
               <Input
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 placeholder="Neues Passwort"
                 className="flex-1"
               />

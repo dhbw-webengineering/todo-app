@@ -1,46 +1,48 @@
   "use client";
 
-  import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-    DialogDescription,
-  } from "@/components/ui/dialog";
-  import { Input } from "@/components/ui/input";
-  import { Textarea } from "@/components/ui/textarea";
-  import { Button } from "@/components/ui/button";
-  import { Checkbox } from "@/components/ui/checkbox";
-  import { useState, useEffect } from "react";
-  import { TodoApiResponse, TodoApiCreate, TodoApiEdit } from "@/types/task";
-  import { format } from "date-fns";
-  import { Calendar } from "@/components/ui/calendar";
-  import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-  } from "@/components/ui/popover";
-  import { de } from "date-fns/locale";
-  import { CalendarIcon, Plus, MoreVertical } from "lucide-react";
-  import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-  } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useState, useEffect, ChangeEvent } from "react";
+import { TodoApiResponse, TodoApiCreate, TodoApiEdit } from "@/types/task";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { de } from "date-fns/locale";
+import { CalendarIcon, Plus, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { MultiSelect } from "../multiselect";
+import { Turtle } from "lucide-react";
 
-  type TaskDialogProps = {
-    mode: "create" | "edit";
-    task?: TodoApiResponse | null;
-    open?: boolean;
-    onOpenChange?: (open: boolean) => void;
-    onSave: (task: TodoApiResponse) => void;
-    onDelete?: (id: number) => void;
-    hideTrigger?: boolean;
-    triggerVariant?: "button" | "dropdown";
-  };
+type TaskDialogProps = {
+  mode: "create" | "edit";
+  task?: TodoApiResponse | null;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onSave: (task: TodoApiResponse) => void;
+  onDelete?: (id: number) => void;
+  hideTrigger?: boolean;
+  triggerVariant?: "button" | "dropdown";
+};
 
   export function TaskDialog({
     mode,
@@ -62,7 +64,7 @@
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
-    const [categoryId, setCategoryId] = useState<number>(1); // Default: 1
+    const [categoryId, setCategoryId] = useState<number[]>([0]);
     const [tagsStr, setTagsStr] = useState("");
     const [completed, setCompleted] = useState(false);
 
@@ -98,6 +100,7 @@
 
     // API Call für Delete
     const deleteTodo = async (id: number) => {
+      //TODO: überall mit ApiRoute ersetzten
       const response = await fetch(`http://localhost:3001/todos/${id}`, {
         method: "DELETE",
         credentials: "include",
@@ -121,7 +124,7 @@
             title,
             dueDate: dueDate!.toISOString(),
             description: description || undefined,
-            categoryId,
+            categoryId: categoryId[0],
             completedAt: completed ? null : new Date().toISOString(),
             tags: tagsStr
               ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
@@ -135,7 +138,7 @@
             title,
             dueDate: dueDate ? dueDate.toISOString() : undefined,
             description: description || undefined,
-            categoryId,
+            categoryId: categoryId[0],
             tags: tagsStr
               ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
               : undefined,
@@ -144,7 +147,7 @@
           const updated = await updateTodo(editData);
           await onSave(updated);
         }
-
+        
         if (mode === "create") {
           resetForm();
         }
@@ -153,7 +156,6 @@
         console.error(
           `Fehler beim ${mode === "create" ? "Erstellen" : "Speichern"}:`,
           error
-
         );
       }
     };
@@ -163,7 +165,7 @@
         setTitle(task.title);
         setDescription(task.description || "");
         setDueDate(task.dueDate ? new Date(task.dueDate) : undefined);
-        setCategoryId(task.categoryId);
+        setCategoryId([task.categoryId]);
         setTagsStr(task.tags?.map((t) => t.name).join(", ") || "");
         setCompleted(!!task.completedAt);
       }
@@ -176,7 +178,7 @@
       setTitle("");
       setDescription("");
       setDueDate(undefined);
-      setCategoryId(1);
+      setCategoryId([0]);
       setTagsStr("");
       setCompleted(false);
       setErrors({});
@@ -237,6 +239,14 @@
       return null;
     };
 
+    const frameworksList = [
+    { value: 0, label: "React", icon: Turtle },
+    { value: 1, label: "Angular", icon: Turtle },
+    { value: 2, label: "Vue", icon: Turtle },
+    { value: 3, label: "Svelte", icon: Turtle },
+    { value: 4, label: "Ember", icon: Turtle },
+  ];
+
     return (
       <>
         {renderTrigger()}
@@ -254,151 +264,149 @@
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
-              {/* Titel */}
-              <div className="space-y-1">
-                <label htmlFor="task-title" className="text-sm font-medium">
-                  Titel *
-                </label>
-                <Input
-                  id="task-title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Titel"
-                  aria-invalid={errors.title}
-                  className={errors.title ? "border-red-500" : ""}
-                />
-              </div>
-
-              {/* Beschreibung */}
-              <div className="space-y-1">
-                <label
-                  htmlFor="task-description"
-                  className="text-sm font-medium"
-                >
-                  Beschreibung (optional)
-                </label>
-                <Textarea
-                  id="task-description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Beschreibung (optional)"
-                />
-              </div>
-
-              {/* Fälligkeitsdatum */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="task-dueDate">
-                  Fälligkeitsdatum *
-                </label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="task-dueDate"
-                      variant="outline"
-                      className={`w-full justify-start text-left font-normal ${
-                        errors.dueDate ? "border-red-500" : ""
-                      }`}
-                      aria-invalid={errors.dueDate}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dueDate
-                        ? format(dueDate, "dd.MM.yyyy")
-                        : "Datum wählen"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto p-0 z-[1000]"
-                    align="start"
-                    sideOffset={4}
-                  >
-                    <div className="pointer-events-auto">
-                      <Calendar
-                        mode="single"
-                        selected={dueDate}
-                        onSelect={setDueDate}
-                        locale={de}
-                        defaultMonth={dueDate ?? new Date()}
-                        initialFocus
-                      />
-                    </div>
-                    <div className="flex justify-between p-2 border-t">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setRelativeDate(0)}
-                      >
-                        Heute
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setRelativeDate(1)}
-                      >
-                        Morgen
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setRelativeDate(7)}
-                      >
-                        In 7 Tagen
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Kategorie (als Zahl, ggf. Select-Komponente verwenden) */}
-              <div className="space-y-1">
-                <label htmlFor="task-category" className="text-sm font-medium">
-                  Kategorie-ID *
-                </label>
-                <Input
-                  id="task-category"
-                  type="number"
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(Number(e.target.value))}
-                  placeholder="Kategorie-ID"
-                  aria-invalid={errors.category}
-                  className={errors.category ? "border-red-500" : ""}
-                  min={1}
-                />
-              </div>
-
-              {/* Tags */}
-              <div className="space-y-1">
-                <label htmlFor="task-tags" className="text-sm font-medium">
-                  Tags (Kommagetrennt, optional)
-                </label>
-                <Input
-                  id="task-tags"
-                  value={tagsStr}
-                  onChange={(e) => setTagsStr(e.target.value)}
-                  placeholder="Tags (Kommagetrennt, optional)"
-                />
-              </div>
-
-              {/* Erledigt */}
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={!completed}
-                  onCheckedChange={() => setCompleted(!completed)}
-                  id="task-completed"
-                />
-                <label htmlFor="task-completed" className="text-sm">
-                  Erledigt
-                </label>
-              </div>
+          <div className="space-y-4">
+            {/* Titel */}
+            <div className="space-y-1">
+              <label htmlFor="task-title" className="text-sm font-medium">
+                Titel *
+              </label>
+              <Input
+                id="task-title"
+                value={title}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                placeholder="Titel"
+                aria-invalid={errors.title}
+                className={errors.title ? "border-red-500" : ""}
+              />
             </div>
 
-            <DialogFooter className="mt-4">
-              <Button onClick={handleSave}>
-                {mode === "create" ? "Erstellen" : "Speichern"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
+            {/* Beschreibung */}
+            <div className="space-y-1">
+              <label
+                htmlFor="task-description"
+                className="text-sm font-medium"
+              >
+                Beschreibung (optional)
+              </label>
+              <Textarea
+                id="task-description"
+                value={description}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
+                placeholder="Beschreibung (optional)"
+              />
+            </div>
+
+            {/* Fälligkeitsdatum */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="task-dueDate">
+                Fälligkeitsdatum *
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="task-dueDate"
+                    variant="outline"
+                    className={`w-full justify-start text-left font-normal ${
+                      errors.dueDate ? "border-red-500" : ""
+                    }`}
+                    aria-invalid={errors.dueDate}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dueDate
+                      ? format(dueDate, "dd.MM.yyyy")
+                      : "Datum wählen"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 z-[1000]"
+                  align="start"
+                  sideOffset={4}
+                >
+                  <Calendar
+                    mode="single"
+                    selected={dueDate}
+                    onSelect={setDueDate}
+                    locale={de}
+                    defaultMonth={dueDate ?? new Date()}
+                    initialFocus
+                  />
+
+                  <div className="flex justify-between p-2 border-t">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRelativeDate(0)}
+                    >
+                      Heute
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRelativeDate(1)}
+                    >
+                      Morgen
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRelativeDate(7)}
+                    >
+                      In 7 Tagen
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            
+            {//TODO: Kategorie select merge
+            /* Kategorie */}
+            <MultiSelect
+              options={[]}
+              onValueChange={setCategoryId}
+              defaultValue={[0]}
+              maxSelectable={1}
+              placeholder="Kategorie"
+              />
+
+            {/* Tags */}
+            <div className="space-y-1">
+              <label htmlFor="task-tags" className="text-sm font-medium">
+                Tags (Kommagetrennt, optional)
+              </label>
+              <Input
+                id="task-tags"
+                value={tagsStr}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setTagsStr(e.target.value)}
+                placeholder="Tags (Kommagetrennt, optional)"
+              />
+            </div>
+
+            {/* Erledigt */}
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={mode === "create" ? false : !completed}
+                onCheckedChange={() => setCompleted(!completed)}
+                id="task-completed"
+              />
+              <label htmlFor="task-completed" className="text-sm">
+                Erledigt
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter className="mt-4">
+            <Button onClick={handleSave}>
+              {mode === "create" ? "Erstellen" : "Speichern"}
+            </Button>
+            {//TODO: reload?
+            <Button onClick={() => {
+              handleSave();
+            }}></Button>
+            }
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
