@@ -385,7 +385,7 @@ type TaskDialogProps = {
             {/* Erledigt */}
             <div className="flex items-center gap-2">
               <Checkbox
-                checked={!completed}
+                checked={mode === "create" ? false : !completed}
                 onCheckedChange={() => setCompleted(!completed)}
                 id="task-completed"
               />

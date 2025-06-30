@@ -18,7 +18,6 @@ import type { Category } from "@/types/category";
 export default function TasksPage() {
   const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Kategorien und Tags vom Backend holen
   const { categories} = useCategories();
@@ -32,7 +31,7 @@ export default function TasksPage() {
   }));
 
   // Tags für MultiSelect mappen
-  const taglsit = tags.map((tag) => ({
+  const tagsList = tags.map((tag) => ({
     value: tag.name,
     label: tag.name,
     icon: Turtle,
@@ -60,84 +59,6 @@ export default function TasksPage() {
     const tagParam = searchParams.get("tags");
     setSelectedTags(tagParam ? tagParam.split(",") : []);
   }, [searchParams]);
-
-  // Initiales Laden der Tasks mit Fehlerbehandlung
-  useEffect(() => {
-    const fetchInitialTasks = async () => {
-      try {
-        const response = await fetch("http://localhost:3001/todos", { credentials: "include" });
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        setTasks(data);
-      } catch (error) {
-        setFetchError("Fehler beim Laden der Aufgaben.");
-        toast.error("Fehler beim Laden der Aufgaben", {
-          description: error instanceof Error ? error.message : "Unbekannter Fehler",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchInitialTasks();
-  }, []);
-
-  const handleUpdate = (updatedTask: TodoApiResponse) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task
-      )
-    );
-  };
-
-  const toggleErledigt = async (id: number) => {
-    const task = tasks.find((t) => t.id === id);
-    if (!task) return;
-
-    const newCompletedAt = task.completedAt ? null : new Date().toISOString();
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, completedAt: newCompletedAt } : t
-      )
-    );
-
-    try {
-      const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ completedAt: newCompletedAt, id: task.id }),
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Fehler beim Speichern im Backend.");
-    } catch (error) {
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === id ? { ...t, completedAt: task.completedAt } : t
-        )
-      );
-      toast.error("Fehler beim Aktualisieren der Aufgabe", {
-        duration: 3000,
-        description: error instanceof Error ? error.message : "Unbekannter Fehler",
-      });
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      const response = await fetch(`http://localhost:3001/todos/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Fehler beim Löschen im Backend.");
-      setTasks((prev) => prev.filter((task) => task.id !== id));
-    } catch (error) {
-      toast.error("Fehler beim Löschen der Aufgabe", {
-        duration: 3000,
-        description: error instanceof Error ? error.message : "Unbekannter Fehler",
-      });
-    }
-  };
 
   const handleCategoriesChange = (newCategories: string[]) => {
     setSelectedCategorie(newCategories);

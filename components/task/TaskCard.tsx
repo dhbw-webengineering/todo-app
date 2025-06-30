@@ -52,8 +52,10 @@ export function TaskCard({
         <div className="flex gap-3 items-start">
           <Checkbox
             checked={isCompleted}
-            //TODO: onChange statt onToggle
-            //onCheckedChange={() => onToggle(task.eintragID)}
+            onCheckedChange={() => {
+              task.completedAt = task.completedAt ? null : new Date().toISOString();
+              onUpdate(task);
+            }}
             className="mt-1 cursor-pointer"
           />
           <div>

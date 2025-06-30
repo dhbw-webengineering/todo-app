@@ -6,7 +6,8 @@ import { useState, useEffect, Dispatch, SetStateAction, useImperativeHandle, for
 import { TaskCard } from "./TaskCard";
 
 import { ApiRoute } from "@/ApiRoute";
-import { TodoApiResponse } from "@/types/task";
+import { TodoApiEdit, TodoApiResponse } from "@/types/task";
+import { toast } from "sonner";
 
 export type TasksContainerRef = {
   updateTask: (task: TodoApiResponse) => void;
@@ -28,14 +29,16 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
   const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useImperativeHandle(ref, () => ({
     updateTask,
     deleteTask
   }));
 
+  // Initiales Laden der Tasks mit Fehlerbehandlung
   useEffect(() => {
-    async function fetchTasks() {
+    const fetchInitialTasks = async () => {
       let start = 0;
       let end = 0;
       if (day !== undefined) {
@@ -47,27 +50,22 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
       }
 
       try {
-        const query = (day !== undefined || range !== undefined) ? `${apiRoute}?start=${start}&end=${end}` : apiRoute;
-        const response = await fetch(query);
+        const response = await fetch("http://localhost:3001/todos", { credentials: "include" });
         if (!response.ok) {
-          throw new Error(`HTTP error: Status ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        //const dataForJson: TaskForJson[] = await response.json();
-        //const data: Task[] = dataForJson.map(entry => {
-        /*  return {
-            ...entry,
-            dueDate: entry.dueDate !== undefined ? moment(entry.dueDate * 1000) : undefined
-          }
-        });*/
         const data: TodoApiResponse[] = await response.json();
         updateTasks(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } catch (error) {
+        setFetchError("Fehler beim Laden der Aufgaben.");
+        toast.error("Fehler beim Laden der Aufgaben", {
+          description: error instanceof Error ? error.message : "Unbekannter Fehler",
+        });
       } finally {
         setLoading(false);
       }
-    }
-    fetchTasks();
+    };
+    fetchInitialTasks();
   }, []);
 
   const updateTasks = (newTasks: SetStateAction<TodoApiResponse[]>) => {
@@ -89,7 +87,25 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     modifyTaskAndSetHasData(
       task,
       task.completedAt ? -1 : 1,
-      () => {
+      async () => {
+        const editData: TodoApiEdit = {
+          id: task.id,
+          title: task.title,
+          dueDate: task.dueDate,
+          description: task.description,
+          categoryId: task.categoryId,
+          tags: task.tags ?
+            task.tags.map((tag) => tag.name.trim()).filter(Boolean)
+            : undefined,
+          completedAt: task.completedAt
+        };
+        const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editData),
+          credentials: "include",
+        });
+        if (!response.ok) throw new Error("Fehler beim Aktualisieren");
         updateTasks(prevTasks => prevTasks.map(oldTask =>
           oldTask.id === task.id ? task : oldTask
         ));
@@ -109,8 +125,20 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     modifyTaskAndSetHasData(
       task,
       -1,
-      () => {
-        setTasks(oldTasks => oldTasks.filter(oTask => oTask.id !== task.id));
+      async () => {
+        try {
+          const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+          if (!response.ok) throw new Error("Fehler beim Löschen im Backend.");
+          setTasks(prevTasks => prevTasks.filter(oTask => oTask.id !== task.id));
+        } catch (error) {
+          toast.error("Fehler beim Löschen der Aufgabe", {
+            duration: 3000,
+            description: error instanceof Error ? error.message : "Unbekannter Fehler",
+          });
+        }
       }
     );
   }
