@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from "react"
 import { useSearchParams } from "next/navigation"
@@ -98,15 +98,16 @@ export function RequestPasswordReset({
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">E-Mail</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  name="email"
-                  placeholder="max@mustermann.com"
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
+                  <Input
+                    id="email"
+                    type="email"
+                    name="email"
+                    placeholder="max@mustermann.com"
+                    required
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                  />
+
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">

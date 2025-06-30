@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ResetPassword } from "@/components/auth/resetPassword";
 
@@ -30,7 +30,9 @@ export default function ResetPasswordPage() {
   return (
     <div className="flex min-h-full w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
-        <ResetPassword token={token!} />
+        <Suspense fallback={<div>Lade...</div>}>
+          <ResetPassword token={token!} />
+        </Suspense>
       </div>
     </div>
   );

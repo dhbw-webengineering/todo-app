@@ -4,7 +4,6 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
   CheckIcon,
-  XCircle,
   ChevronDown,
   XIcon,
   WandSparkles,
@@ -133,7 +132,7 @@ export const MultiSelect = React.forwardRef<
       animation = 0,
       maxCount = 3,
       modalPopover = false,
-      asChild = false,
+      // asChild = false,
       className,
       ...props
     },
@@ -174,11 +173,12 @@ export const MultiSelect = React.forwardRef<
       setIsPopoverOpen((prev) => !prev);
     };
 
-    const clearExtraOptions = () => {
-      const newSelectedValues = selectedValues.slice(0, maxCount);
-      setSelectedValues(newSelectedValues);
-      onValueChange(newSelectedValues);
-    };
+    // TODO: Kann das entfernt werden?
+    // const clearExtraOptions = () => {
+    //   const newSelectedValues = selectedValues.slice(0, maxCount);
+    //   setSelectedValues(newSelectedValues);
+    //   onValueChange(newSelectedValues);
+    // };
 
     const toggleAll = () => {
       if (selectedValues.length === options.length) {

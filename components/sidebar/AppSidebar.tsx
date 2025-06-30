@@ -17,7 +17,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
@@ -44,10 +43,10 @@ import {
 
 import { useState } from "react";
 import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
-import  ThemeChanger  from "@/components/themeChanger";
+import ThemeChanger from "@/components/themeChanger";
 
 import { useRouter } from "next/navigation"
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 // Menu items.
 const items = [
@@ -102,16 +101,9 @@ export function AppSidebar() {
   };
 
   const router = useRouter()
-  
+
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  
-  const handleCreateTask = async (taskData: any) => {
-    try {
-      console.log("Neuer Task erstellt:", taskData);
-    } catch (error) {
-      console.error("Fehler beim Erstellen des Tasks:", error);
-    }
-  };
+
 
   const handleLogout = async () => {
     fetch('http://localhost:3001/logout', { method: 'POST', credentials: "include" }).then(() => {
@@ -247,13 +239,13 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      
+
       {/* TaskDialog mit mode="create" außerhalb der Sidebar-Struktur */}
       <TaskDialog
+        onSave={() => {}}
         mode="create"
         open={openCreateDialog}
         onOpenChange={setOpenCreateDialog}
-        onSave={handleCreateTask}
         hideTrigger={true} // Button ist bereits in der Sidebar implementiert
       />
     </Sidebar>

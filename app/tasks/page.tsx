@@ -178,7 +178,9 @@ export default function TasksPage() {
             onDelete={handleDelete}
           />
         ))}
+
       </div>
     </div>
+
   );
 }

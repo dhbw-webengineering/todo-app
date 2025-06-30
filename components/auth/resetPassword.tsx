@@ -55,7 +55,7 @@ export function ResetPassword({ className, token, ...props }: ResetPasswordProps
         setError(data.message || "Fehler beim Zurücksetzen des Passworts.");
         toast.error(data.message || "Fehler beim Zurücksetzen des Passworts.", { duration: 3000 });
       }
-    } catch (err) {
+    } catch  {
       setError("Netzwerkfehler. Bitte versuche es später erneut.");
       toast.error("Netzwerkfehler. Bitte versuche es später erneut.", { duration: 3000 });
     }

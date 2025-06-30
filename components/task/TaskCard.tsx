@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TodoApiResponse, TodoApiEdit } from "@/types/task"; 
+import { TodoApiResponse } from "@/types/task"; 
 import { TaskDialog } from "@/components/task/TaskDialog";
 import { format, differenceInCalendarDays } from "date-fns";
 
