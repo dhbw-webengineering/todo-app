@@ -91,7 +91,7 @@ type TaskDialogProps = {
             title: title,
             dueDate: dueDate!.toISOString(),
             description: description || undefined,
-            categoryId: 0, //TODO: categoryId[0],
+            categoryId: 1, //TODO: categoryId[0],
             completedAt: completed ? null : new Date().toISOString(),
             tags: tagsStr
               ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
