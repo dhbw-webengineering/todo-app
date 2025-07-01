@@ -16,7 +16,6 @@ export default function TasksPage() {
   // Kategorien und Tags vom Backend holen
   const { categories} = useCategories();
   const { tags, refetch: refetchTags } = useTags();
-  // console.log("Refetch Tags im state triggered", tags);
 
 
   // Kategorien für MultiSelect mappen
