@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ResetPassword } from "@/components/auth/resetPassword";
+import { ApiRoute } from "@/ApiRoute";
 
 export default function ResetPasswordPage() {
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
@@ -11,7 +12,7 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     if (token) {
-      fetch(`http://localhost:3001/reset-password-token-verify?token=${token}`)
+      fetch(`${ApiRoute.RESET_PASSWORD_TOKEN_VERIFY}?token=${token}`)
         .then((response) => setIsValidToken(response.status === 200))
         .catch(() => setIsValidToken(false));
     } else {

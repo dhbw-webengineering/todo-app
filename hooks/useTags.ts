@@ -1,3 +1,4 @@
+import { ApiRoute } from "@/ApiRoute";
 import { useEffect, useState } from "react";
 
 export interface Tag {
@@ -10,7 +11,7 @@ export function useTags() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3001/tags", 
+    fetch(ApiRoute.TAGS, 
         { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {

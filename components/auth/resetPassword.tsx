@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react"; // Checkmark mit Kreis
+import { ApiRoute } from "@/ApiRoute";
 
 type ResetPasswordProps = React.ComponentProps<"div"> & {
   token: string;
@@ -41,7 +42,7 @@ export function ResetPassword({ className, token, ...props }: ResetPasswordProps
     }
 
     try {
-      const response = await fetch("http://localhost:3001/reset-password", {
+      const response = await fetch(ApiRoute.RESET_PASSWORD, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, newPassword: password }),

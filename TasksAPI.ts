@@ -16,7 +16,7 @@ export const createTodoApi = async (data: TodoApiCreate) => {
 
 export const loadTodosApi = async (callback?: (data: TodoApiResponse[]) => void, catchRun?: () => void, finallyRun?: () => void) => {
     try {
-        const response = await fetch("http://localhost:3001/todos", { credentials: "include" });
+        const response = await fetch(ApiRoute.TODOS, { credentials: "include" });
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
