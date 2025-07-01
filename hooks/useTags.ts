@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface Tag {
   id: number;
@@ -9,9 +9,9 @@ export function useTags() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("http://localhost:3001/tags", 
-        { credentials: "include" })
+  const fetchTags = useCallback(() => {
+    setLoading(true);
+    fetch("http://localhost:3001/tags", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -27,5 +27,9 @@ export function useTags() {
       .finally(() => setLoading(false));
   }, []);
 
-  return { tags, loading };
+  useEffect(() => {
+    fetchTags();
+  }, [fetchTags]);
+
+  return { tags, loading, refetch: fetchTags };
 }

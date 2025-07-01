@@ -21,10 +21,11 @@ interface TasksContainerProps {
   showTasksDone: boolean;
   sendTaskUpdate?: (task: TodoApiResponse) => void;
   sendTaskDelete?: (task: TodoApiResponse) => void;
+  onTagsChanged?: () => void;
 }
 
 function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>) {
-  const {day, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete} = props;
+  const {day, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete, onTagsChanged} = props;
   const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error] = useState<string | null>(null);
@@ -92,13 +93,17 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     );
   }
 
-  const sendOrDeleteTask = (task: TodoApiResponse) => {
+  const sendOrDeleteTask = async (task: TodoApiResponse) => {
     if (sendTaskDelete !== undefined) {
       sendTaskDelete(task);
     } else {
       deleteTask(task);
     }
-    deleteTodoApi(task.id);
+    await deleteTodoApi(task.id);
+    if (onTagsChanged) {
+      console.log("Refetch Tags triggered");
+      onTagsChanged();
+    }
   }
 
   // delete task inside this Container
