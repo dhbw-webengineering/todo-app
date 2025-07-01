@@ -31,15 +31,13 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { MultiSelect } from "../multiselect";
-import { Turtle } from "lucide-react";
-import { createTodoApi, deleteTodoApi, updateTodoApi } from "@/TasksAPI";
+import { createTodoApi, updateTodoApi } from "@/TasksAPI";
 
 type TaskDialogProps = {
   mode: "create" | "edit";
   task?: TodoApiResponse | null;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSave: (task: TodoApiResponse) => void;
   onDelete?: (id: number) => void;
   hideTrigger?: boolean;
   triggerVariant?: "button" | "dropdown";
@@ -50,7 +48,6 @@ type TaskDialogProps = {
     task,
     open,
     onOpenChange,
-    onSave,
     onDelete,
     hideTrigger = false,
     triggerVariant = "button",
@@ -92,13 +89,12 @@ type TaskDialogProps = {
             dueDate: dueDate!.toISOString(),
             description: description || undefined,
             categoryId: 1, //TODO: categoryId[0],
-            completedAt: completed ? null : new Date().toISOString(),
+            completedAt: completed ? new Date().toISOString() : null,
             tags: tagsStr
               ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
               : undefined,
           };
-          const created = await createTodoApi(createData);
-          await onSave(created);
+          await createTodoApi(createData);
         } else if (mode === "edit" && task) {
           const editData: TodoApiEdit = {
             id: task.id,
@@ -111,8 +107,7 @@ type TaskDialogProps = {
               : undefined,
             completedAt: completed ? (task.completedAt ? task.completedAt : new Date().toISOString()) : null,
           };
-          const updated = await updateTodoApi(editData);
-          await onSave(updated);
+          await updateTodoApi(editData);
         }
         
         if (mode === "create") {
@@ -204,14 +199,6 @@ type TaskDialogProps = {
 
       return null;
     };
-
-    const frameworksList = [
-    { value: 0, label: "React", icon: Turtle },
-    { value: 1, label: "Angular", icon: Turtle },
-    { value: 2, label: "Vue", icon: Turtle },
-    { value: 3, label: "Svelte", icon: Turtle },
-    { value: 4, label: "Ember", icon: Turtle },
-  ];
 
     return (
       <>
@@ -351,7 +338,7 @@ type TaskDialogProps = {
             {/* Erledigt */}
             <div className="flex items-center gap-2">
               <Checkbox
-                checked={mode === "create" ? false : !completed}
+                checked={completed}
                 onCheckedChange={() => setCompleted(!completed)}
                 id="task-completed"
               />

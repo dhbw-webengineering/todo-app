@@ -1,23 +1,17 @@
 "use client";
 
 import { useState,  useEffect } from "react";
-import { TaskCard } from "components/task/TaskCard";
 import { MultiSelect } from "@/components/multiselect";
-import { TodoApiResponse } from "@/types/task";
-import { Turtle } from "lucide-react";
 import { DateRangePicker } from "@/components/dateRangePicker";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import TasksContainer from "@/components/task/TasksContainer";
 import { ApiRoute } from "@/ApiRoute";
 import { DateRange } from "react-day-picker";
-import { toast } from "sonner";
 import { useCategories } from "@/hooks/useCategory";
 import { useTags } from "@/hooks/useTags";
 import type { Category } from "@/types/category";
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Kategorien und Tags vom Backend holen
   const { categories} = useCategories();
@@ -27,14 +21,12 @@ export default function TasksPage() {
   const categorielist = categories.map((cat: Category) => ({
     value: String(cat.id),
     label: cat.name,
-    icon: Turtle,
   }));
 
   // Tags für MultiSelect mappen
   const tagsList = tags.map((tag) => ({
     value: tag.name,
     label: tag.name,
-    icon: Turtle,
   }));
 
   // Query-Parameter Hooks

@@ -2,7 +2,7 @@
 
 import { TodoApiResponse } from "@/types/task";
 import TasksDisplay from "./TasksDisplay";
-import React, { createRef, Ref, RefObject, useState } from "react";
+import React, { createRef, RefObject, useState } from "react";
 import { TasksContainerRef } from "./TasksContainer";
 
 
