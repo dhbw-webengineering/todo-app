@@ -160,7 +160,6 @@ type TaskDialogProps = {
     const handleDelete = async () => {
       if (mode === "edit" && task && onDelete) {
         try {
-          await deleteTodoApi(task.id);
           onDelete(task.id);
           setCurrentOpen(false);
         } catch (error) {
