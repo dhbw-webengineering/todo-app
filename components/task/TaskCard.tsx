@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TodoApiResponse, TodoApiEdit } from "@/types/task"; 
+import { TodoApiResponse } from "@/types/task"; 
 import { TaskDialog } from "@/components/task/TaskDialog";
 import { differenceInCalendarDays, format } from "date-fns";
 import moment from 'moment'
@@ -51,7 +51,7 @@ export function TaskCard({
 
         <div className="flex gap-3 items-start">
           <Checkbox
-            checked={isCompleted}
+            checked={!!isCompleted}
             onCheckedChange={() => {
               task.completedAt = task.completedAt ? null : new Date().toISOString();
               onUpdate(task);
@@ -89,7 +89,6 @@ export function TaskCard({
           <TaskDialog 
             mode="edit" 
             task={task} 
-            onSave={onUpdate} 
             onDelete={onDelete}
             triggerVariant="dropdown"
             hideTrigger={false}
