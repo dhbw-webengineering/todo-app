@@ -8,6 +8,7 @@ import { TaskCard } from "./TaskCard";
 import { ApiRoute } from "@/ApiRoute";
 import { TodoApiEdit, TodoApiResponse } from "@/types/task";
 import { toast } from "sonner";
+import { deleteTodoApi, loadTodosApi, updateTodoApi } from "TasksAPI";
 
 export type TasksContainerRef = {
   updateTask: (task: TodoApiResponse) => void;
@@ -49,21 +50,11 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
         end = range?.[1];
       }
 
-      try {
-        const response = await fetch("http://localhost:3001/todos", { credentials: "include" });
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data: TodoApiResponse[] = await response.json();
-        updateTasks(data);
-      } catch (error) {
-        setFetchError("Fehler beim Laden der Aufgaben.");
-        toast.error("Fehler beim Laden der Aufgaben", {
-          description: error instanceof Error ? error.message : "Unbekannter Fehler",
-        });
-      } finally {
-        setLoading(false);
-      }
+      loadTodosApi(
+        data => updateTasks(data),
+        () => setFetchError("Fehler beim Laden der Aufgaben."),
+        () => setLoading(false)
+      );
     };
     fetchInitialTasks();
   }, []);
@@ -81,29 +72,16 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     } else {
       updateTask(task);
     }
-    const updateAPI = async () => {
-      const editData: TodoApiEdit = {
-        id: task.id,
-        title: task.title,
-        dueDate: task.dueDate,
-        description: task.description,
-        categoryId: task.categoryId,
-        tags: task.tags ?
-          task.tags.map((tag) => tag.name.trim()).filter(Boolean)
-          : undefined,
-        completedAt: task.completedAt
-      };
-      const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Fehler beim Aktualisieren");
+    const editData: TodoApiEdit = {
+      ...task,
+      tags: task.tags ?
+        task.tags.map((tag) => tag.name.trim()).filter(Boolean)
+        : undefined,
     };
-    updateAPI();
+    updateTodoApi(editData);
   }
 
+  // update task inside this Container
   const updateTask = (task: TodoApiResponse) => {
     modifyTaskAndSetHasData(
       task,
@@ -122,23 +100,10 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     } else {
       deleteTask(task);
     }
-    const deleteAPI = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/todos/${task.id}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
-        if (!response.ok) throw new Error("Fehler beim Löschen im Backend.");
-      } catch (error) {
-        toast.error("Fehler beim Löschen der Aufgabe", {
-          duration: 3000,
-          description: error instanceof Error ? error.message : "Unbekannter Fehler",
-        });
-      }
-    };
-    deleteAPI();
+    deleteTodoApi(task.id);
   }
 
+  // delete task inside this Container
   const deleteTask = (task: TodoApiResponse) => {
     modifyTaskAndSetHasData(
       task,

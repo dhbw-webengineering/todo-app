@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MultiSelect } from "../multiselect";
 import { Turtle } from "lucide-react";
+import { createTodoApi, deleteTodoApi, updateTodoApi } from "@/TasksAPI";
 
 type TaskDialogProps = {
   mode: "create" | "edit";
@@ -74,40 +75,6 @@ type TaskDialogProps = {
       category?: boolean;
     }>({});
 
-    // API Call für Create
-    const createTodo = async (data: TodoApiCreate) => {
-      const response = await fetch("http://localhost:3001/todos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Fehler beim Erstellen");
-      return (await response.json()) as TodoApiResponse;
-    };
-
-    // API Call für Update
-    const updateTodo = async (data: TodoApiEdit) => {
-      const response = await fetch(`http://localhost:3001/todos/${data.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Fehler beim Aktualisieren");
-      return (await response.json()) as TodoApiResponse;
-    };
-
-    // API Call für Delete
-    const deleteTodo = async (id: number) => {
-      //TODO: überall mit ApiRoute ersetzten
-      const response = await fetch(`http://localhost:3001/todos/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Fehler beim Löschen");
-    };
-
     const handleSave = async () => {
       const newErrors = {
         title: !title.trim(),
@@ -121,16 +88,16 @@ type TaskDialogProps = {
       try {
         if (mode === "create") {
           const createData: TodoApiCreate = {
-            title,
+            title: title,
             dueDate: dueDate!.toISOString(),
             description: description || undefined,
-            categoryId: categoryId[0],
+            categoryId: 0, //TODO: categoryId[0],
             completedAt: completed ? null : new Date().toISOString(),
             tags: tagsStr
               ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
               : undefined,
           };
-          const created = await createTodo(createData);
+          const created = await createTodoApi(createData);
           await onSave(created);
         } else if (mode === "edit" && task) {
           const editData: TodoApiEdit = {
@@ -144,7 +111,7 @@ type TaskDialogProps = {
               : undefined,
             completedAt: completed ? (task.completedAt ? task.completedAt : new Date().toISOString()) : null,
           };
-          const updated = await updateTodo(editData);
+          const updated = await updateTodoApi(editData);
           await onSave(updated);
         }
         
@@ -193,7 +160,7 @@ type TaskDialogProps = {
     const handleDelete = async () => {
       if (mode === "edit" && task && onDelete) {
         try {
-          await deleteTodo(task.id);
+          await deleteTodoApi(task.id);
           onDelete(task.id);
           setCurrentOpen(false);
         } catch (error) {
