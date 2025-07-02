@@ -10,11 +10,13 @@ moment.locale("de")
 export function TaskCard({
   task,
   onUpdate,
-  onDelete
+  onDelete,
+  onTagsChanged
 }: {
   task: TodoApiResponse;
   onUpdate: (updatedTask: TodoApiResponse) => void;
   onDelete: (id: number) => void;
+  onTagsChanged?: () => void; 
 }) {
   let dueDateLabel = "";
   if (task.dueDate) {
@@ -92,6 +94,7 @@ export function TaskCard({
             onDelete={onDelete}
             triggerVariant="dropdown"
             hideTrigger={false}
+            onTagsChanged={onTagsChanged}
           />
         </div>
       </div>

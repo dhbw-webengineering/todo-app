@@ -101,7 +101,6 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     }
     await deleteTodoApi(task.id);
     if (onTagsChanged) {
-      console.log("Refetch Tags triggered");
       onTagsChanged();
     }
   }
@@ -152,7 +151,13 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
   return (
       <div className={"grid gap-5"}>
           {sortedTasks.map((task: TodoApiResponse) => (
-                    <TaskCard onDelete={() => sendOrDeleteTask(task)} onUpdate={sendOrUpdateTask} key={task.id} task={task} />
+                    <TaskCard 
+                    onDelete={() => sendOrDeleteTask(task)} 
+                    onUpdate={sendOrUpdateTask} 
+                    key={task.id} 
+                    task={task} 
+                    onTagsChanged={onTagsChanged} 
+                    />
                   ))}
       </div>
   );
