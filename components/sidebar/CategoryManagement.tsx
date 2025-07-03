@@ -225,19 +225,19 @@ export function CategoryManagement() {
                                 value={newCategoryName}
                                 onChange={(e) => setNewCategoryName(e.target.value)}
                                 placeholder="Neue Kategorie"
-                                className="flex-1 px-2 py-1 text-sm border rounded"
+                                className="flex-1 min-w-0 bg-transparent px-2 py-1 text-sm border rounded"
                                 autoFocus
                             />
                             <button
                                 onClick={handleCreateCategory}
-                                className="p-1 text-green-600 hover:text-green-800"
+                                className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-green-500 hover:bg-green-500/10"
                                 title="Speichern"
                             >
                               <CheckCircle2 className="h-4 w-4" />
                             </button>
                             <button
                                 onClick={handleCancelCategoryAction}
-                                className="p-1 text-red-600 hover:text-red-800"
+                                className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-red-500 hover:bg-red-500/10"
                                 title="Abbrechen"
                             >
                               <X className="h-4 w-4" />
@@ -256,26 +256,26 @@ export function CategoryManagement() {
                                     type="text"
                                     value={newCategoryName}
                                     onChange={(e) => setNewCategoryName(e.target.value)}
-                                    className="flex-1 px-2 py-1 text-sm border rounded"
+                                    className="flex-1 min-w-0 bg-transparent px-2 py-1 text-sm border rounded"
                                     autoFocus
                                 />
                                 <button
                                     onClick={handleUpdateCategory}
-                                    className="p-1 text-green-600 hover:text-green-800"
+                                    className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-green-500 hover:bg-green-500/10"
                                     title="Speichern"
                                 >
                                   <CheckCircle2 className="h-4 w-4" />
                                 </button>
                                 <button
                                     onClick={handleCancelCategoryAction}
-                                    className="p-1 text-red-600 hover:text-red-800"
+                                    className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-red-500 hover:bg-red-500/10"
                                     title="Abbrechen"
                                 >
                                   <X className="h-4 w-4" />
                                 </button>
                               </div>
                           ) : (
-                              // Normal display - ✅ ENDGÜLTIGE KORREKTUR
+                              // Normal display
                               <>
                                 <SidebarMenuButton asChild>
                                   <a href={`/tasks?category=${category.id}`} className="flex w-full items-center gap-2">
