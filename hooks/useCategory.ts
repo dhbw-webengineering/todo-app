@@ -1,4 +1,5 @@
 // hooks/useCategories.ts
+import { ApiRoute } from "@/ApiRoute";
 import { useEffect, useState } from "react";
 
 export interface Category {
@@ -12,7 +13,7 @@ export function useCategories() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3001/category",
+    fetch(ApiRoute.CATEGORY,
       {credentials: "include"})
       .then((res) => res.json())
       .then((data) => setCategories(data.map((c: Category) => ({

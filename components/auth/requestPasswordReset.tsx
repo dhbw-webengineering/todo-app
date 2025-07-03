@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
+import { ApiRoute } from "@/ApiRoute"
 
 export function RequestPasswordReset({
   className,
@@ -28,7 +29,7 @@ export function RequestPasswordReset({
 
   const handleReset = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    fetch("http://localhost:3001/reset-password-request", {
+    fetch(ApiRoute.RESET_PASSWORD_REQUEST, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

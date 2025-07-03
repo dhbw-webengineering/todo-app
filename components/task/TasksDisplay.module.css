@@ -1,0 +1,12 @@
+.timeDisplay {
+  padding-left: 25px;
+  padding-top: 10px;
+  margin-bottom: 15px;
+  text-decoration-line: overline;
+  text-decoration-thickness: 2px;
+  font-weight: 350;
+}
+
+.timeDisplay:not(:first-child) {
+  margin-top: 35px
+}

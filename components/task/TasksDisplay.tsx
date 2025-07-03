@@ -2,6 +2,8 @@
 
 import { useState, RefObject } from 'react';
 
+import styles from "./TasksDisplay.module.css";
+
 import TasksContainer, { TasksContainerRef } from "./TasksContainer";
 
 import { ApiRoute } from "@/ApiRoute";
@@ -9,6 +11,7 @@ import { TodoApiResponse } from '@/types/task';
 
 
 interface TasksDisplayProps {
+  scrollId: string,
   header: string,
   day?: number,
   range?: [number, number],
@@ -19,7 +22,7 @@ interface TasksDisplayProps {
 }
 
 export default function TasksDisplay(props: TasksDisplayProps) {
-  const { header, day, range, sendTaskUpdate, sendTaskDelete, tasksUpdateRef, sendHasDataChanged } = props;
+  const {scrollId, header, day, range, sendTaskUpdate, sendTaskDelete, tasksUpdateRef, sendHasDataChanged } = props;
   const [hasData, setHasData] = useState(true);
 
   const updateHasData = (hasData: boolean) => {
@@ -31,7 +34,7 @@ export default function TasksDisplay(props: TasksDisplayProps) {
     <>
     { hasData &&
       <>
-      <h3 className={"pl-5 mt-[50px] mb-2 text-muted-foreground font-bold"}>{header}</h3>
+      <h3 id={scrollId} className={styles.timeDisplay}>{header}</h3>
       <TasksContainer apiRoute={ApiRoute.TODOS} day={day} range={range} setHasData={updateHasData} showTasksDone={false} sendTaskUpdate={sendTaskUpdate} sendTaskDelete={sendTaskDelete} ref={tasksUpdateRef}/>
       </>
     }
