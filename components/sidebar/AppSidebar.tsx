@@ -36,11 +36,8 @@ import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
 import Link from "next/link";
 
 import  ThemeChanger  from "@/components/themeChanger";
-import ThemeChanger from "@/components/themeChanger";
 import { CategoryManagement } from "./CategoryManagement";
-
 import { useRouter } from "next/navigation"
-import { toast } from "sonner";
 import { ApiRoute } from "@/ApiRoute";
 import { toast } from "sonner";
 
