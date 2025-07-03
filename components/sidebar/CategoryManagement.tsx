@@ -322,7 +322,7 @@ export function CategoryManagement() {
             <DialogHeader>
               <DialogTitle>Kategorie löschen</DialogTitle>
               <DialogDescription>
-                Bist du sicher, dass du die Kategorie "{categoryToDelete?.name}" löschen möchtest?
+                Bist du sicher, dass du die Kategorie &quot;{categoryToDelete?.name}&quot; löschen möchtest?
                 Alle Tasks in dieser Kategorie werden nicht gelöscht, aber sie verlieren ihre Kategorie-Zuordnung.
               </DialogDescription>
             </DialogHeader>
