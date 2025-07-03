@@ -15,7 +15,8 @@ export default function TasksPage() {
 
   // Kategorien und Tags vom Backend holen
   const { categories} = useCategories();
-  const { tags,} = useTags();
+  const { tags, refetch: refetchTags } = useTags();
+
 
   // Kategorien für MultiSelect mappen
   const categorielist = categories.map((cat: Category) => ({
@@ -118,7 +119,11 @@ export default function TasksPage() {
         </div>
       </div>
       <div className="space-y-4 max-w-3xl">
-        <TasksContainer apiRoute={ApiRoute.TODOS} showTasksDone={true}/>
+        <TasksContainer 
+        apiRoute={ApiRoute.TODOS} 
+        showTasksDone={true}
+        onTagsChanged={refetchTags}
+        />
       </div>
     </div>
   );
