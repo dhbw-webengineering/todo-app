@@ -7,6 +7,7 @@ import { TaskCard } from "./TaskCard";
 import { ApiRoute } from "@/ApiRoute";
 import { TodoApiEdit, TodoApiResponse } from "@/types/task";
 import { deleteTodoApi, loadTodosApi, updateTodoApi } from "TasksAPI";
+import { useSearchParams } from 'next/navigation'; // App Router
 
 export type TasksContainerRef = {
   updateTask: (task: TodoApiResponse) => void;
@@ -31,6 +32,8 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
   const [error] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  const searchParams = useSearchParams();
+
   useImperativeHandle(ref, () => ({
     updateTask,
     deleteTask
@@ -38,6 +41,9 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
 
   // Initiales Laden der Tasks mit Fehlerbehandlung
   useEffect(() => {
+    
+    
+    
     const fetchInitialTasks = async () => {
       let start = 0;
       let end = 0;
@@ -52,7 +58,8 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
       loadTodosApi(
         data => updateTasks(data),
         () => setFetchError("Fehler beim Laden der Aufgaben."),
-        () => setLoading(false)
+        () => setLoading(false),
+        searchParams
       );
     };
     fetchInitialTasks();
