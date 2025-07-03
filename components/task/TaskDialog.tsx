@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, use } from "react";
 import { TodoApiResponse, TodoApiCreate, TodoApiEdit } from "@/types/task";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -22,7 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { de } from "date-fns/locale";
+import { ca, de, se } from "date-fns/locale";
 import { CalendarIcon, Plus, MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
@@ -33,24 +33,27 @@ import {
 import { MultiSelect } from "../multiselect";
 import { Turtle } from "lucide-react";
 import { createTodoApi, updateTodoApi } from "@/TasksAPI";
+import { useCategories } from "@/hooks/useCategory";
 
 type TaskDialogProps = {
   mode: "create" | "edit";
   task?: TodoApiResponse | null;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  onSave: (data: TodoApiCreate | TodoApiEdit) => Promise<any>;
   onDelete?: (id: number) => void;
+  onTagsChanged?: () => void;
   hideTrigger?: boolean;
   triggerVariant?: "button" | "dropdown";
-  onTagsChanged?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function TaskDialog({
   mode,
   task,
+  onSave,
+  onDelete,
   open,
   onOpenChange,
-  onDelete,
   hideTrigger = false,
   triggerVariant = "button",
   onTagsChanged
@@ -75,6 +78,13 @@ export function TaskDialog({
     category?: boolean;
   }>({});
 
+
+  const {categories} = useCategories();
+  const categoryOptions = categories.map((c) => ({
+    label: c.name.trim(),//maybe typen und reihenflge ändern
+    value: Number(c.id),
+
+  }));
   const handleSave = async () => {
     const newErrors = {
       title: !title.trim(),
@@ -88,30 +98,31 @@ export function TaskDialog({
     try {
       if (mode === "create") {
         const createData: TodoApiCreate = {
-          title: title,
-          dueDate: dueDate!.toISOString(),
-          description: description || undefined,
-          categoryId: 1, //TODO: categoryId[0],
-          completedAt: completed ? new Date().toISOString() : null,
-          tags: tagsStr
-            ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
-            : undefined,
+       title: title.trim(),
+        dueDate: dueDate!.toISOString(),
+        description: description || undefined,
+        categoryId: categoryId[0],
+        completedAt: completed ? new Date().toISOString() : null,
+        tags: tagsStr
+          ? tagsStr.split(",").map(s => s.trim()).filter(Boolean)
+          : undefined,
         };
-        await createTodoApi(createData);
+          await onSave(createData);
+        
 
       } else if (mode === "edit" && task) {
         const editData: TodoApiEdit = {
-          id: task.id,
-          title,
-          dueDate: dueDate ? dueDate.toISOString() : undefined,
-          description: description || undefined,
-          categoryId: categoryId[0],
-          tags: tagsStr
-            ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
-            : undefined,
-          completedAt: completed ? (task.completedAt ? task.completedAt : new Date().toISOString()) : null,
+      id: task.id,
+        title: title.trim() || undefined,
+        dueDate: dueDate ? dueDate.toISOString() : undefined,
+        description: description || undefined,
+        categoryId: categoryId[0],
+        completedAt: completed ? new Date().toISOString() : null,
+        tags: tagsStr
+          ? tagsStr.split(",").map(s => s.trim()).filter(Boolean)
+          : undefined,
         };
-        await updateTodoApi(editData);
+          await onSave(editData);
       }
       if (onTagsChanged) {
         onTagsChanged();
@@ -320,11 +331,12 @@ export function TaskDialog({
             {//TODO: Kategorie select merge
             /* Kategorie */}
             <MultiSelect
-              options={[]}
-              onValueChange={setCategoryId}
-              defaultValue={[0]}
+              options={categoryOptions}
+              value={categoryId}
+              onValueChange={vals => setCategoryId(vals.map(Number))}
               maxSelectable={1}
-              placeholder="Kategorie"
+              placeholder="Kategorie auswählen"
+              maxCount={1}
             />
 
             {/* Tags */}

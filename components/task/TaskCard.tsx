@@ -1,9 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TodoApiResponse } from "@/types/task"; 
+import { TodoApiEdit, TodoApiResponse } from "@/types/task"; 
 import { TaskDialog } from "@/components/task/TaskDialog";
 import { differenceInCalendarDays, format } from "date-fns";
 import moment from 'moment'
+import { Category } from "@/hooks/useCategory";
+import { Tag } from "@/types/tag";
 
 moment.locale("de")
 
@@ -11,12 +13,14 @@ export function TaskCard({
   task,
   onUpdate,
   onDelete,
-  onTagsChanged
+  categories,
+  tags
 }: {
   task: TodoApiResponse;
   onUpdate: (updatedTask: TodoApiResponse) => void;
   onDelete: (id: number) => void;
-  onTagsChanged?: () => void; 
+  categories: Category[];
+  tags: Tag[];
 }) {
   let dueDateLabel = "";
   if (task.dueDate) {
@@ -53,13 +57,20 @@ export function TaskCard({
 
         <div className="flex gap-3 items-start">
           <Checkbox
-            checked={!!isCompleted}
-            onCheckedChange={() => {
-              task.completedAt = task.completedAt ? null : new Date().toISOString();
-              onUpdate(task);
+            checked={!!task.completedAt}
+            onCheckedChange={async () => {
+              const updated: TodoApiEdit = { 
+                id: task.id,
+                title: task.title,
+                dueDate: task.dueDate,
+                description: task.description,
+                categoryId: task.categoryId,
+                tags: task.tags?.map(t => t.name),
+                completedAt: task.completedAt ? null : new Date().toISOString()
+              };
+              await onUpdate(updated);
             }}
-            className="mt-1 cursor-pointer"
-          />
+            className="mt-1 cursor-pointer"/>
           <div>
             <h2
               className={`text-lg font-semibold ${
@@ -91,10 +102,10 @@ export function TaskCard({
           <TaskDialog 
             mode="edit" 
             task={task} 
+            onSave={onUpdate}
             onDelete={onDelete}
             triggerVariant="dropdown"
             hideTrigger={false}
-            onTagsChanged={onTagsChanged}
           />
         </div>
       </div>
