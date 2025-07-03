@@ -71,7 +71,7 @@ export function SignupForm({
           description: data.message || "Unbekannter Fehler"
         });
       }
-    } catch (error) {
+    } catch {
       setError("Netzwerkfehler")
       toast.error("Netzwerkfehler", { duration: 3000 })
     }

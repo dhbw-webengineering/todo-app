@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Laptop } from "lucide-react"; // Optional: Icons, falls du lucide-react installiert hast
+import { Sun, Moon} from "lucide-react"; // Optional: Icons, falls du lucide-react installiert hast
 
 const options = [
   { value: "dark", label: "Dark", icon: <Moon className="w-4 h-4 mr-2" /> },
@@ -10,7 +10,7 @@ const options = [
 
 export default function ThemeSwitch() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const {resolvedTheme, setTheme} = useTheme();
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;

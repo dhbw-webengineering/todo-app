@@ -1,13 +1,11 @@
 'use client';
 
-import styles from "./TasksContainer.module.css";
 
-import { useState, useEffect, Dispatch, SetStateAction, useImperativeHandle, forwardRef, Ref } from 'react';
+import { useState, useEffect, SetStateAction, useImperativeHandle, forwardRef, Ref } from 'react';
 import { TaskCard } from "./TaskCard";
 
 import { ApiRoute } from "@/ApiRoute";
 import { TodoApiEdit, TodoApiResponse } from "@/types/task";
-import { toast } from "sonner";
 import { deleteTodoApi, loadTodosApi, updateTodoApi } from "TasksAPI";
 
 export type TasksContainerRef = {
@@ -26,10 +24,10 @@ interface TasksContainerProps {
 }
 
 function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>) {
-  const {apiRoute, day, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete} = props;
+  const {day, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete} = props;
   const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   useImperativeHandle(ref, () => ({
@@ -143,11 +141,11 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
   });
 
 
-  if (loading) return <div className={styles.loading}>Loading tasks...</div>;
-  if (error) return <div className={styles.error}>Error: {error}</div>;
+  if (loading) return <div className={"text-center text-lg mt-12"}>Loading tasks...</div>;
+  if (error) return <div className={"text-center text-lg mt-12"}>Error: {error}</div>;
 
   return (
-      <div className={styles.taskList}>
+      <div className={"grid gap-5"}>
           {sortedTasks.map((task: TodoApiResponse) => (
                     <TaskCard onDelete={() => sendOrDeleteTask(task)} onUpdate={sendOrUpdateTask} key={task.id} task={task} />
                   ))}
