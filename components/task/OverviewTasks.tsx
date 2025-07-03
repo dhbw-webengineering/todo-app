@@ -60,7 +60,7 @@ export default function OverviewTasks() {
     //TODO: use right styles file/seperate style
     return (
         <>
-        <div className={`${styles.displaysContainer} space-x-4 mb-6`}>
+        <div className={styles.displaysContainer}>
             { taskListRefs.filter(entry => entry[1] || entry[1] === undefined).length === 0 &&
                 <p>Keine Daten verfügbar.</p>
             }

@@ -34,7 +34,7 @@ export default function TasksDisplay(props: TasksDisplayProps) {
     <>
     { hasData &&
       <>
-      <h3 className={`${styles.timeDisplay} pl-5 mt-[50px] mb-2 text-muted-foreground font-bold`}>{header}</h3>
+      <h3 id={scrollId} className={styles.timeDisplay}>{header}</h3>
       <TasksContainer apiRoute={ApiRoute.TODOS} day={day} range={range} setHasData={updateHasData} showTasksDone={false} sendTaskUpdate={sendTaskUpdate} sendTaskDelete={sendTaskDelete} ref={tasksUpdateRef}/>
       </>
     }
