@@ -30,9 +30,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MultiSelect } from "../multiselect";
-import { Turtle } from "lucide-react";
 import { createTodoApi, updateTodoApi } from "@/TasksAPI";
+import { useCategories } from "@/hooks/useCategory";
+import { CategorySelect } from "@/components/categorySelect";
+import type { Category } from "@/types/category";
 
 type TaskDialogProps = {
   mode: "create" | "edit";
@@ -53,7 +54,7 @@ export function TaskDialog({
   onDelete,
   hideTrigger = false,
   triggerVariant = "button",
-  onTagsChanged
+  onTagsChanged,
 }: TaskDialogProps) {
   // State Management
   const [internalOpen, setInternalOpen] = useState(false);
@@ -61,14 +62,15 @@ export function TaskDialog({
   const currentOpen = isControlled ? open : internalOpen;
   const setCurrentOpen = isControlled ? onOpenChange! : setInternalOpen;
 
+  const { categories } = useCategories();
+
   // Form State
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
-  const [categoryId, setCategoryId] = useState<number[]>([0]);
+  const [categoryId, setCategoryId] = useState<string>("");
   const [tagsStr, setTagsStr] = useState("");
   const [completed, setCompleted] = useState(false);
-
   const [errors, setErrors] = useState<{
     title?: boolean;
     dueDate?: boolean;
@@ -91,31 +93,36 @@ export function TaskDialog({
           title: title,
           dueDate: dueDate!.toISOString(),
           description: description || undefined,
-          categoryId: 1, //TODO: categoryId[0],
+          categoryId: Number(categoryId),
           completedAt: completed ? new Date().toISOString() : null,
           tags: tagsStr
             ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
             : undefined,
         };
         await createTodoApi(createData);
-
       } else if (mode === "edit" && task) {
         const editData: TodoApiEdit = {
           id: task.id,
           title,
           dueDate: dueDate ? dueDate.toISOString() : undefined,
           description: description || undefined,
-          categoryId: categoryId[0],
+          categoryId: Number(categoryId),
           tags: tagsStr
             ? tagsStr.split(",").map((name) => name.trim()).filter(Boolean)
             : undefined,
-          completedAt: completed ? (task.completedAt ? task.completedAt : new Date().toISOString()) : null,
+          completedAt: completed
+            ? task.completedAt
+              ? task.completedAt
+              : new Date().toISOString()
+            : null,
         };
         await updateTodoApi(editData);
       }
       if (onTagsChanged) {
         onTagsChanged();
       }
+      window.location.reload();
+
       if (mode === "create") {
         resetForm();
       }
@@ -133,20 +140,21 @@ export function TaskDialog({
       setTitle(task.title);
       setDescription(task.description || "");
       setDueDate(task.dueDate ? new Date(task.dueDate) : undefined);
-      setCategoryId([task.categoryId]);
+      setCategoryId(String(task.categoryId));
       setTagsStr(task.tags?.map((t) => t.name).join(", ") || "");
       setCompleted(!!task.completedAt);
     }
     if (mode === "create") {
       resetForm();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, task]);
 
   const resetForm = () => {
     setTitle("");
     setDescription("");
     setDueDate(undefined);
-    setCategoryId([0]);
+    setCategoryId("");
     setTagsStr("");
     setCompleted(false);
     setErrors({});
@@ -316,16 +324,17 @@ export function TaskDialog({
               </Popover>
             </div>
 
-
-            {//TODO: Kategorie select merge
-            /* Kategorie */}
-            <MultiSelect
-              options={[]}
-              onValueChange={setCategoryId}
-              defaultValue={[0]}
-              maxSelectable={1}
-              placeholder="Kategorie"
-            />
+            {/* Kategorie */}
+            <div className="space-y-1">
+              <label htmlFor="task-category" className="text-sm font-medium">
+                Kategorie *
+              </label>
+              <CategorySelect 
+                data={categories}
+                value={categoryId}
+                onChange={setCategoryId}
+                />
+            </div>
 
             {/* Tags */}
             <div className="space-y-1">
@@ -357,11 +366,6 @@ export function TaskDialog({
             <Button onClick={handleSave}>
               {mode === "create" ? "Erstellen" : "Speichern"}
             </Button>
-            {//TODO: reload?
-              <Button onClick={() => {
-                handleSave();
-              }}></Button>
-            }
           </DialogFooter>
         </DialogContent>
       </Dialog>
