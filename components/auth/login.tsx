@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { ChangeEvent, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
+import { ApiRoute } from "@/ApiRoute"
 
 export function LoginForm({
     className,
@@ -33,7 +34,7 @@ export function LoginForm({
         const email = formData.get("email")
         const password = formData.get("password")
 
-        const api = fetch("http://localhost:3001/login", {
+        const api = fetch(ApiRoute.LOGIN, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -77,7 +78,7 @@ export function LoginForm({
                                     placeholder="max@mustermann.com"
                                     required
                                     value={email}
-                                    onChange={e => setEmail(e.target.value)}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                                 />
                             </div>
                             <div className="grid gap-3">

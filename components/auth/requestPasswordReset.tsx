@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { ChangeEvent, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
+import { ApiRoute } from "@/ApiRoute"
 
 export function RequestPasswordReset({
   className,
@@ -28,7 +29,7 @@ export function RequestPasswordReset({
 
   const handleReset = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    fetch("http://localhost:3001/reset-password-request", {
+    fetch(ApiRoute.RESET_PASSWORD_REQUEST, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +106,7 @@ export function RequestPasswordReset({
                   placeholder="max@mustermann.com"
                   required
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 />
               </div>
               <div className="flex flex-col gap-3">

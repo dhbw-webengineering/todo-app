@@ -16,6 +16,8 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { CheckCircle2, ArrowRight } from "lucide-react"
 import { createCategory } from "@/lib/categoryApi"
+import { ApiRoute } from "@/ApiRoute"
+
 
 export function SignupForm({
   className,
@@ -50,7 +52,7 @@ export function SignupForm({
     }
 
     try {
-      const response = await fetch("http://localhost:3001/register", {
+      const response = await fetch(ApiRoute.REGISTER, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -78,7 +80,7 @@ export function SignupForm({
           description: data.message || "Unbekannter Fehler"
         });
       }
-    } catch (error) {
+    } catch {
       setError("Netzwerkfehler")
       toast.error("Netzwerkfehler", { duration: 3000 })
     }

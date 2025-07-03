@@ -33,10 +33,15 @@ import {
 
 import { useState } from "react";
 import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
+import Link from "next/link";
+
+import  ThemeChanger  from "@/components/themeChanger";
 import ThemeChanger from "@/components/themeChanger";
 import { CategoryManagement } from "./CategoryManagement";
 
 import { useRouter } from "next/navigation"
+import { toast } from "sonner";
+import { ApiRoute } from "@/ApiRoute";
 import { toast } from "sonner";
 
 // Menu items.
@@ -78,9 +83,10 @@ export function AppSidebar() {
       console.error("Fehler beim Erstellen des Tasks:", error);
     }
   };
+  const [loading] = useState(false);
 
   const handleLogout = async () => {
-    fetch('http://localhost:3001/logout', { method: 'POST', credentials: "include" }).then(() => {
+    fetch(ApiRoute.LOGOUT, { method: 'POST', credentials: "include" }).then(() => {
       router.push("/auth/login");
       toast.success("Erfolgreich abgemeldet", {
         duration: 3000,
@@ -101,6 +107,7 @@ export function AppSidebar() {
         <div className="p-2">
           <button
             onClick={() => setOpenCreateDialog(true)}
+            disabled={loading}
             className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
@@ -115,10 +122,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
+                    <Link href={item.url} className="flex items-center gap-2">
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
