@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { createTodoApi, updateTodoApi } from "@/TasksAPI";
 import { useCategories } from "@/hooks/useCategory";
-import { CategorySelect } from "@/components/categorySelect";
+import { CategorySelect } from "@/components/sidebar/categorySelect";
 import type { Category } from "@/types/category";
 
 type TaskDialogProps = {

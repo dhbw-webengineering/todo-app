@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MultiSelect } from "@/components/multiselect";
-import { DateRangePicker } from "@/components/dateRangePicker";
+import { MultiSelect } from "@/components/task/multiselect";
+import { DateRangePicker } from "@/components/task/dateRangePicker";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import TasksContainer from "@/components/task/TasksContainer";
 import { ApiRoute } from "@/ApiRoute";
