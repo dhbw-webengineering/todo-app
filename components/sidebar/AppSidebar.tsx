@@ -4,12 +4,10 @@ import {
   Calendar,
   Home,
   Search,
-  FolderCheck,
   SquareCheckBig,
   User2,
   ChevronUp,
   Plus,
-  MoreHorizontal,
 } from "lucide-react";
 
 import {
@@ -21,19 +19,11 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,10 +36,10 @@ import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
 import Link from "next/link";
 
 import  ThemeChanger  from "@/components/themeChanger";
-
+import { CategoryManagement } from "./CategoryManagement";
 import { useRouter } from "next/navigation"
-import { toast } from "sonner";
 import { ApiRoute } from "@/ApiRoute";
+import { toast } from "sonner";
 
 // Menu items.
 const items = [
@@ -75,37 +65,21 @@ const items = [
   },
 ];
 
-const kat = [
-  {
-    title: "Kategorie 1",
-    id: "1",
-    url: `/tasks?kat=1`,
-    icon: Home,
-  },
-  {
-    title: "Kategorie 2",
-    id: "2",
-    url: `/tasks?kat=2`,
-    icon: Home,
-  },
-  {
-    title: "Kategorie 3",
-    id: "3",
-    url: `/tasks?kat=3`,
-    icon: Home,
-  },
-];
+// This will be replaced with data from the API
 
 
 
 export function AppSidebar() {
-  const handleAddCategory = () => {
-    alert("Kategorie hinzufügen geklickt");
-  };
-
-  const router = useRouter()
-  
+  const router = useRouter();
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
+
+  const handleCreateTask = async (taskData: any) => {
+    try {
+      console.log("Neuer Task erstellt:", taskData);
+    } catch (error) {
+      console.error("Fehler beim Erstellen des Tasks:", error);
+    }
+  };
   const [loading] = useState(false);
 
   const handleLogout = async () => {
@@ -156,61 +130,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Filter</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <Collapsible defaultOpen>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <FolderCheck className="h-4 w-4" />
-                      <span>Alle Kategorien</span>
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <SidebarMenuAction
-                    title="Kategorie hinzufügen"
-                    onClick={handleAddCategory}
-                  >
-                    <Plus />
-                  </SidebarMenuAction>
-                </SidebarMenuItem>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {kat.map((item) => (
-                      <SidebarMenuSubItem key={item.id}>
-                        <SidebarMenuButton asChild>
-                          <Link
-                            href={item.url}
-                            className="flex items-center gap-2"
-                          >
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                        <DropdownMenu modal={false}>
-                          <DropdownMenuTrigger asChild>
-                            <SidebarMenuAction>
-                              <MoreHorizontal />
-                            </SidebarMenuAction>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent side="right" align="start">
-                            <DropdownMenuItem>
-                              <span>Kategorie bearbeiten</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <span>Kategorie löschen</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </Collapsible>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <CategoryManagement />
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
@@ -243,14 +163,16 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      
+
       {/* TaskDialog mit mode="create" außerhalb der Sidebar-Struktur */}
       <TaskDialog
         mode="create"
         open={openCreateDialog}
         onOpenChange={setOpenCreateDialog}
+        onSave={handleCreateTask}
         hideTrigger={true} // Button ist bereits in der Sidebar implementiert
       />
+
     </Sidebar>
   );
 }

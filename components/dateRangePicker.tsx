@@ -17,14 +17,16 @@ import {
 export function DateRangePicker({
   className,
   onChange, 
+  value,
 }: {
+   value?: DateRange | undefined,
   className?: string;
   onChange?: (range: DateRange | undefined) => void; 
 }) {
-  const today = new Date();
+  
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: today,
-    to: today });
+    from: value?.from || undefined,
+    to: value?.to || undefined,});
 
   const handleSelect = (range: DateRange | undefined) => {
     setDate(range);

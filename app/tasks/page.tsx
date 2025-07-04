@@ -1,6 +1,6 @@
 "use client";
 
-import { useState,  useEffect } from "react";
+import { useState, useEffect } from "react";
 import { MultiSelect } from "@/components/multiselect";
 import { DateRangePicker } from "@/components/dateRangePicker";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -12,10 +12,9 @@ import { useTags } from "@/hooks/useTags";
 import type { Category } from "@/types/category";
 
 export default function TasksPage() {
-
   // Kategorien und Tags vom Backend holen
-  const { categories} = useCategories();
-  const { tags,} = useTags();
+  const { categories } = useCategories();
+  const { tags, refetch: refetchTags } = useTags();
 
   // Kategorien für MultiSelect mappen
   const categorielist = categories.map((cat: Category) => ({
@@ -25,7 +24,7 @@ export default function TasksPage() {
 
   // Tags für MultiSelect mappen
   const tagsList = tags.map((tag) => ({
-    value: tag.name,
+    value: String(tag.id),
     label: tag.name,
   }));
 
@@ -34,57 +33,75 @@ export default function TasksPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Initialisierung der Filter aus der URL
+  // Initialisierung der Filter aus der URL (nutze getAll!)
   const [selectedCategorie, setSelectedCategorie] = useState<string[]>(() => {
-    const catParam = searchParams.get("categories");
-    return catParam ? catParam.split(",") : [];
+    return searchParams.getAll("category");
   });
   const [selectedTags, setSelectedTags] = useState<string[]>(() => {
-    const tagParam = searchParams.get("tags");
-    return tagParam ? tagParam.split(",") : [];
+    return searchParams.getAll("tag");
+  });
+
+  // DateRange initialisieren aus Query-Parametern
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    const fromParam = searchParams.get("from");
+    const toParam = searchParams.get("to");
+    if (fromParam && toParam) {
+      const fromDate = new Date(fromParam);
+      const toDate = new Date(toParam);
+      if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime())) {
+        return { from: fromDate, to: toDate };
+      }
+    }
+    return undefined;
   });
 
   // Synchronisiere Auswahl mit Query-Parametern
   useEffect(() => {
-    const catParam = searchParams.get("categories");
-    setSelectedCategorie(catParam ? catParam.split(",") : []);
-    const tagParam = searchParams.get("tags");
-    setSelectedTags(tagParam ? tagParam.split(",") : []);
+    setSelectedCategorie(searchParams.getAll("category"));
+    setSelectedTags(searchParams.getAll("tag"));
+
+    // DateRange synchronisieren
+    const fromParam = searchParams.get("from");
+    const toParam = searchParams.get("to");
+    if (fromParam && toParam) {
+      const fromDate = new Date(fromParam);
+      const toDate = new Date(toParam);
+      if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime())) {
+        setDateRange({ from: fromDate, to: toDate });
+        return;
+      }
+    }
+    setDateRange(undefined);
   }, [searchParams]);
 
   const handleCategoriesChange = (newCategories: string[]) => {
     setSelectedCategorie(newCategories);
-  
+
     const params = new URLSearchParams(searchParams);
-    if (newCategories.length > 0) {
-      params.set("categories", newCategories.join(","));
-    } else {
-      params.delete("categories");
-    }
+    params.delete("category");
+    newCategories.forEach(cat => params.append("category", cat));
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   const handleTagsChange = (newTags: string[]) => {
     setSelectedTags(newTags);
 
-   
     const params = new URLSearchParams(searchParams);
-    if (newTags.length > 0) {
-      params.set("tags", newTags.join(","));
-    } else {
-      params.delete("tags");
-    }
+    params.delete("tag");
+    newTags.forEach(tag => params.append("tag", tag));
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   const handleDateChange = (range: DateRange | undefined) => {
+    setDateRange(range);
+
     const params = new URLSearchParams(searchParams);
     if (range?.from && range?.to) {
-      params.set("startDate", String(range.from.getTime()));
-      params.set("endDate", String(range.to.getTime()));
+      params.set("from", range.from.toISOString());
+      params.set("to", range.to.toISOString());
     } else {
-      params.delete("startDate");
-      params.delete("endDate");
+      params.delete("from");
+      params.delete("to");
     }
     router.replace(`${pathname}?${params.toString()}`);
   };
@@ -114,11 +131,15 @@ export default function TasksPage() {
           />
         </div>
         <div className="w-1/6">
-          <DateRangePicker onChange={handleDateChange} />
+          <DateRangePicker value={dateRange} onChange={handleDateChange} />
         </div>
       </div>
       <div className="space-y-4 max-w-3xl">
-        <TasksContainer apiRoute={ApiRoute.TODOS} showTasksDone={true}/>
+        <TasksContainer 
+          apiRoute={ApiRoute.TODOS} 
+          showTasksDone={true}
+          onTagsChanged={refetchTags}
+        />
       </div>
     </div>
   );
