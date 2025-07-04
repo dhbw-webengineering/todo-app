@@ -48,7 +48,7 @@ export function CategorySelect({ data, value, onChange }: CategorySelectProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full justify-between cursor-pointer"
         >
           {internalValue
             ? data.find((cat) => String(cat.id) === internalValue)?.name
@@ -67,6 +67,7 @@ export function CategorySelect({ data, value, onChange }: CategorySelectProps) {
                   key={cat.id}
                   value={String(cat.id)}
                   onSelect={handleSelect}
+                  className="cursor-pointer"
                 >
                   {cat.name}
                   <Check

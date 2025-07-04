@@ -16,7 +16,6 @@ export type TasksContainerRef = {
 
 interface TasksContainerProps {
   apiRoute: ApiRoute;
-  day?: number;
   range?: [number, number];
   setHasData?: (hasData: boolean) => void;
   showTasksDone: boolean;
@@ -26,7 +25,7 @@ interface TasksContainerProps {
 }
 
 function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>) {
-  const {day, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete, onTagsChanged} = props;
+  const {range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete, onTagsChanged} = props;
   const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error] = useState<string | null>(null);
@@ -41,25 +40,24 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
 
   // Initiales Laden der Tasks mit Fehlerbehandlung
   useEffect(() => {
-    
-    
-    
     const fetchInitialTasks = async () => {
-      let start = 0;
-      let end = 0;
-      if (day !== undefined) {
-        start = end = day;
-      }
+      const params = new URLSearchParams(searchParams);
+
       if (range !== undefined) {
-        start = range?.[0];
-        end = range?.[1];
+        const start = new Date();
+        start.setDate(start.getDate() + range[0]);
+        const end = new Date();
+        end.setDate(end.getDate() + range[1]);
+
+        params.set("from", start.toISOString());
+        params.set("to", end.toISOString());
       }
 
       loadTodosApi(
-        data => updateTasks(data),
+        data => updateTasks(showTasksDone ? data : data.filter(task => !task.completedAt)),
         () => setFetchError("Fehler beim Laden der Aufgaben."),
         () => setLoading(false),
-        searchParams
+        params
       );
     };
     fetchInitialTasks();
@@ -123,10 +121,15 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
 
   const modifyTaskAndSetHasData = (task: TodoApiResponse, increaseValue: number, runnable: () => void) => {
     let count = tasks.filter(cTask => !cTask.completedAt).length;
-    if (tasks.filter(fTask => fTask.id === task.id).length !== 1) {
+    const prevTask = tasks.filter(fTask => fTask.id === task.id)[0];
+
+    if (!prevTask) {
       return;
     }
-    count += increaseValue;
+
+    if (prevTask.completedAt !== task.completedAt) {
+      count += increaseValue;
+    }
 
     runnable();
 

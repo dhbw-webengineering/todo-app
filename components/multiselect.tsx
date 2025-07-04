@@ -59,7 +59,6 @@ interface MultiSelectProps<T>
   modalPopover?: boolean;
   asChild?: boolean;
   className?: string;
-  maxSelectable?: number;
 }
 
 function withForwardRef<T>(
@@ -82,7 +81,6 @@ const MultiSelectInner =<T,>
     modalPopover = false,
     asChild = false,
     className,
-    maxSelectable,
     ...props
   }: MultiSelectProps<T>,
   ref: React.Ref<T>
@@ -115,7 +113,7 @@ const MultiSelectInner =<T,>
   const toggleOption = (option: T) => {
     const newSelectedValues = selectedValues.includes(option)
       ? selectedValues.filter((value) => value !== option)
-      : (maxSelectable === undefined || selectedValues.length < maxSelectable ? [...selectedValues, option] : selectedValues);
+      : [...selectedValues, option];
     setSelectedValues(newSelectedValues);
     onValueChange(newSelectedValues);
   };
@@ -157,7 +155,7 @@ const MultiSelectInner =<T,>
           {...props}
           onClick={handleTogglePopover}
           className={cn(
-            "flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
+            "flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto cursor-pointer",
             className
           )}
         >
@@ -214,7 +212,7 @@ const MultiSelectInner =<T,>
           ) : (
             <div className="flex items-center justify-between w-full mx-auto">
               <span className="text-sm text-muted-foreground mx-3">
-                {`${placeholder}${maxSelectable !== undefined ? (` (max. ${maxSelectable})`) : ""}`}
+                {placeholder}
               </span>
               <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />
             </div>

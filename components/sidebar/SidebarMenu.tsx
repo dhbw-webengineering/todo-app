@@ -19,7 +19,7 @@ export function SidebarMenu() {
         className="flex items-center gap-2 bg-background/80 backdrop-blur-sm border shadow-md hover:shadow-lg transition-all duration-200"
       >
         <PanelLeftOpen className="h-4 w-4" />
-        <span className="sm:inline">Navigation öffnen</span>
+        <span className="sm:inline cursor-pointer">Navigation öffnen</span>
       </Button>
     </div>
   );
