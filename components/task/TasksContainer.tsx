@@ -15,7 +15,6 @@ export type TasksContainerRef = {
 
 interface TasksContainerProps {
   apiRoute: ApiRoute;
-  day?: number;
   range?: [number, number];
   setHasData?: (hasData: boolean) => void;
   showTasksDone: boolean;
@@ -24,7 +23,7 @@ interface TasksContainerProps {
 }
 
 function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>) {
-  const {day, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete} = props;
+  const {range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete} = props;
   const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error] = useState<string | null>(null);
@@ -40,9 +39,6 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
     const fetchInitialTasks = async () => {
       let start = 0;
       let end = 0;
-      if (day !== undefined) {
-        start = end = day;
-      }
       if (range !== undefined) {
         start = range?.[0];
         end = range?.[1];

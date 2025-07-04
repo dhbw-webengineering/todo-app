@@ -312,8 +312,7 @@ type TaskDialogProps = {
             </div>
 
             
-            {//TODO: Kategorie select merge
-            /* Kategorie */}
+            {/* Kategorie */}
             <MultiSelect
               options={[]}
               onValueChange={setCategoryId}
