@@ -65,11 +65,12 @@ export default function OverviewTasks() {
       </div>
 
         <div className={styles.scrollbarContainer}>
-            { displaysData.filter(entry => entry.hasData).map((entry, index) =>
+            { displaysData.map((entry, index) =>
+                entry.hasData &&
                 <Button key={index} variant="outline" className={styles.scrollbarButton} onClick={() => scrollToSection(index)}>
                     {entry.header}
-                </Button>)
-            }
+                </Button>
+            )}
         </div>
         </>
     );
