@@ -33,7 +33,6 @@ import {
 import { createTodoApi, updateTodoApi } from "@/TasksAPI";
 import { useCategories } from "@/hooks/useCategory";
 import { CategorySelect } from "@/components/categorySelect";
-import type { Category } from "@/types/category";
 
 type TaskDialogProps = {
   mode: "create" | "edit";
@@ -273,7 +272,7 @@ export function TaskDialog({
                   <Button
                     id="task-dueDate"
                     variant="outline"
-                    className={`w-full justify-start text-left font-normal ${errors.dueDate ? "border-red-500" : ""
+                    className={`w-full justify-start text-left font-normal cursor-pointer ${errors.dueDate ? "border-red-500" : ""
                       }`}
                     aria-invalid={errors.dueDate}
                   >
@@ -301,6 +300,7 @@ export function TaskDialog({
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="cursor-pointer"
                       onClick={() => setRelativeDate(0)}
                     >
                       Heute
@@ -308,6 +308,7 @@ export function TaskDialog({
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="cursor-pointer"
                       onClick={() => setRelativeDate(1)}
                     >
                       Morgen
@@ -315,6 +316,7 @@ export function TaskDialog({
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="cursor-pointer"
                       onClick={() => setRelativeDate(7)}
                     >
                       In 7 Tagen
@@ -355,6 +357,7 @@ export function TaskDialog({
                 checked={completed}
                 onCheckedChange={() => setCompleted(!completed)}
                 id="task-completed"
+                className="cursor-pointer"
               />
               <label htmlFor="task-completed" className="text-sm">
                 Erledigt
@@ -363,7 +366,7 @@ export function TaskDialog({
           </div>
 
           <DialogFooter className="mt-4">
-            <Button onClick={handleSave}>
+            <Button className="cursor-pointer" onClick={handleSave}>
               {mode === "create" ? "Erstellen" : "Speichern"}
             </Button>
           </DialogFooter>

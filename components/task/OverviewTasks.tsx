@@ -60,7 +60,16 @@ export default function OverviewTasks() {
             }
 
             { displaysData.map((entry, index) => 
-                <TasksDisplay key={index} scrollId={`${sectionsIdStart}${index}`} header={entry.header} range={entry.range} sendTaskUpdate={updateTask} sendTaskDelete={deleteTask} tasksUpdateRef={entry.containerRef as RefObject<TasksContainerRef>} sendHasDataChanged={onDisplayHasDataChanged} />
+                <TasksDisplay
+                    key={index}
+                    scrollId={`${sectionsIdStart}${index}`}
+                    header={entry.header}
+                    range={entry.range}
+                    sendTaskUpdate={updateTask}
+                    sendTaskDelete={deleteTask}
+                    tasksUpdateRef={entry.containerRef as RefObject<TasksContainerRef>}
+                    sendHasDataChanged={onDisplayHasDataChanged}
+                />
             )}
       </div>
 

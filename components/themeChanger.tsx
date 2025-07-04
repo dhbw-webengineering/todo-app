@@ -20,7 +20,7 @@ export default function ThemeSwitch() {
       {options.map((opt) => (
         <button
           key={opt.value}
-          className={`flex items-center px-2 py-1 rounded transition-colors
+          className={`flex items-center px-2 py-1 rounded transition-colors cursor-pointer
             ${resolvedTheme === opt.value
               ? "bg-zinc-300 dark:bg-zinc-700 font-semibold"
               : "hover:bg-zinc-200 dark:hover:bg-zinc-600"}

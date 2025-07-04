@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 // Der Import von "next/link" wurde entfernt, da er nicht aufgelöst werden konnte.
 // import Link from "next/link";
 import { toast } from "sonner";
@@ -44,6 +44,7 @@ import {
   X,
   CheckCircle2,
 } from "lucide-react";
+import Link from "next/link";
 
 
 
@@ -189,6 +190,7 @@ export function CategoryManagement() {
                   <SidebarMenuAction
                       title="Kategorie hinzufügen"
                       onClick={handleAddCategory}
+                      className="cursor-pointer"
                   >
                     <Plus />
                   </SidebarMenuAction>
@@ -223,21 +225,21 @@ export function CategoryManagement() {
                             <input
                                 type="text"
                                 value={newCategoryName}
-                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setNewCategoryName(e.target.value)}
                                 placeholder="Neue Kategorie"
                                 className="flex-1 min-w-0 bg-transparent px-2 py-1 text-sm border rounded"
                                 autoFocus
                             />
                             <button
                                 onClick={handleCreateCategory}
-                                className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-green-500 hover:bg-green-500/10"
+                                className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-green-500 hover:bg-green-500/10 cursor-pointer"
                                 title="Speichern"
                             >
                               <CheckCircle2 className="h-4 w-4" />
                             </button>
                             <button
                                 onClick={handleCancelCategoryAction}
-                                className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-red-500 hover:bg-red-500/10"
+                                className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-red-500 hover:bg-red-500/10 cursor-pointer"
                                 title="Abbrechen"
                             >
                               <X className="h-4 w-4" />
@@ -255,20 +257,20 @@ export function CategoryManagement() {
                                 <input
                                     type="text"
                                     value={newCategoryName}
-                                    onChange={(e) => setNewCategoryName(e.target.value)}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setNewCategoryName(e.target.value)}
                                     className="flex-1 min-w-0 bg-transparent px-2 py-1 text-sm border rounded"
                                     autoFocus
                                 />
                                 <button
                                     onClick={handleUpdateCategory}
-                                    className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-green-500 hover:bg-green-500/10"
+                                    className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-green-500 hover:bg-green-500/10 cursor-pointer"
                                     title="Speichern"
                                 >
                                   <CheckCircle2 className="h-4 w-4" />
                                 </button>
                                 <button
                                     onClick={handleCancelCategoryAction}
-                                    className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-red-500 hover:bg-red-500/10"
+                                    className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-red-500 hover:bg-red-500/10 cursor-pointer"
                                     title="Abbrechen"
                                 >
                                   <X className="h-4 w-4" />
@@ -278,10 +280,10 @@ export function CategoryManagement() {
                               // Normal display
                               <>
                                 <SidebarMenuButton asChild>
-                                  <a href={`/tasks?category=${category.id}`} className="flex w-full items-center gap-2">
+                                  <Link href={`/tasks?category=${category.id}`} className="flex w-full items-center gap-2">
                                     <FolderCheck className="h-4 w-4" />
                                     <span>{category.name}</span>
-                                  </a>
+                                  </Link>
                                 </SidebarMenuButton>
 
                                 <DropdownMenu modal={false}>
@@ -317,7 +319,7 @@ export function CategoryManagement() {
         </SidebarGroup>
 
         {/* Confirmation Dialog for Category Deletion */}
-        <Dialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
+        <Dialog open={!!categoryToDelete} onOpenChange={(open: boolean) => !open && setCategoryToDelete(null)}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Kategorie löschen</DialogTitle>
@@ -327,10 +329,10 @@ export function CategoryManagement() {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setCategoryToDelete(null)}>
+              <Button variant="outline" className="cursor-pointer" onClick={() => setCategoryToDelete(null)}>
                 Abbrechen
               </Button>
-              <Button variant="destructive" onClick={handleDeleteCategory}>
+              <Button variant="destructive" className="cursor-pointer" onClick={handleDeleteCategory}>
                 Löschen
               </Button>
             </DialogFooter>

@@ -54,11 +54,6 @@ const items = [
     icon: SquareCheckBig,
   },
   {
-    title: "Kalender",
-    url: "#",
-    icon: Calendar,
-  },
-  {
     title: "Suche",
     url: "#",
     icon: Search,
@@ -72,14 +67,6 @@ const items = [
 export function AppSidebar() {
   const router = useRouter();
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
-
-  const handleCreateTask = async (taskData: any) => {
-    try {
-      console.log("Neuer Task erstellt:", taskData);
-    } catch (error) {
-      console.error("Fehler beim Erstellen des Tasks:", error);
-    }
-  };
   const [loading] = useState(false);
 
   const handleLogout = async () => {
@@ -96,7 +83,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center justify-between p-4">
           <h1 className="text-lg font-bold">Todo-Webapp</h1>
-          <SidebarTrigger />
+          <SidebarTrigger className="cursor-pointer"/>
         </div>
         <div className="border-b border-gray-200 dark:border-gray-700" />
       </SidebarHeader>
@@ -139,7 +126,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className="cursor-pointer">
                 <SidebarMenuButton>
                   <User2 /> Username
                   <ChevronUp className="ml-auto" />
@@ -150,11 +137,13 @@ export function AppSidebar() {
                 className="w-[--radix-popper-anchor-width]"
               >
                 <DropdownMenuItem
+                  className="cursor-pointer"
                   onClick={() => router.push("/account")}>
                   <span>Account</span>
 
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  className="cursor-pointer"
                   onClick={handleLogout}>
                   <span>Sign out</span>
                 </DropdownMenuItem>
@@ -169,7 +158,6 @@ export function AppSidebar() {
         mode="create"
         open={openCreateDialog}
         onOpenChange={setOpenCreateDialog}
-        onSave={handleCreateTask}
         hideTrigger={true} // Button ist bereits in der Sidebar implementiert
       />
 

@@ -54,7 +54,7 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
       }
 
       loadTodosApi(
-        data => updateTasks(data),
+        data => updateTasks(showTasksDone ? data : data.filter(task => !task.completedAt)),
         () => setFetchError("Fehler beim Laden der Aufgaben."),
         () => setLoading(false),
         params
@@ -121,10 +121,15 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
 
   const modifyTaskAndSetHasData = (task: TodoApiResponse, increaseValue: number, runnable: () => void) => {
     let count = tasks.filter(cTask => !cTask.completedAt).length;
-    if (tasks.filter(fTask => fTask.id === task.id).length !== 1) {
+    const prevTask = tasks.filter(fTask => fTask.id === task.id)[0];
+
+    if (!prevTask) {
       return;
     }
-    count += increaseValue;
+
+    if (prevTask.completedAt !== task.completedAt) {
+      count += increaseValue;
+    }
 
     runnable();
 
