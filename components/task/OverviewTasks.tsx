@@ -52,7 +52,6 @@ export default function OverviewTasks() {
         element?.scrollIntoView({behavior: "smooth"});
     }
 
-    //TODO: remove day from TaskdDisplay/Container -> only range
     return (
         <>
         <div className={styles.displaysContainer}>

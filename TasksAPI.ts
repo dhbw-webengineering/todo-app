@@ -15,7 +15,7 @@ export const createTodoApi = async (data: TodoApiCreate) => {
     return (await response.json()) as TodoApiResponse;
 };
 
-export const loadTodosApi = async (callback?: (data: TodoApiResponse[]) => void, catchRun?: () => void, finallyRun?: () => void, searchParams?: ReadonlyURLSearchParams) => {
+export const loadTodosApi = async (callback?: (data: TodoApiResponse[]) => void, catchRun?: () => void, finallyRun?: () => void, searchParams?: URLSearchParams) => {
     try {
         const queryString = searchParams?.toString() ?? '';
         const url = queryString

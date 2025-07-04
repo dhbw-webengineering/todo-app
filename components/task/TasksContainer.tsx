@@ -40,22 +40,24 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
 
   // Initiales Laden der Tasks mit Fehlerbehandlung
   useEffect(() => {
-    
-    
-    
     const fetchInitialTasks = async () => {
-      let start = 0;
-      let end = 0;
+      const params = new URLSearchParams(searchParams);
+
       if (range !== undefined) {
-        start = range?.[0];
-        end = range?.[1];
+        const start = new Date();
+        start.setDate(start.getDate() + range[0]);
+        const end = new Date();
+        end.setDate(end.getDate() + range[1]);
+
+        params.set("from", start.toISOString());
+        params.set("to", end.toISOString());
       }
 
       loadTodosApi(
         data => updateTasks(data),
         () => setFetchError("Fehler beim Laden der Aufgaben."),
         () => setLoading(false),
-        searchParams
+        params
       );
     };
     fetchInitialTasks();
