@@ -1,7 +1,6 @@
 import { toast } from "sonner";
 import { TodoApiCreate, TodoApiEdit, TodoApiResponse } from "./types/task";
 import { ApiRoute } from "./ApiRoute";
-import type { ReadonlyURLSearchParams } from 'next/navigation';
 
 export const createTodoApi = async (data: TodoApiCreate) => {
     console.log(JSON.stringify(data))
@@ -15,12 +14,12 @@ export const createTodoApi = async (data: TodoApiCreate) => {
     return (await response.json()) as TodoApiResponse;
 };
 
-export const loadTodosApi = async (callback?: (data: TodoApiResponse[]) => void, catchRun?: () => void, finallyRun?: () => void, searchParams?: URLSearchParams) => {
+export const loadTodosApi = async (apiRoute: ApiRoute, callback?: (data: TodoApiResponse[]) => void, catchRun?: () => void, finallyRun?: () => void, searchParams?: URLSearchParams) => {
     try {
         const queryString = searchParams?.toString() ?? '';
         const url = queryString
-            ? `${ApiRoute.TODOS}?${queryString}`
-            : ApiRoute.TODOS;
+            ? `${apiRoute}?${queryString}`
+            : apiRoute;
         const response = await fetch(url, { credentials: "include" });
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
