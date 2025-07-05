@@ -42,6 +42,7 @@ import { ApiRoute } from "@/ApiRoute";
 import { toast } from "sonner";
 
 // Menu items.
+//TODO: open dialog for search?
 const items = [
   {
     title: "Dashboard",
@@ -55,7 +56,7 @@ const items = [
   },
   {
     title: "Suche",
-    url: "#",
+    url: "/search",
     icon: Search,
   },
 ];

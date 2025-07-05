@@ -25,7 +25,7 @@ interface TasksContainerProps {
 }
 
 function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>) {
-  const {range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete, onTagsChanged} = props;
+  const {apiRoute, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete, onTagsChanged} = props;
   const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error] = useState<string | null>(null);
@@ -54,6 +54,7 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
       }
 
       loadTodosApi(
+        apiRoute,
         data => updateTasks(showTasksDone ? data : data.filter(task => !task.completedAt)),
         () => setFetchError("Fehler beim Laden der Aufgaben."),
         () => setLoading(false),
@@ -159,17 +160,17 @@ function TasksContainer(props: TasksContainerProps, ref: Ref<TasksContainerRef>)
   if (error) return <div className={"text-center text-lg mt-12"}>Error: {error}</div>;
 
   return (
-      <div className={"grid gap-5"}>
-          {sortedTasks.map((task: TodoApiResponse) => (
-                    <TaskCard 
-                    onDelete={() => sendOrDeleteTask(task)} 
-                    onUpdate={sendOrUpdateTask} 
-                    key={task.id} 
-                    task={task} 
-                    onTagsChanged={onTagsChanged} 
-                    />
-                  ))}
-      </div>
+    <div className={"grid gap-5"}>
+      {sortedTasks.map((task: TodoApiResponse) => (
+        <TaskCard 
+          onDelete={() => sendOrDeleteTask(task)} 
+          onUpdate={sendOrUpdateTask} 
+          key={task.id} 
+          task={task} 
+          onTagsChanged={onTagsChanged} 
+        />
+      ))}
+    </div>
   );
 };
 

@@ -8,5 +8,6 @@ export enum ApiRoute {
     TAGS = `${ApiRoute.BASE_PATH}/tags`,
     RESET_PASSWORD_TOKEN_VERIFY = `${ApiRoute.BASE_PATH}/reset-password-token-verify`,
     RESET_PASSWORD_REQUEST = `${ApiRoute.BASE_PATH}/reset-password-request`,
-    RESET_PASSWORD = `${ApiRoute.BASE_PATH}/reset-password`
+    RESET_PASSWORD = `${ApiRoute.BASE_PATH}/reset-password`,
+    SEARCH = `${ApiRoute.BASE_PATH}/todos/search`
 }

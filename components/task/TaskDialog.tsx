@@ -76,6 +76,9 @@ export function TaskDialog({
     category?: boolean;
   }>({});
 
+  // State for delete confirmation
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
+
   const handleSave = async () => {
     const newErrors = {
       title: !title.trim(),
@@ -172,7 +175,7 @@ export function TaskDialog({
         setCurrentOpen(false);
       } catch (error) {
         console.error("Fehler beim Löschen:", error);
-      }
+      } 
     }
   };
 
@@ -202,7 +205,7 @@ export function TaskDialog({
             <DropdownMenuItem onClick={() => setCurrentOpen(true)} className="cursor-pointer">
               Bearbeiten
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-red-600 cursor-pointer">
+            <DropdownMenuItem onClick={() => setShowDeleteConfirmation(true)} className="text-red-600 cursor-pointer">
               Löschen
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -217,6 +220,7 @@ export function TaskDialog({
     <>
       {renderTrigger()}
 
+      {/*Todo edit dialog*/}
       <Dialog open={currentOpen} onOpenChange={setCurrentOpen}>
         <DialogContent>
           <DialogHeader>
@@ -368,6 +372,26 @@ export function TaskDialog({
           <DialogFooter className="mt-4">
             <Button className="cursor-pointer" onClick={handleSave}>
               {mode === "create" ? "Erstellen" : "Speichern"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation dialog for task deletion */}
+      <Dialog open={!!showDeleteConfirmation} onOpenChange={(open: boolean) => setShowDeleteConfirmation(open)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Todo löschen</DialogTitle>
+            <DialogDescription>
+              Bist du sicher, dass du die Todo &quot;{task?.title}&quot; löschen möchtest?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" className="cursor-pointer" onClick={() => setShowDeleteConfirmation(false)}>
+              Abbrechen
+            </Button>
+            <Button variant="destructive" className="cursor-pointer" onClick={handleDelete}>
+              Löschen
             </Button>
           </DialogFooter>
         </DialogContent>
