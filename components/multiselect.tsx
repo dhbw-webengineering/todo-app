@@ -158,6 +158,7 @@ const MultiSelectInner =<T,>
             "flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto cursor-pointer",
             className
           )}
+          variant="outline"
         >
           {selectedValues.length > 0 ? (
             <div className="flex justify-between items-center w-full">
