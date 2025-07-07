@@ -64,7 +64,7 @@ interface MultiSelectProps<T>
 function withForwardRef<T>(
   render: (props: MultiSelectProps<T>, ref: React.Ref<T>) => React.ReactNode
 ): (props: MultiSelectProps<T> & React.RefAttributes<T>) => React.ReactNode {
-  return React.forwardRef(render) as any;
+  return React.forwardRef(render) as React.ForwardRefExoticComponent<MultiSelectProps<T> & React.RefAttributes<T>>;
 }
 
 const MultiSelectInner =<T,>
