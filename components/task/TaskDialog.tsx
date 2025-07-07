@@ -123,6 +123,7 @@ export function TaskDialog({
       if (onTagsChanged) {
         onTagsChanged();
       }
+      //TODO: remove
       window.location.reload();
 
       if (mode === "create") {
