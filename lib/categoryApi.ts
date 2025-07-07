@@ -1,10 +1,9 @@
 import { Category } from "@/types/category";
-
-const API_URL = "http://localhost:3001";
+import { ApiRoute } from "@/ApiRoute";
 
 // Fetch all categories for the current user
 export async function fetchCategories(): Promise<Category[]> {
-  const response = await fetch(`${API_URL}/category`, {
+  const response = await fetch(ApiRoute.CATEGORY, {
     credentials: "include", // Include cookies for authentication
   });
 
@@ -17,7 +16,7 @@ export async function fetchCategories(): Promise<Category[]> {
 
 // Create a new category
 export async function createCategory(name: string): Promise<Category> {
-  const response = await fetch(`${API_URL}/category`, {
+  const response = await fetch(ApiRoute.CATEGORY, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -35,7 +34,7 @@ export async function createCategory(name: string): Promise<Category> {
 
 // Update a category
 export async function updateCategory(id: string, name: string): Promise<Category> {
-  const response = await fetch(`${API_URL}/category/${id}`, {
+  const response = await fetch(`${ApiRoute.CATEGORY}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -53,7 +52,7 @@ export async function updateCategory(id: string, name: string): Promise<Category
 
 // Delete a category
 export async function deleteCategory(id: string): Promise<void> {
-  const response = await fetch(`${API_URL}/category/${id}`, {
+  const response = await fetch(`${ApiRoute.CATEGORY}/${id}`, {
     method: "DELETE",
     credentials: "include", // Include cookies for authentication
   });
