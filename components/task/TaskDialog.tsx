@@ -31,7 +31,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { createTodoApi, updateTodoApi } from "@/TasksAPI";
-import { useCategories } from "@/hooks/useCategory";
+import { useCategoriesContext } from "@/hooks/useCategoriesContext";
 import { CategorySelect } from "@/components/categorySelect";
 
 type TaskDialogProps = {
@@ -61,7 +61,7 @@ export function TaskDialog({
   const currentOpen = isControlled ? open : internalOpen;
   const setCurrentOpen = isControlled ? onOpenChange! : setInternalOpen;
 
-  const { categories } = useCategories();
+  const { categories } = useCategoriesContext();
 
   // Form State
   const [title, setTitle] = useState("");
