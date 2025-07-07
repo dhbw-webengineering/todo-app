@@ -40,35 +40,34 @@ import { CategoryManagement } from "./CategoryManagement";
 import { useRouter } from "next/navigation"
 import { ApiRoute } from "@/ApiRoute";
 import { toast } from "sonner";
-
-// Menu items.
-//TODO: open dialog for search?
-const items = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Alle Tasks",
-    url: "/tasks",
-    icon: SquareCheckBig,
-  },
-  {
-    title: "Suche",
-    url: "/search",
-    icon: Search,
-  },
-];
-
-// This will be replaced with data from the API
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import SearchMenu from "../searchMenu";
 
 
 export function AppSidebar() {
   const router = useRouter();
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [openSearchDialog, setOpenSearchDialog] = useState(false);
   const [loading] = useState(false);
+
+  // Menu items.
+  const items = [
+    {
+      title: "Dashboard",
+      url: "/",
+      icon: Home
+    },
+    {
+      title: "Alle Tasks",
+      url: "/tasks",
+      icon: SquareCheckBig
+    },
+    {
+      title: "Suche",
+      icon: Search,
+      onClick: () => setOpenSearchDialog(true)
+    },
+  ];
 
   const handleLogout = async () => {
     fetch(ApiRoute.LOGOUT, { method: 'POST', credentials: "include" }).then(() => {
@@ -78,6 +77,11 @@ export function AppSidebar() {
       });
     });
   };
+
+  const onSearch = async (params: URLSearchParams) => {
+      router.replace(`/search?${params.toString()}`);
+      setOpenSearchDialog(false);
+  }
 
   return (
     <Sidebar>
@@ -107,10 +111,20 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
+                    { item.url ?
+                      (
+                        <Link href={item.url} className="flex items-center gap-2">
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </Link>
+                      ) :
+                      (
+                        <div onClick={item.onClick} className="flex items-center gap-2 cursor-pointer">
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </div>
+                      )
+                    }
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -161,6 +175,18 @@ export function AppSidebar() {
         onOpenChange={setOpenCreateDialog}
         hideTrigger={true} // Button ist bereits in der Sidebar implementiert
       />
+
+      {/* Search dialog */}
+      <Dialog open={openSearchDialog} onOpenChange={setOpenSearchDialog}>
+          <DialogContent>
+            <DialogHeader className="mb-3">
+              <DialogTitle>
+                Suchen
+              </DialogTitle>
+            </DialogHeader>
+            <SearchMenu onSearch={onSearch} />
+          </DialogContent>
+        </Dialog>
 
     </Sidebar>
   );

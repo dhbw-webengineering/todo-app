@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 
 type SearchMenuProps = {
-    onSearch: (title: string, ignorecase: boolean) => void;
+    onSearch: (urlSearchParams: URLSearchParams) => void;
 }
 
 export default function SearchMenu(props: SearchMenuProps) {
@@ -18,6 +18,7 @@ export default function SearchMenu(props: SearchMenuProps) {
 
     const [searchTitle, setSearchTitle] = useState<string>(searchParams.get("title") ?? "");
     const [ignorecase, setIgnorecase] = useState<boolean>(searchParams.get("ignorecase") ? !!Number(searchParams.get("ignorecase")) : true);
+    const [notDone, setNotDone] = useState<boolean>(searchParams.get("notDone") ? !!Number(searchParams.get("notDone")) : false);
 
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -35,13 +36,19 @@ export default function SearchMenu(props: SearchMenuProps) {
             });
             return;
         }
-        onSearch(searchTitle.trim(), ignorecase);
+
+        const params = new URLSearchParams();
+        params.set("title", searchTitle.trim());
+        params.set("ignorecase", `${Number(ignorecase)}`)
+        params.set("notDone", `${Number(notDone)}`)
+        
+        onSearch(params);
     }
 
 
     return (
-        <>
-            <div className="flex flex-row">
+        <div className="flex-column">
+            <div className="flex">
                 <Input
                     value={searchTitle}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTitle(e.target.value)}
@@ -52,7 +59,7 @@ export default function SearchMenu(props: SearchMenuProps) {
                     Suchen
                 </Button>
             </div>
-            <div className="flex flex-row items-center mt-[7px]">
+            <div className="flex items-center mt-[7px]">
                 <Checkbox
                     checked={!ignorecase}
                     onCheckedChange={() => setIgnorecase(!ignorecase)}
@@ -63,6 +70,17 @@ export default function SearchMenu(props: SearchMenuProps) {
                     Groß-/Kleinschreibung beachten
                 </label>
             </div>
-        </>
+            <div className="flex items-center mt-[2px]">
+                <Checkbox
+                    checked={notDone}
+                    onCheckedChange={() => setNotDone(!notDone)}
+                    className="cursor-pointer"
+                    label="Abgeschlossene ausblenden"
+                />
+                <label htmlFor="task-completed" className="text-sm ml-[5px]">
+                    Abgeschlossene ausblenden
+                </label>
+            </div>
+        </div>
     );
 }

@@ -13,12 +13,13 @@ export default function SearchPage() {
 
     const [hasData, setHasData] = useState<boolean>(true);
 
-    const onSearch = async (title: string, ignorecase: boolean) => {
-        router.replace(`${pathname}?title=${title}&ignorecase=${ignorecase ? 1 : 0}`);
+    const onSearch = async (params: URLSearchParams) => {
+        router.replace(`${pathname}?${params.toString()}`);
     }
 
     return (
         <div className="p-6 max-w-3xl">
+            <h1 className="text-2xl font-bold mb-6">Suche</h1>
             <SearchMenu onSearch={onSearch} />
             <div className="mt-[30px]">
                 { !hasData &&
