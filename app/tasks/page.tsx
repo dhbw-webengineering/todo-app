@@ -109,7 +109,7 @@ export default function TasksPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
-      <div className="flex items-center space-x-4 mb-6">
+      <div className="flex items-stretch space-x-4 mb-6">
         <div className="w-1/5">
           <MultiSelect
             options={categorielist}
