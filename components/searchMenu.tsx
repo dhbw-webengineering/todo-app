@@ -55,7 +55,7 @@ export default function SearchMenu(props: SearchMenuProps) {
                     placeholder="Nach Titel suchen"
                     onKeyDown={handleInputKeyDown}
                 />
-                <Button className="ml-[20px] cursor-pointer" onClick={search}>
+                <Button className="ml-[20px] cursor-pointer" onClick={search} disabled={isSearchInputInvalid}>
                     Suchen
                 </Button>
             </div>
