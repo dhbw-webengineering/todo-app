@@ -47,8 +47,8 @@ export default function SearchMenu(props: SearchMenuProps) {
 
 
     return (
-        <>
-            <div className="flex flex-row">
+        <div className="flex-column">
+            <div className="flex">
                 <Input
                     value={searchTitle}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTitle(e.target.value)}
@@ -59,7 +59,7 @@ export default function SearchMenu(props: SearchMenuProps) {
                     Suchen
                 </Button>
             </div>
-            <div className="flex flex-row items-center mt-[7px]">
+            <div className="flex items-center mt-[7px]">
                 <Checkbox
                     checked={!ignorecase}
                     onCheckedChange={() => setIgnorecase(!ignorecase)}
@@ -70,7 +70,7 @@ export default function SearchMenu(props: SearchMenuProps) {
                     Groß-/Kleinschreibung beachten
                 </label>
             </div>
-            <div className="flex flex-row items-center mt-[2px]">
+            <div className="flex items-center mt-[2px]">
                 <Checkbox
                     checked={notDone}
                     onCheckedChange={() => setNotDone(!notDone)}
@@ -81,6 +81,6 @@ export default function SearchMenu(props: SearchMenuProps) {
                     Abgeschlossene ausblenden
                 </label>
             </div>
-        </>
+        </div>
     );
 }

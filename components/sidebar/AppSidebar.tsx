@@ -179,7 +179,7 @@ export function AppSidebar() {
       {/* Search dialog */}
       <Dialog open={openSearchDialog} onOpenChange={setOpenSearchDialog}>
           <DialogContent>
-            <DialogHeader className="mb-5">
+            <DialogHeader className="mb-3">
               <DialogTitle>
                 Suchen
               </DialogTitle>
