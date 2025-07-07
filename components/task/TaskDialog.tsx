@@ -378,7 +378,7 @@ export function TaskDialog({
       </Dialog>
 
       {/* Confirmation dialog for task deletion */}
-      <Dialog open={!!showDeleteConfirmation} onOpenChange={(open: boolean) => setShowDeleteConfirmation(open)}>
+      <Dialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Todo löschen</DialogTitle>

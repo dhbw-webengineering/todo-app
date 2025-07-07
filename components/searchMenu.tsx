@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 
 type SearchMenuProps = {
-    onSearch: (title: string, ignorecase: boolean) => void;
+    onSearch: (urlSearchParams: URLSearchParams) => void;
 }
 
 export default function SearchMenu(props: SearchMenuProps) {
@@ -35,7 +35,12 @@ export default function SearchMenu(props: SearchMenuProps) {
             });
             return;
         }
-        onSearch(searchTitle.trim(), ignorecase);
+
+        const params = new URLSearchParams();
+        params.set("title", searchTitle.trim());
+        params.set("ignorecase", `${Number(ignorecase)}`)
+        
+        onSearch(params);
     }
 
 
