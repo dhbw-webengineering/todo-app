@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { ApiRoute } from "@/ApiRoute";
+import { ApiRoute } from "@/src/utils/ApiRoute";
 
 const PUBLIC_ROUTES = [
   "/auth/login",

@@ -1,0 +1,38 @@
+"use client"
+
+import { ApiRoute } from "@/src/utils/ApiRoute";
+import SearchMenu from "@/src/components/searchMenu";
+import TasksContainer from "@/src/components/task/TasksContainer";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+
+export default function SearchPage() {
+    const pathname = usePathname();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const [hasData, setHasData] = useState<boolean>(true);
+
+    const onSearch = async (params: URLSearchParams) => {
+        router.replace(`${pathname}?${params.toString()}`);
+    }
+
+    return (
+        <div className="p-6 max-w-3xl">
+            <h1 className="text-2xl font-bold mb-6">Suche</h1>
+            <SearchMenu onSearch={onSearch} />
+            <div className="mt-[30px]">
+                { !hasData &&
+                    <p className="ml-3">{`Keine Ergebnisse zur Suche \"${searchParams.get("title")}\" gefunden.`}</p>
+                }
+                { searchParams.has("title") &&
+                    <TasksContainer
+                        apiRoute={ApiRoute.SEARCH} 
+                        showTasksDone={true}
+                        setHasData={setHasData}
+                    />
+                }
+            </div>
+        </div>
+    );
+}

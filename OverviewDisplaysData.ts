@@ -1,5 +1,5 @@
 import { createRef, RefObject } from "react"
-import { TasksContainerRef } from "./components/task/TasksContainer"
+import { TasksContainerRef } from "./src/components/task/TasksContainer"
 
 export default class OverviewDisplaysData {
     containerRef: RefObject<TasksContainerRef | null> = createRef<TasksContainerRef>();
