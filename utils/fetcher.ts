@@ -11,7 +11,6 @@ export default async function fetcher<T = any>(
 ): Promise<T> {
   const defaultInit: RequestInit = {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
     ...init,
   }
 

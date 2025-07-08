@@ -25,6 +25,9 @@ export function useAuth() {
         await fetcher(ApiRoute.LOGIN, {
             method: 'POST',
             body: JSON.stringify({ email, password }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
         })
         await loadUser()
         router.push('/tasks')

@@ -1,5 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 import {
   Calendar,
   Home,
@@ -25,79 +30,64 @@ import {
 } from "@/components/ui/sidebar";
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 
-import { useState } from "react";
-import { TaskDialog } from "@/components/task/TaskDialog"; // Unified TaskDialog
-import Link from "next/link";
-
-import  ThemeChanger  from "@/components/themeChanger";
-import { CategoryManagement } from "./CategoryManagement";
-import { useRouter } from "next/navigation"
-import { ApiRoute } from "@/ApiRoute";
-import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { TaskDialog } from "@/components/task/TaskDialog";
 import SearchMenu from "../searchMenu";
+import ThemeChanger from "@/components/themeChanger";
+import { CategoryManagement } from "./CategoryManagement";
 
+import { useAuth } from "@/hooks/useAuth";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export function AppSidebar() {
   const router = useRouter();
+  const { user, loading, logout } = useAuth();     // useAuth verwenden
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [openSearchDialog, setOpenSearchDialog] = useState(false);
-  const [loading] = useState(false);
 
-  // Menu items.
+  // Menüeinträge
   const items = [
-    {
-      title: "Dashboard",
-      url: "/",
-      icon: Home
-    },
-    {
-      title: "Alle Tasks",
-      url: "/tasks",
-      icon: SquareCheckBig
-    },
-    {
-      title: "Suche",
-      icon: Search,
-      onClick: () => setOpenSearchDialog(true)
-    },
+    { title: "Dashboard", url: "/", icon: Home },
+    { title: "Alle Tasks", url: "/tasks", icon: SquareCheckBig },
+    { title: "Suche", icon: Search, onClick: () => setOpenSearchDialog(true) },
   ];
 
+  // Logout über Hook
   const handleLogout = async () => {
-    fetch(ApiRoute.LOGOUT, { method: 'POST', credentials: "include" }).then(() => {
-      router.push("/auth/login");
-      toast.success("Erfolgreich abgemeldet", {
-        duration: 3000,
-      });
-    });
+    try {
+      await logout();
+      toast.success("Erfolgreich abgemeldet", { duration: 3000 });
+    } catch {
+      toast.error("Fehler beim Abmelden");
+    }
   };
 
-  const onSearch = async (params: URLSearchParams) => {
-      router.replace(`/search?${params.toString()}`);
-      setOpenSearchDialog(false);
-  }
+  // Such-Callback
+  const onSearch = (params: URLSearchParams) => {
+    router.replace(`/search?${params.toString()}`);
+    setOpenSearchDialog(false);
+  };
 
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center justify-between p-4">
           <h1 className="text-lg font-bold">Todo-Webapp</h1>
-          <SidebarTrigger className="cursor-pointer"/>
+          <SidebarTrigger className="cursor-pointer" />
         </div>
         <div className="border-b border-gray-200 dark:border-gray-700" />
       </SidebarHeader>
+
       <SidebarContent>
         <div className="p-2">
           <button
             onClick={() => setOpenCreateDialog(true)}
-            disabled={loading}
-            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer"
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20"
           >
             <Plus className="h-4 w-4" />
             <span>Task erstellen</span>
@@ -111,20 +101,20 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    { item.url ?
-                      (
-                        <Link href={item.url} className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </Link>
-                      ) :
-                      (
-                        <div onClick={item.onClick} className="flex items-center gap-2 cursor-pointer">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </div>
-                      )
-                    }
+                    {item.url ? (
+                      <Link href={item.url} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    ) : (
+                      <div
+                        onClick={item.onClick}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </div>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -134,33 +124,28 @@ export function AppSidebar() {
 
         <CategoryManagement />
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <ThemeChanger />
           </SidebarMenuItem>
+
           <SidebarMenuItem>
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild className="cursor-pointer">
-                <SidebarMenuButton>
-                  <User2 /> Username
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="flex items-center gap-2">
+                  <User2 className="h-4 w-4" />
+                  {loading ? "Lädt..." : user?.email ?? "Gast"}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => router.push("/account")}>
-                  <span>Account</span>
-
+              <DropdownMenuContent side="top" align="start" className="w-48">
+                <DropdownMenuItem onSelect={() => router.push("/account")}>
+                  Account
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={handleLogout}>
-                  <span>Sign out</span>
+                <DropdownMenuItem onSelect={handleLogout}>
+                  Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -168,26 +153,23 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
 
-      {/* TaskDialog mit mode="create" außerhalb der Sidebar-Struktur */}
+      {/* Task-Dialog */}
       <TaskDialog
         mode="create"
         open={openCreateDialog}
         onOpenChange={setOpenCreateDialog}
-        hideTrigger={true} // Button ist bereits in der Sidebar implementiert
+        hideTrigger
       />
 
-      {/* Search dialog */}
+      {/* Such-Dialog */}
       <Dialog open={openSearchDialog} onOpenChange={setOpenSearchDialog}>
-          <DialogContent>
-            <DialogHeader className="mb-3">
-              <DialogTitle>
-                Suchen
-              </DialogTitle>
-            </DialogHeader>
-            <SearchMenu onSearch={onSearch} />
-          </DialogContent>
-        </Dialog>
-
+        <DialogContent>
+          <DialogHeader className="mb-3">
+            <DialogTitle>Suchen</DialogTitle>
+          </DialogHeader>
+          <SearchMenu onSearch={onSearch} />
+        </DialogContent>
+      </Dialog>
     </Sidebar>
   );
 }
