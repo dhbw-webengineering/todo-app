@@ -27,7 +27,6 @@ export default function SearchPage() {
                 }
                 { searchParams.has("title") &&
                     <TasksContainer
-                        apiRoute={ApiRoute.SEARCH} 
                         showTasksDone={true}
                         setHasData={setHasData}
                     />

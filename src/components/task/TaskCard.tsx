@@ -5,6 +5,8 @@ import { TaskDialog } from "@/src/components/task/TaskDialog";
 import { differenceInCalendarDays, format } from "date-fns";
 import moment from 'moment';
 import { toast } from 'sonner';
+import { is } from "date-fns/locale";
+import Link from "next/link";
 
 moment.locale("de");
 
@@ -51,15 +53,25 @@ export function TaskCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            {isCompleted && (
+            {isCompleted ? (
               <Badge variant="default" className="text-xs bg-green-200 text-green-800">
                 Erledigt
               </Badge>
+            ) : (new Date(task.dueDate) < new Date()) ? (
+              <Badge variant="destructive" className="text-xs">
+                Überfällig
+              </Badge>
+            ) : (
+              <Badge variant="secondary" className="text-xs">
+                Offen
+              </Badge>
             )}
             {task.category && (
-              <Badge variant="secondary" className="text-xs">
-                {task.category.name}
-              </Badge>
+              <Link href={`/tasks?category=${task.category.id}`} className="cursor-pointer">
+                <Badge variant="outline" className="text-xs">
+                  {task.category.name}
+                </Badge>
+              </Link>
             )}
             {task.dueDate && (
               <span className="text-sm text-gray-500">
@@ -88,11 +100,14 @@ export function TaskCard({
 
           <div className="flex items-center justify-between mt-3">
             <div className="flex flex-wrap gap-1">
-              {task.tags?.map(tag => (
-                <Badge key={tag.id} variant="outline" className="text-xs">
-                  {tag.name}
-                </Badge>
-              ))}
+              {task.tags?.length ? (task.tags?.map(tag => (
+                <Link key={tag.id} href={`/tasks?tag=${tag.id}`} className="cursor-pointer">
+                  <Badge variant="outline" className="text-xs">
+                    {tag.name}
+                  </Badge>
+                </Link>
+              ))) : (
+                <span className="text-xs text-gray-500 italic">keine Tags</span>)}
             </div>
             <TaskDialog
               mode="edit"

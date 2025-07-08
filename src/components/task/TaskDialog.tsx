@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Dialog, DialogTrigger, DialogContent, DialogHeader,
+  Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogFooter, DialogDescription
 } from '@/src/components/ui/dialog';
 import { de } from 'date-fns/locale';
