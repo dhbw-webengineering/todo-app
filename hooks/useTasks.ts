@@ -1,50 +1,44 @@
-import { useState, useEffect, useCallback } from 'react'
-import fetcher from '@/utils/fetcher'
-import { TodoApiResponse } from '@/types/task'
-import { ApiRoute } from '@/ApiRoute'
+import { useState, useEffect, useCallback } from 'react';
+import fetcher from '@/utils/fetcher';
+import { TodoApiResponse } from '@/types/task';
+import { ApiRoute } from 'ApiRoute';
 
-interface UseTasksResult {
-  tasks: TodoApiResponse[]
-  loading: boolean
-  error: string | null
-  refetch: () => Promise<void>
+export interface UseTasksResult {
+  tasks: TodoApiResponse[];
+  loading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
 }
 
 export function useTasks(
   params: URLSearchParams,
   showDone: boolean
 ): UseTasksResult {
-  const [tasks, setTasks] = useState<TodoApiResponse[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [tasks, setTasks] = useState<TodoApiResponse[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
-      const query = params.toString()
-      const data = await fetcher<TodoApiResponse[]>(
-        `${ApiRoute.TODOS}${query ? `?${query}` : ''}`,
-        { method: 'GET' }
-      )
-      setTasks(showDone ? data : data.filter(t => !t.completedAt))
+      const qs = params.toString();
+      const url = qs
+        ? `${ApiRoute.TODOS}?${qs}`
+        : ApiRoute.TODOS;
+      const data = await fetcher<TodoApiResponse[]>(url, { method: 'GET' });
+      setTasks(showDone ? data : data.filter(t => !t.completedAt));
     } catch (err: any) {
-      setTasks([])
-      setError(err.message || 'Fehler beim Laden der Aufgaben')
+      setTasks([]);
+      setError(err.message || 'Fehler beim Laden der Aufgaben');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [params.toString(), showDone])
+  }, [params.toString(), showDone]);
 
   useEffect(() => {
-    void load()
-  }, [load])
+    void load();
+  }, [load]);
 
-  return {
-    tasks,
-    loading,
-    error,
-    refetch: load,    
-  }
+  return { tasks, loading, error, refetch: load };
 }
-
