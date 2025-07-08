@@ -21,6 +21,8 @@ import { CategorySelect } from '@/src/components/categorySelect';
 import { format } from 'date-fns';
 import { useState, useEffect } from 'react';
 import { TodoApiResponse, TodoApiCreate, TodoApiEdit } from '@/src/types/task';
+import { useTaskQuery } from '@/src/state/TaskQueryContext';
+
 
 type TaskDialogProps = {
   mode: 'create' | 'edit';
@@ -54,6 +56,7 @@ export function TaskDialog({
   const [tagsStr, setTagsStr] = useState('');
   const [completed, setCompleted] = useState(false);
   const [errors, setErrors] = useState<{ title?: boolean; dueDate?: boolean; category?: boolean; }>({});
+  const { invalidateAll } = useTaskQuery();
 
   useEffect(() => {
     if (mode === 'edit' && task) {
@@ -84,6 +87,7 @@ export function TaskDialog({
           tags: tagsStr ? tagsStr.split(',').map(n => n.trim()).filter(Boolean) : undefined,
         };
         await createTodoApi(data);
+        invalidateAll();
       } else {
         const edit: TodoApiEdit = {
           id: task!.id,
@@ -95,9 +99,8 @@ export function TaskDialog({
           completedAt: completed ? (task!.completedAt || new Date().toISOString()) : null,
         };
         await updateTodoApi(edit);
+        invalidateAll();
       }
-      // **Wichtig:** Anzeige neu laden
-      onTagsChanged?.();
       setOpen(false);
     } catch (err) {
       console.error(err);
@@ -107,6 +110,7 @@ export function TaskDialog({
   const handleDelete = async () => {
     if (mode === 'edit' && task && onDelete) {
       onDelete(task.id);
+      invalidateAll();
       setOpen(false);
     }
   };
