@@ -1,27 +1,50 @@
-import { useState, useEffect } from 'react'
-import fetcher from '../utils/fetcher'
+import { useState, useEffect, useCallback } from 'react'
+import fetcher from '@/utils/fetcher'
 import { TodoApiResponse } from '@/types/task'
+import { ApiRoute } from '@/ApiRoute'
 
-export function useTasks(filter: string) {
+interface UseTasksResult {
+  tasks: TodoApiResponse[]
+  loading: boolean
+  error: string | null
+  refetch: () => Promise<void>
+}
+
+export function useTasks(
+  params: URLSearchParams,
+  showDone: boolean
+): UseTasksResult {
   const [tasks, setTasks] = useState<TodoApiResponse[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const query = params.toString()
+      const data = await fetcher<TodoApiResponse[]>(
+        `${ApiRoute.TODOS}${query ? `?${query}` : ''}`,
+        { method: 'GET' }
+      )
+      setTasks(showDone ? data : data.filter(t => !t.completedAt))
+    } catch (err: any) {
+      setTasks([])
+      setError(err.message || 'Fehler beim Laden der Aufgaben')
+    } finally {
+      setLoading(false)
+    }
+  }, [params.toString(), showDone])
 
   useEffect(() => {
-    async function load() {
-      setLoading(true)
-      try {
-        const data = await fetcher<TodoApiResponse[]>(`/api/tasks?filter=${encodeURIComponent(filter)}`, {
-          method: 'GET',
-        })
-        setTasks(data)
-      } catch {
-        setTasks([])
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [filter])
+    void load()
+  }, [load])
 
-  return { tasks, loading }
+  return {
+    tasks,
+    loading,
+    error,
+    refetch: load,    
+  }
 }
+
