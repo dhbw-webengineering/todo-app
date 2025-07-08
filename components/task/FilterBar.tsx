@@ -106,30 +106,33 @@ export function FilterBar() {
     };
 
     return (
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-            <div className="w-1/5">
-                <MultiSelect
-                    options={categoryOptions}
-                    value={selectedCategories}
-                    onValueChange={onCategoriesChange}
-                    placeholder="Kategorie"
-                    variant="inverted"
-                />
-            </div>
-            <div className="w-1/5">
-                <MultiSelect
-                    options={tagOptions}
-                    value={selectedTags}
-                    onValueChange={onTagsChange}
-                    placeholder="Tags"
-                    variant="secondary"
-                />
-            </div>
-            <div className="w-1/6">
-                <DateRangePicker
-                    value={dateRange}
-                    onChange={onDateChange}
-                />
+        <div>
+            <p className='mb-2'>Filter</p>
+            <div className="flex flex-wrap items-center gap-4 mb-6">
+                <div className="w-1/5">
+                    <MultiSelect
+                        options={categoryOptions}
+                        value={selectedCategories}
+                        onValueChange={onCategoriesChange}
+                        placeholder="Kategorie"
+                        variant="inverted"
+                    />
+                </div>
+                <div className="w-1/5">
+                    <MultiSelect
+                        options={tagOptions}
+                        value={selectedTags}
+                        onValueChange={onTagsChange}
+                        placeholder="Tags"
+                        variant="secondary"
+                    />
+                </div>
+                <div className="w-1/6">
+                    <DateRangePicker
+                        value={dateRange}
+                        onChange={onDateChange}
+                    />
+                </div>
             </div>
         </div>
     );

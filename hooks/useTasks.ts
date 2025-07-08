@@ -27,7 +27,8 @@ export function useTasks(
       const qs = params.toString();
       const url = qs ? `${ApiRoute.TODOS}?${qs}` : ApiRoute.TODOS;
       const data = await fetcher<TodoApiResponse[]>(url, { method: 'GET' });
-      setTasks(showDone ? data : data.filter((t) => !t.completedAt));
+      const filtered = showDone ? data : data.filter(t => !t.completedAt);
+      setTasks(filtered);
     } catch (err: any) {
       setTasks([]);
       setError(err.message || 'Fehler beim Laden der Aufgaben');
@@ -36,24 +37,19 @@ export function useTasks(
     }
   }, [params.toString(), showDone]);
 
-  const updateTask = useCallback(
-    async (task: TodoApiResponse) => {
-      await fetcher(`${ApiRoute.TODOS}/${task.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(task),
-      });
-      await load();
-    },
-    [load]
-  );
+  const updateTask = useCallback(async (task: TodoApiResponse) => {
+    await fetcher(`${ApiRoute.TODOS}/${task.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(task),
+    });
+    setTasks(prev => prev.map(t => t.id === task.id ? task : t));
+  }, []);
 
-  const deleteTask = useCallback(
-    async (id: string) => {
-      await fetcher(`${ApiRoute.TODOS}/${id}`, { method: 'DELETE' });
-      await load();
-    },
-    [load]
-  );
+  const deleteTask = useCallback(async (id: string) => {
+    await fetcher(`${ApiRoute.TODOS}/${id}`, { method: 'DELETE' });
+    setTasks(prev => prev.filter(t => t.id !== parseInt(id)));
+  }, []);
 
   useEffect(() => {
     void load();

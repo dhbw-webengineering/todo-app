@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { TaskCard } from './TaskCard';
 import { useTasks, UseTasksResult } from '@/hooks/useTasks';
 import { TodoApiResponse } from '@/types/task';
+import { toast } from 'sonner';
 
 export type TasksContainerRef = {
   updateTask: (task: TodoApiResponse) => void;
@@ -34,7 +35,7 @@ function TasksContainer(
     sendTaskDelete,
     onTagsChanged,
   }: TasksContainerProps,
-  ref: Ref<TasksContainerRef>
+  ref: Ref<TasksContainerRef | null>
 ) {
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
@@ -49,53 +50,73 @@ function TasksContainer(
     params.set('to', to.toISOString());
   }
 
-  const { tasks, loading, error, refetch }: UseTasksResult =
+  const { tasks, loading, error, refetch, updateTask: updateTaskHook }: UseTasksResult =
     useTasks(params, showTasksDone);
 
   useImperativeHandle(ref, () => ({
-    updateTask: (task: TodoApiResponse) => handleUpdate(task),
-    deleteTask: (task: TodoApiResponse) => handleDelete(task),
+    updateTask: handleUpdate,
+    deleteTask: handleDelete,
   }));
 
   useEffect(() => {
     setHasData?.(tasks.length > 0);
   }, [tasks, setHasData]);
 
-  const handleUpdate = (task: TodoApiResponse) => {
-    if (sendTaskUpdate) {
-      sendTaskUpdate(task);
-    } else {
-      void refetch();
+  const handleUpdate = async (task: TodoApiResponse) => {
+    try {
+      await updateTaskHook(task);
+      sendTaskUpdate?.(task);
+      toast.success('Task erfolgreich aktualisiert');
+    } catch (error) {
+      toast.error('Fehler beim Aktualisieren der Aufgabe');
+      console.error(error);
     }
   };
 
-  const handleDelete = (task: TodoApiResponse) => {
-    if (sendTaskDelete) {
-      sendTaskDelete(task);
-    } else {
-      void refetch();
+  const handleDelete = async (task: TodoApiResponse) => {
+    try {
+      if (sendTaskDelete) {
+        sendTaskDelete(task);
+      } else {
+        await refetch();
+      }
+      onTagsChanged?.();
+      toast.success('Task erfolgreich gelöscht');
+    } catch (error) {
+      toast.error('Fehler beim Löschen der Aufgabe');
+      console.error(error);
     }
-    onTagsChanged?.();
   };
+
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if ((a.completedAt === null) !== (b.completedAt === null)) {
+      return a.completedAt ? 1 : -1;
+    }
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+  });
 
   if (loading) {
-    return <div className="text-center text-lg mt-12">Loading tasks...</div>;
+    return <div className="text-center py-4">Loading tasks...</div>;
   }
+  
   if (error) {
     return (
-      <div className="text-center text-lg mt-12 text-red-600">
+      <div className="text-center py-4 text-red-500">
         Error: {error}
       </div>
     );
   }
 
   return (
-    <div className="grid gap-5">
-      {tasks.map((task) => (
+    <div className="space-y-4">
+      {sortedTasks.map(task => (
         <TaskCard
           key={task.id}
           task={task}
-          onUpdate={() => handleUpdate(task)}
+          onUpdate={handleUpdate}
           onDelete={() => handleDelete(task)}
           onTagsChanged={onTagsChanged}
         />

@@ -1,11 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TodoApiResponse } from "@/types/task"; 
+import { TodoApiResponse } from "@/types/task";
 import { TaskDialog } from "@/components/task/TaskDialog";
 import { differenceInCalendarDays, format } from "date-fns";
-import moment from 'moment'
+import moment from 'moment';
+import { toast } from 'sonner';
 
-moment.locale("de")
+moment.locale("de");
 
 export function TaskCard({
   task,
@@ -15,15 +16,14 @@ export function TaskCard({
 }: {
   task: TodoApiResponse;
   onUpdate: (updatedTask: TodoApiResponse) => void;
-  onDelete: (id: number) => void;
-  onTagsChanged?: () => void; 
+  onDelete: () => void;
+  onTagsChanged?: () => void;
 }) {
   let dueDateLabel = "";
   if (task.dueDate) {
     const heute = new Date();
     const faellig = new Date(task.dueDate);
     const diff = differenceInCalendarDays(faellig, heute);
-
     if (diff === 0) dueDateLabel = "heute fällig";
     else if (diff === 1) dueDateLabel = "morgen fällig";
     else if (diff > 1) dueDateLabel = `fällig in ${diff} Tagen`;
@@ -31,71 +31,77 @@ export function TaskCard({
     else dueDateLabel = `seit ${Math.abs(diff)} Tagen fällig`;
   }
 
-  const isCompleted = task.completedAt;
+  const isCompleted = !!task.completedAt;
+
+  const handleToggleComplete = async () => {
+    try {
+      const updated: TodoApiResponse = {
+        ...task,
+        completedAt: isCompleted ? null : new Date().toISOString()
+      };
+      await onUpdate(updated);
+    } catch (error) {
+      toast.error('Fehler beim Aktualisieren des Task-Status');
+      console.error(error);
+    }
+  };
 
   return (
-    <div className="border rounded-xl p-4 shadow-sm bg-white dark:bg-zinc-900 w-full flex flex-col">
-      <div>
-        <div className="flex justify-between items-start">
-          <p className="pb-3 text-sm text-muted-foreground">
-            {task.category && <span>{task.category.name}</span>}
+    <div className={`border rounded-lg p-4 shadow-sm`}>
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            {isCompleted && (
+              <Badge variant="default" className="text-xs bg-green-200 text-green-800">
+                Erledigt
+              </Badge>
+            )}
+            {task.category && (
+              <Badge variant="secondary" className="text-xs">
+                {task.category.name}
+              </Badge>
+            )}
             {task.dueDate && (
-              <span>
-                {" "}
-                • {dueDateLabel} •{" "}
-                {format(new Date(task.dueDate), "dd.MM.yyyy")}
+              <span className="text-sm text-gray-500">
+                • {dueDateLabel} • {format(new Date(task.dueDate), "dd.MM.yyyy")}
               </span>
             )}
-          </p>
-
-          {isCompleted && <Badge variant="default">Erledigt</Badge>}
-        </div>
-
-        <div className="flex gap-3 items-start">
-          <Checkbox
-            checked={!!isCompleted}
-            onCheckedChange={() => {
-              task.completedAt = task.completedAt ? null : new Date().toISOString();
-              onUpdate(task);
-            }}
-            className="mt-1 cursor-pointer"
-          />
-          <div>
-            <h2
-              className={`text-lg font-semibold ${
-                isCompleted ? "line-through text-muted-foreground" : ""
-              }`}
-            >
-              {task.title}
-            </h2>
-            {task.description && (
-              <p className="text-sm text-muted-foreground">
-                {task.description}
-              </p>
-            )}
           </div>
-        </div>
-      </div>
 
-      {/* Container für Tags und Menubar */}
-      <div className="mt-3 flex flex-wrap justify-between items-start">
-        <div className="flex flex-wrap gap-2 max-w-[calc(100%-40px)] flex-grow">
-          {task.tags?.map((tag) => (
-            <Badge key={tag.id} variant="secondary">
-              {tag.name}
-            </Badge>
-          ))}
-        </div>
+          <div className="flex items-center gap-3">
+            <Checkbox
+              checked={isCompleted}
+              onCheckedChange={handleToggleComplete}
+              className="mt-1 cursor-pointer"
+            />
+            <div className="flex-1">
+              <h4 className={`font-medium ${isCompleted ? 'line-through text-gray-500' : ''}`}>
+                {task.title}
+              </h4>
+              {task.description && (
+                <p className={`text-sm mt-1 ${isCompleted ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {task.description}
+                </p>
+              )}
+            </div>
+          </div>
 
-        <div className="flex-shrink-0 ml-4 self-end">
-          <TaskDialog 
-            mode="edit" 
-            task={task} 
-            onDelete={onDelete}
-            triggerVariant="dropdown"
-            hideTrigger={false}
-            onTagsChanged={onTagsChanged}
-          />
+          <div className="flex items-center justify-between mt-3">
+            <div className="flex flex-wrap gap-1">
+              {task.tags?.map(tag => (
+                <Badge key={tag.id} variant="outline" className="text-xs">
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
+            <TaskDialog
+              mode="edit"
+              task={task}
+              onDelete={onDelete}
+              triggerVariant="dropdown"
+              onTagsChanged={onTagsChanged}
+            />
+          </div>
         </div>
       </div>
     </div>
