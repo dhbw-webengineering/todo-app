@@ -1,11 +1,6 @@
 'use client';
 
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useEffect,
-  Ref,
-} from 'react';
+import React, { forwardRef, useImperativeHandle, useEffect, Ref } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { TaskCard } from './TaskCard';
 import { useTasks, UseTasksResult } from '@/hooks/useTasks';
@@ -27,30 +22,23 @@ interface TasksContainerProps {
 }
 
 function TasksContainer(
-  {
-    range,
-    setHasData,
-    showTasksDone,
-    sendTaskUpdate,
-    sendTaskDelete,
-    onTagsChanged,
-  }: TasksContainerProps,
+  { range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete, onTagsChanged }: TasksContainerProps,
   ref: Ref<TasksContainerRef | null>
 ) {
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
 
   if (range) {
-    const [fromOffset, toOffset] = range;
-    const from = new Date();
-    from.setDate(from.getDate() + fromOffset);
-    const to = new Date();
-    to.setDate(to.getDate() + toOffset);
-    params.set('from', from.toISOString());
-    params.set('to', to.toISOString());
+    const [from, to] = range;
+    const start = new Date();
+    start.setDate(start.getDate() + from);
+    const end = new Date();
+    end.setDate(end.getDate() + to);
+    params.set('from', start.toISOString());
+    params.set('to', end.toISOString());
   }
 
-  const { tasks, loading, error, refetch, updateTask: updateTaskHook }: UseTasksResult =
+  const { tasks, loading, error, refetch, updateTask: updateHook }: UseTasksResult =
     useTasks(params, showTasksDone);
 
   useImperativeHandle(ref, () => ({
@@ -64,63 +52,46 @@ function TasksContainer(
 
   const handleUpdate = async (task: TodoApiResponse) => {
     try {
-      await updateTaskHook(task);
+      await updateHook(task);
       sendTaskUpdate?.(task);
-      toast.success('Task erfolgreich aktualisiert');
-    } catch (error) {
-      toast.error('Fehler beim Aktualisieren der Aufgabe');
-      console.error(error);
+      toast.success('Task aktualisiert');
+    } catch {
+      toast.error('Update fehlgeschlagen');
     }
   };
 
   const handleDelete = async (task: TodoApiResponse) => {
     try {
-      if (sendTaskDelete) {
-        sendTaskDelete(task);
-      } else {
-        await refetch();
-      }
+      if (sendTaskDelete) sendTaskDelete(task);
+      else await refetch();
       onTagsChanged?.();
-      toast.success('Task erfolgreich gelöscht');
-    } catch (error) {
-      toast.error('Fehler beim Löschen der Aufgabe');
-      console.error(error);
+      toast.success('Task gelöscht');
+    } catch {
+      toast.error('Löschen fehlgeschlagen');
     }
   };
 
-  const sortedTasks = [...tasks].sort((a, b) => {
-    if ((a.completedAt === null) !== (b.completedAt === null)) {
-      return a.completedAt ? 1 : -1;
-    }
-    if (!a.dueDate && !b.dueDate) return 0;
-    if (!a.dueDate) return 1;
-    if (!b.dueDate) return -1;
-    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-  });
-
-  if (loading) {
-    return <div className="text-center py-4">Loading tasks...</div>;
-  }
-  
-  if (error) {
-    return (
-      <div className="text-center py-4 text-red-500">
-        Error: {error}
-      </div>
-    );
-  }
+  if (loading) return <div className="text-center py-4">Lade...</div>;
+  if (error)   return <div className="text-center py-4 text-red-500">Error: {error}</div>;
 
   return (
     <div className="space-y-4">
-      {sortedTasks.map(task => (
-        <TaskCard
-          key={task.id}
-          task={task}
-          onUpdate={handleUpdate}
-          onDelete={() => handleDelete(task)}
-          onTagsChanged={onTagsChanged}
-        />
-      ))}
+      {tasks
+        .sort((a, b) => {
+          const ac = !!a.completedAt, bc = !!b.completedAt;
+          if (ac !== bc) return ac ? 1 : -1;
+          if (!a.dueDate || !b.dueDate) return a.dueDate ? -1 : b.dueDate ? 1 : 0;
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        })
+        .map(task => (
+          <TaskCard
+            key={task.id}
+            task={task}
+            onUpdate={handleUpdate}
+            onDelete={() => handleDelete(task)}
+            onTagsChanged={onTagsChanged}
+          />
+        ))}
     </div>
   );
 }
