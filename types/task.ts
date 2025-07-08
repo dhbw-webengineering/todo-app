@@ -18,6 +18,7 @@ export interface TodoApiResponse {
     name: string;
   }[];
 }
+
 export interface TodoApiCreate {
   title: string;
   dueDate: string; // ISO-String
