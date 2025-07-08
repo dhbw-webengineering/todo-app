@@ -1,6 +1,6 @@
 import { toast } from "sonner";
-import { TodoApiCreate, TodoApiEdit, TodoApiResponse } from "./types/task";
-import { ApiRoute } from "./ApiRoute";
+import { TodoApiCreate, TodoApiEdit, TodoApiResponse } from "../types/task";
+import { ApiRoute } from "@/ApiRoute";
 
 export const createTodoApi = async (data: TodoApiCreate) => {
     console.log(JSON.stringify(data))

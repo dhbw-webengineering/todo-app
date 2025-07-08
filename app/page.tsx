@@ -1,11 +1,12 @@
-import OverviewTasks from "@/components/task/OverviewTasks";
+'use client';
 
+import React from 'react';
+import OverviewTasks from '@/components/task/OverviewTasks';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Dashboard Todoapp</h1>
+    <main className="p-6">
       <OverviewTasks />
-    </div>
+    </main>
   );
 }
