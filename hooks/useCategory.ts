@@ -1,27 +1,16 @@
-// hooks/useCategories.ts
-import { ApiRoute } from "@/ApiRoute";
-import { useEffect, useState } from "react";
+// DEPRECATED: This file is deprecated and should not be used.
+// Please use the useCategoriesContext hook from @/hooks/useCategoriesContext instead.
+// The Category interface is now imported from @/types/category.
 
-export interface Category {
-  id: number;
-  userId: number;
-  name: string;
-}
+import { useCategoriesContext } from "@/hooks/useCategoriesContext";
 
+// This function is kept for backward compatibility but will log a warning when used
 export function useCategories() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch(ApiRoute.CATEGORY,
-      {credentials: "include"})
-      .then((res) => res.json())
-      .then((data) => setCategories(data.map((c: Category) => ({
-        ...c,
-        name: c.name.trim(),
-      }))))
-      .finally(() => setLoading(false));
-  }, []);
-
-  return { categories, loading };
+  console.warn(
+    "useCategories is deprecated. Please use useCategoriesContext from @/hooks/useCategoriesContext instead."
+  );
+  return useCategoriesContext();
 }
+
+// Re-export Category from the types directory
+export { Category } from "@/types/category";

@@ -7,13 +7,13 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import TasksContainer from "@/components/task/TasksContainer";
 import { ApiRoute } from "@/ApiRoute";
 import { DateRange } from "react-day-picker";
-import { useCategories } from "@/hooks/useCategory";
+import { useCategoriesContext } from "@/hooks/useCategoriesContext";
 import { useTags } from "@/hooks/useTags";
 import type { Category } from "@/types/category";
 
 export default function TasksPage() {
   // Kategorien und Tags vom Backend holen
-  const { categories } = useCategories();
+  const { categories } = useCategoriesContext();
   const { tags, refetch: refetchTags } = useTags();
 
   // Kategorien für MultiSelect mappen

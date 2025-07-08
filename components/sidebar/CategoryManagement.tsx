@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
-// Der Import von "next/link" wurde entfernt, da er nicht aufgelöst werden konnte.
-// import Link from "next/link";
+import { useState, ChangeEvent } from "react";
 import { toast } from "sonner";
 import { Category } from "@/types/category";
-import { fetchCategories, createCategory, updateCategory, deleteCategory } from "@/lib/categoryApi";
+import { createCategory, updateCategory, deleteCategory } from "@/lib/categoryApi";
+import { useCategoriesContext } from "@/hooks/useCategoriesContext";
 import {
   Collapsible,
   CollapsibleContent,
@@ -49,10 +48,8 @@ import Link from "next/link";
 
 
 export function CategoryManagement() {
-  // State for categories
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Get categories from context
+  const { categories, isLoading, error, refetchCategories } = useCategoriesContext();
 
   // State for category creation/editing
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -61,26 +58,6 @@ export function CategoryManagement() {
 
   // State for delete confirmation
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
-
-  // Fetch categories when component mounts
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        setIsLoading(true);
-        const data = await fetchCategories();
-        setCategories(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch categories:", err);
-        setError("Failed to load categories");
-        toast.error("Failed to load categories");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCategories();
-  }, []);
 
   // Handle adding a new category
   const handleAddCategory = () => {
@@ -96,8 +73,8 @@ export function CategoryManagement() {
     }
 
     try {
-      const newCategory = await createCategory(newCategoryName);
-      setCategories([...categories, newCategory]);
+      await createCategory(newCategoryName);
+      await refetchCategories(); // Refresh categories from the server
       setIsCreatingCategory(false);
       setNewCategoryName("");
       toast.success("Kategorie erstellt");
@@ -123,12 +100,8 @@ export function CategoryManagement() {
     }
 
     try {
-      const updatedCategory = await updateCategory(editingCategory.id.toString(), newCategoryName);
-      setCategories(
-          categories.map((cat) =>
-              cat.id === updatedCategory.id ? updatedCategory : cat
-          )
-      );
+      await updateCategory(editingCategory.id.toString(), newCategoryName);
+      await refetchCategories(); // Refresh categories from the server
       setEditingCategory(null);
       setNewCategoryName("");
       toast.success("Kategorie aktualisiert");
@@ -156,7 +129,7 @@ export function CategoryManagement() {
 
     try {
       await deleteCategory(categoryToDelete.id.toString());
-      setCategories(categories.filter((cat) => cat.id !== categoryToDelete.id));
+      await refetchCategories(); // Refresh categories from the server
       setCategoryToDelete(null);
       toast.success("Kategorie gelöscht");
     } catch (err) {
