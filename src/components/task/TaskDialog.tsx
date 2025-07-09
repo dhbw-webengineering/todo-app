@@ -24,7 +24,7 @@ import { TodoApiResponse, TodoApiCreate, TodoApiEdit } from '@/src/types/task';
 import { useTaskQuery } from '@/src/state/TaskQueryContext';
 import { z } from "zod"
 import { toast } from 'sonner';
-
+import { cn } from '@/src/utils/utils';
 
 const TaskSchema = z.object({
   title: z.string().min(1, "Titel darf nicht leer sein"),
@@ -35,12 +35,10 @@ const TaskSchema = z.object({
   completed: z.boolean(),
 })
 
-
 type TaskDialogProps = {
   mode: 'create' | 'edit';
   task?: TodoApiResponse | null;
   onDelete?: (id: number) => void;
-  onTagsChanged?: () => void;
   triggerVariant?: 'button' | 'dropdown';
   hideTrigger?: boolean;
   open?: boolean;
@@ -51,7 +49,6 @@ export function TaskDialog({
   mode,
   task,
   onDelete,
-  onTagsChanged,
   triggerVariant = 'button',
   hideTrigger = false,
   open: controlledOpen,
@@ -67,7 +64,7 @@ export function TaskDialog({
   const { categories } = useCategories();
   const [tagsStr, setTagsStr] = useState('');
   const [completed, setCompleted] = useState(false);
-  const [errors, setErrors] = useState<{ title?: boolean; dueDate?: boolean; category?: boolean; }>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof z.infer<typeof TaskSchema>, string>>>({});
   const { invalidateAll } = useTaskQuery();
 
   useEffect(() => {
@@ -95,19 +92,17 @@ export function TaskDialog({
     });
 
     if (!parsed.success) {
-      const fieldErrors: typeof errors = {};
-      const firstMessage = parsed.error.issues[0]?.message;
-
+      const newErrors: Partial<Record<keyof z.infer<typeof TaskSchema>, string>> = {};
       for (const issue of parsed.error.issues) {
-        if (issue.path.includes("title")) fieldErrors.title = true;
-        if (issue.path.includes("dueDate")) fieldErrors.dueDate = true;
-        if (issue.path.includes("categoryId")) fieldErrors.category = true;
+        const key = issue.path[0] as keyof z.infer<typeof TaskSchema>;
+        newErrors[key] = issue.message;
       }
-
-      setErrors(fieldErrors);
-      toast.error(firstMessage || "Bitte fülle alle erforderlichen Felder korrekt aus.");
+      setErrors(newErrors);
+      toast.error(parsed.error.issues[0]?.message || "Fehlerhafte Eingabe");
       return;
     }
+
+    setErrors({});
 
     try {
       const tagList = tagsStr
@@ -144,8 +139,6 @@ export function TaskDialog({
       toast.error("Speichern fehlgeschlagen. Bitte versuche es erneut.");
     }
   };
-
-
 
   const handleDelete = async () => {
     if (mode === 'edit' && task && onDelete) {
@@ -193,7 +186,13 @@ export function TaskDialog({
         <div className="space-y-4 py-2">
           <div>
             <label>Titel *</label>
-            <Input value={title} onChange={e => setTitle(e.target.value)} aria-invalid={errors.title} />
+            <Input
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              aria-invalid={!!errors.title}
+              className={errors.title ? "border-red-500" : ""}
+            />
+            {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
           </div>
           <div>
             <label>Beschreibung</label>
@@ -203,7 +202,7 @@ export function TaskDialog({
             <label>Fälligkeitsdatum *</label>
             <Popover>
               <PopoverTrigger asChild className="cursor-pointer">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className={cn("w-full justify-start", errors.dueDate && "border-red-500")}>
                   {dueDate ? format(dueDate, 'dd.MM.yyyy') : 'Datum wählen'}
                   <CalendarIcon className="ml-auto" />
                 </Button>
@@ -217,10 +216,12 @@ export function TaskDialog({
                 />
               </PopoverContent>
             </Popover>
+            {errors.dueDate && <p className="text-sm text-red-600">{errors.dueDate}</p>}
           </div>
           <div>
             <label>Kategorie *</label>
             <CategorySelect data={categories} value={categoryId} onChange={id => setCategoryId(id)} />
+            {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId}</p>}
           </div>
           <div>
             <label>Tags</label>

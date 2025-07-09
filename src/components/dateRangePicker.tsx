@@ -13,7 +13,6 @@ import {
   PopoverTrigger,
 } from "@/src/components/ui/popover"
 import { useState } from "react"
-import { useSearchParams } from "next/navigation"
 
 
 export function DateRangePicker({
@@ -25,17 +24,10 @@ export function DateRangePicker({
   className?: string;
   onChange?: (range: DateRange | undefined) => void;
 }) {
-  const searchParams = useSearchParams();
 
   const initialRange: DateRange | undefined = (() => {
-    const fromParam = searchParams.get("from");
-    const toParam = searchParams.get("to");
-
-    const fromDate = fromParam ? new Date(fromParam) : undefined;
-    const toDate = toParam ? new Date(toParam) : undefined;
-
-    if (fromDate && !isNaN(fromDate.getTime()) && toDate && !isNaN(toDate.getTime())) {
-      return { from: fromDate, to: toDate };
+    if (value?.from && !isNaN(value?.from.getTime()) && value.to && !isNaN(value.to.getTime())) {
+      return { from: value?.from, to: value.to };
     }
     return undefined;
   })();

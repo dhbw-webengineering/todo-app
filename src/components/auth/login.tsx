@@ -34,8 +34,8 @@ export function LoginForm({
     try {
       await login(email, password)
       toast.success("Erfolgreich eingeloggt")
-    } catch (err: any) {
-      toast.error(err.message || "Login fehlgeschlagen")
+    } catch {
+      toast.error("Login fehlgeschlagen")
     } finally {
       setLoading(false)
     }

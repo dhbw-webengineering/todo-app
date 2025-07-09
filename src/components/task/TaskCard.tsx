@@ -10,12 +10,10 @@ export function TaskCard({
   task,
   onUpdate,
   onDelete,
-  onTagsChanged
 }: {
   task: TodoApiResponse;
   onUpdate: (updatedTask: TodoApiResponse) => void;
   onDelete: () => void;
-  onTagsChanged?: () => void;
 }) {
   let dueDateLabel = "";
   if (task.dueDate) {
@@ -87,7 +85,7 @@ export function TaskCard({
                 {task.title}
               </h4>
               {task.description && (
-                <p className={`text-sm mt-1 ${isCompleted ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-sm mt-1 ${isCompleted ? 'text-gray-600' : 'text-gray-400'}`}>
                   {task.description}
                 </p>
               )}
@@ -110,7 +108,6 @@ export function TaskCard({
               task={task}
               onDelete={onDelete}
               triggerVariant="dropdown"
-              onTagsChanged={onTagsChanged}
             />
           </div>
         </div>

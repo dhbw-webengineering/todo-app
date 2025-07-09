@@ -1,4 +1,5 @@
-"use client"
+'use client'
+
 import React, { ChangeEvent, useState } from "react"
 import { Card, CardHeader, CardContent, CardTitle } from "@/src/components/ui/card"
 import { Button } from "@/src/components/ui/button"
@@ -9,6 +10,7 @@ import fetcher from "../utils/fetcher"
 import { toast } from "sonner"
 import { useAuth } from "@/src/state/useAuth"
 import { z } from "zod"
+import { cn } from "@/src/utils/utils"
 
 const AccountSchema = z
   .object({
@@ -27,6 +29,7 @@ export default function AccountCard() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const { user } = useAuth()
   const [email, setEmail] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof z.infer<typeof AccountSchema>, string>>>({})
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,11 +52,20 @@ export default function AccountCard() {
       setEditMode(false)
       setPassword("")
       setConfirmPassword("")
-    } catch (err: any) {
+      setFieldErrors({})
+    } catch (err) {
       if (err instanceof z.ZodError) {
+        const errors: Partial<Record<keyof z.infer<typeof AccountSchema>, string>> = {}
+        err.errors.forEach(e => {
+          const field = e.path[0] as keyof z.infer<typeof AccountSchema>
+          errors[field] = e.message
+        })
+        setFieldErrors(errors)
         toast.error(err.errors[0].message)
       } else {
         console.error(err)
+        toast.error("Ein unerwarteter Fehler ist aufgetreten.", {
+          description: "Die E-Mail-Adresse wird möglicherweise schon verwendet.",})
       }
     }
   }
@@ -61,7 +73,6 @@ export default function AccountCard() {
   if (!user) {
     return <div className="text-center p-4">Lade Benutzerinformationen...</div>
   }
-
 
   return (
     <Card className="max-w-md mx-auto shadow-lg border-2 border-gray-100">
@@ -72,38 +83,49 @@ export default function AccountCard() {
       <CardContent>
         {editMode ? (
           <form onSubmit={handleSave} className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Mail className="text-gray-400" />
-              <Input
-                type="email"
-                value={email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                className="flex-1"
-                placeholder="E-Mail"
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <Mail className="text-gray-400" />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  className={cn("flex-1", fieldErrors.email && "border-red-500")}
+                  placeholder="E-Mail"
+                  required
+                />
+              </div>
+              {fieldErrors.email && <p className="text-sm text-red-600">{fieldErrors.email}</p>}
+            </div>
 
-                required
-              />
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <RectangleEllipsis className="text-gray-400" />
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                  placeholder="Neues Passwort"
+                  className={cn("flex-1", fieldErrors.password && "border-red-500")}
+                />
+              </div>
+              {fieldErrors.password && <p className="text-sm text-red-600">{fieldErrors.password}</p>}
             </div>
-            <div className="flex items-center gap-2">
-              <RectangleEllipsis className="text-gray-400" />
-              <Input
-                type="password"
-                value={password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                placeholder="Neues Passwort"
-                className="flex-1"
-              />
+
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <RectangleEllipsis className="text-gray-400" />
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                  placeholder="Passwort wiederholen"
+                  className={cn("flex-1", fieldErrors.confirmPassword && "border-red-500")}
+                />
+              </div>
+              {fieldErrors.confirmPassword && <p className="text-sm text-red-600">{fieldErrors.confirmPassword}</p>}
             </div>
-            <div className="flex items-center gap-2">
-              <RectangleEllipsis className="text-gray-400" />
-              <Input
-                type="password"
-                value={confirmPassword}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
-                placeholder="Passwort wiederholen"
-                className="flex-1"
-              />
-            </div>
+
             <div className="flex gap-2">
               <Button type="submit" className="w-1/2">
                 Speichern
@@ -112,7 +134,10 @@ export default function AccountCard() {
                 type="button"
                 variant="outline"
                 className="w-1/2"
-                onClick={() => setEditMode(false)}
+                onClick={() => {
+                  setEditMode(false)
+                  setFieldErrors({})
+                }}
               >
                 Abbrechen
               </Button>
@@ -122,7 +147,7 @@ export default function AccountCard() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Mail className="text-gray-400" />
-              <span className="font-semibold">Email:</span>
+              <span className="font-semibold">E-Mail:</span>
               <span>{user.email}</span>
             </div>
             <div className="flex items-center gap-2">

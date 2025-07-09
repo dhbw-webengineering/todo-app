@@ -41,16 +41,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export function AppSidebar() {
   const router = useRouter();
-  const { user, loading, logout } = useAuth();     // useAuth verwenden
+  const { user, loading, logout } = useAuth(); 
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  const [openSearchDialog, setOpenSearchDialog] = useState(false);
 
   const pathname = usePathname();
 
   const items = [
     { title: "Dashboard", url: "/", icon: Home },
     { title: "Tasks", url: "/tasks", icon: SquareCheckBig },
-    { title: "Suche", icon: Search, url: "/search", onClick: () => setOpenSearchDialog(true) },
+    { title: "Suche", icon: Search, url: "/search" },
   ];
 
   // Logout über Hook
@@ -61,12 +60,6 @@ export function AppSidebar() {
     } catch {
       toast.error("Fehler beim Abmelden");
     }
-  };
-
-  // Such-Callback
-  const onSearch = (params: URLSearchParams) => {
-    router.replace(`/search?${params.toString()}`);
-    setOpenSearchDialog(false);
   };
 
   return (

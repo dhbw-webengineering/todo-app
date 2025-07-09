@@ -2,10 +2,10 @@ import { toast } from 'sonner'
 
 export interface FetchError extends Error {
   status: number
-  data?: any
+  data?: unknown
 }
 
-export default async function fetcher<T = any>(
+export default async function fetcher<T = unknown>(
   input: RequestInfo,
   init: RequestInit = {}
 ): Promise<T> {
@@ -23,11 +23,11 @@ export default async function fetcher<T = any>(
 
   if (!res.ok) {
     const errMessage =
-      (data as any)?.message ||
-      res.statusText ||
-      'Ein unbekannter Fehler ist aufgetreten.'
+      (typeof data === 'object' && data !== null && 'message' in data)
+        ? (data as { message?: string }).message ?? res.statusText
+        : res.statusText || 'Ein unbekannter Fehler ist aufgetreten.'
 
-      toast.error(errMessage)
+    toast.error(errMessage)
 
     const error = new Error(errMessage) as FetchError
     error.status = res.status

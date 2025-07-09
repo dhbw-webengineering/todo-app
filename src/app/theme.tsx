@@ -12,7 +12,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
-  // Initialisiere Theme: localStorage > System > light
+  // Theme: localStorage > System > light
   useLayoutEffect(() => {
     const stored = localStorage.getItem("theme");
     if (stored === "dark" || stored === "light") {

@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTasks } from '@/src/state/useTasks'
 import { useTaskQuery } from '@/src/state/TaskQueryContext'
 import { Button } from '@/src/components/ui/button'
@@ -22,27 +22,28 @@ const SECTIONS: Section[] = [
 export default function Dashboard() {
     const { tasks, loading, error } = useTasks(new URLSearchParams(), false)
     const { invalidateAll } = useTaskQuery()
-    const [active, setActive] = React.useState<boolean[]>(SECTIONS.map(() => true))
+    const [active, setActive] = useState<boolean[]>(SECTIONS.map(() => true))
 
-    const today = new Date()
 
-    const inRange = (dueDate: string, [from, to]: [number | undefined, number]) => {
+    const inRange = useCallback((dueDate: string, [from, to]: [number | undefined, number]) => {
+        const today = new Date()
+
         const d = new Date(dueDate)
         const diff = Math.floor((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
         return (from === undefined || diff >= from) && diff <= to
-    }
+    }, [])
 
     const scrollTo = (i: number) => {
         document.getElementById(`section-${i}`)?.scrollIntoView({ behavior: 'smooth' })
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!loading && !error) {
             setActive(SECTIONS.map(sec =>
                 tasks.some(t => t.dueDate && inRange(t.dueDate, sec.range))
             ))
         }
-    }, [tasks, loading, error])
+    }, [tasks, loading, error, inRange])
 
     return (
         <div className="p-6 pr-0 lg:pr-48">
