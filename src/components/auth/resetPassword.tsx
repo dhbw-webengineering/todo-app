@@ -9,14 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
+
 import { toast } from "sonner";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react"; // Checkmark mit Kreis
 import { ApiRoute } from "@/src/utils/ApiRoute";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { PasswordField } from "@/src/components/auth/PasswordField";
 
 export function ResetPassword({ className, ...props }: React.ComponentProps<"div">) {
   const [success, setSuccess] = useState(false);
@@ -137,12 +137,8 @@ export function ResetPassword({ className, ...props }: React.ComponentProps<"div
         <CardContent>
           <form onSubmit={handleReset}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="password">Neues Passwort</Label>
-                <Input id="password" type="password" name="password" required placeholder="Passwort" />
-                <Label htmlFor="password2">Passwort wiederholen</Label>
-                <Input id="password2" type="password" name="password2" required placeholder="Passwort wiederholen" />
-              </div>
+              <PasswordField id="password" name="password" label="Neues Passwort" required placeholder="Passwort" />
+              <PasswordField id="password2" name="password2" label="Passwort wiederholen" required placeholder="Passwort wiederholen" />
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
                   Passwort zurücksetzen
