@@ -3,12 +3,8 @@ import { Checkbox } from "@/src/components/ui/checkbox";
 import { TodoApiResponse } from "@/src/types/task";
 import { TaskDialog } from "@/src/components/task/TaskDialog";
 import { differenceInCalendarDays, format } from "date-fns";
-import moment from 'moment';
 import { toast } from 'sonner';
-import { is } from "date-fns/locale";
 import Link from "next/link";
-
-moment.locale("de");
 
 export function TaskCard({
   task,
