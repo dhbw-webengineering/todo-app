@@ -1,0 +1,15 @@
+export enum ApiRoute {
+    BASE_PATH = "http://localhost:3001",
+    TODOS = `${ApiRoute.BASE_PATH}/todos`,
+    LOGIN = `${ApiRoute.BASE_PATH}/login`,
+    LOGOUT = `${ApiRoute.BASE_PATH}/logout`,
+    REGISTER = `${ApiRoute.BASE_PATH}/register`,
+    CATEGORY = `${ApiRoute.BASE_PATH}/category`,
+    TAGS = `${ApiRoute.BASE_PATH}/tags`,
+    RESET_PASSWORD_TOKEN_VERIFY = `${ApiRoute.BASE_PATH}/reset-password-token-verify`,
+    RESET_PASSWORD_REQUEST = `${ApiRoute.BASE_PATH}/reset-password-request`,
+    RESET_PASSWORD = `${ApiRoute.BASE_PATH}/reset-password`,
+    SEARCH = `${ApiRoute.BASE_PATH}/todos/search`,
+    ME = `${ApiRoute.BASE_PATH}/me`,
+    USER = `${ApiRoute.BASE_PATH}/user`,
+}
