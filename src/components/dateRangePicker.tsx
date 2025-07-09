@@ -58,7 +58,7 @@ export function DateRangePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-normal cursor-pointer",
+              "justify-start text-left font-normal cursor-pointer",
               !date && "text-muted-foreground"
             )}
           >
