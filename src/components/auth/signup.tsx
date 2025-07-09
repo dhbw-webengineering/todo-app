@@ -15,7 +15,6 @@ import { Label } from "@/src/components/ui/label"
 import { toast } from "sonner"
 import Link from "next/link"
 import { CheckCircle2, ArrowRight } from "lucide-react"
-import { createCategory } from "@/src/utils/categoryApi"
 import { ApiRoute } from "@/src/utils/ApiRoute"
 
 

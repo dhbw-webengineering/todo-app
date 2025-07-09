@@ -2,11 +2,13 @@
 
 import SearchMenu from "@/src/components/searchMenu";
 import TasksContainer from "@/src/components/task/TasksContainer";
+import { useProtectedRoute } from "@/src/state/useProtectedRoute";
 import { ApiRoute } from "@/src/utils/ApiRoute";
 import { Suspense } from "react";
 import { useState } from "react";
 
 export default function SearchPage() {
+    useProtectedRoute()
     const [hasData, setHasData] = useState<boolean>(true);
 
     return (

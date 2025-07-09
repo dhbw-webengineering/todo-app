@@ -1,5 +1,5 @@
 "use client"
-import AccountCard from "@/src/components/accountCard";
+import AccountCard from "@/src/components/AccountCard";
 import { useProtectedRoute } from "@/src/state/useProtectedRoute";
 
 export default function AccountPage() {

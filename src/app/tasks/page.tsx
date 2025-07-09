@@ -6,6 +6,7 @@ import TasksContainer from '@/src/components/task/TasksContainer';
 import { Switch } from '@/src/components/ui/switch';
 import { Label } from '@/src/components/ui/label';
 import { Suspense } from 'react';
+import { useProtectedRoute } from '@/src/state/useProtectedRoute';
 
 export default function TasksPage() {
   const [showCompleted, setShowCompleted] = useState(true);

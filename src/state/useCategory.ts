@@ -40,7 +40,7 @@ export const useCategory = () => {
       invalidateAll();
       return updated;
     },
-    [refresh]
+    [refresh, invalidateAll]
   );
 
   const removeCategory = useCallback(

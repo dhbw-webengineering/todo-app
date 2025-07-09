@@ -6,11 +6,6 @@ import { toast } from "sonner";
 import type { Category } from "@/src/types/category";
 import { useCategory } from "@/src/state/useCategory";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/src/components/ui/collapsible";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -289,8 +284,10 @@ export function CategoryManagement() {
           <DialogHeader>
             <DialogTitle>Kategorie löschen</DialogTitle>
             <DialogDescription>
-              Bist du sicher, dass du die Kategorie "{deletingCategory?.name}"
-              löschen möchtest? Alle Tasks verlieren dann ihre Kategorie.
+              {`
+              Bist du sicher, dass du die Kategorie "${deletingCategory?.name}"
+              löschen möchtest? Alle Tasks verlieren dann ihre Kategorie.`
+              }
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

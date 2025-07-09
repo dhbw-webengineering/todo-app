@@ -1,5 +1,3 @@
-import { toast } from 'sonner'
-
 export interface FetchError extends Error {
   status: number
   data?: unknown
