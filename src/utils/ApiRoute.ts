@@ -11,4 +11,5 @@ export enum ApiRoute {
     RESET_PASSWORD = `${ApiRoute.BASE_PATH}/reset-password`,
     SEARCH = `${ApiRoute.BASE_PATH}/todos/search`,
     ME = `${ApiRoute.BASE_PATH}/me`,
+    USER = `${ApiRoute.BASE_PATH}/user`,
 }

@@ -4,17 +4,64 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/src/components/ui/ca
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Mail, RectangleEllipsis, User } from "lucide-react"
+import { ApiRoute } from "../utils/ApiRoute"
+import fetcher from "../utils/fetcher"
+import { toast } from "sonner"
+import { useAuth } from "@/src/state/useAuth"
+import { z } from "zod"
 
-export default function AccountCard({ user }: { user: { email: string } }) {
+const AccountSchema = z
+  .object({
+    email: z.string().email("Ungültige E-Mail-Adresse"),
+    password: z.string().min(6, "Passwort muss mindestens 6 Zeichen lang sein"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwörter stimmen nicht überein",
+    path: ["confirmPassword"],
+  })
+
+export default function AccountCard() {
   const [editMode, setEditMode] = useState(false)
-  const [email, setEmail] = useState(user.email)
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const { user } = useAuth()
+  const [email, setEmail] = useState("")
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Hier könntest du die neuen Werte an ein Backend schicken
-    setEditMode(false)
+
+    try {
+      const validated = AccountSchema.parse({ email, password, confirmPassword })
+
+      await fetcher(ApiRoute.USER, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: validated.email,
+          password: validated.password,
+        }),
+      })
+
+      toast.success("Profil aktualisiert")
+      setEditMode(false)
+      setPassword("")
+      setConfirmPassword("")
+    } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        toast.error(err.errors[0].message)
+      } else {
+        console.error(err)
+      }
+    }
   }
+
+  if (!user) {
+    return <div className="text-center p-4">Lade Benutzerinformationen...</div>
+  }
+
 
   return (
     <Card className="max-w-md mx-auto shadow-lg border-2 border-gray-100">
@@ -32,6 +79,8 @@ export default function AccountCard({ user }: { user: { email: string } }) {
                 value={email}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 className="flex-1"
+                placeholder="E-Mail"
+
                 required
               />
             </div>
@@ -42,6 +91,16 @@ export default function AccountCard({ user }: { user: { email: string } }) {
                 value={password}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 placeholder="Neues Passwort"
+                className="flex-1"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <RectangleEllipsis className="text-gray-400" />
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                placeholder="Passwort wiederholen"
                 className="flex-1"
               />
             </div>
@@ -64,17 +123,14 @@ export default function AccountCard({ user }: { user: { email: string } }) {
             <div className="flex items-center gap-2">
               <Mail className="text-gray-400" />
               <span className="font-semibold">Email:</span>
-              <span>{email}</span>
+              <span>{user.email}</span>
             </div>
             <div className="flex items-center gap-2">
               <RectangleEllipsis className="text-gray-400" />
               <span className="font-semibold">Passwort:</span>
               <span>********</span>
             </div>
-            <Button
-              className="mt-4 w-full"
-              onClick={() => setEditMode(true)}
-            >
+            <Button className="mt-4 w-full" onClick={() => setEditMode(true)}>
               Profil bearbeiten
             </Button>
           </div>
