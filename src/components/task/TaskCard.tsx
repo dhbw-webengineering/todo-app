@@ -13,7 +13,7 @@ export function TaskCard({
 }: {
   task: TodoApiResponse;
   onUpdate: (updatedTask: TodoApiResponse) => void;
-  onDelete: () => void;
+  onDelete: (id: number) => void;
 }) {
   let dueDateLabel = "";
   if (task.dueDate) {
@@ -106,7 +106,7 @@ export function TaskCard({
             <TaskDialog
               mode="edit"
               task={task}
-              onDelete={onDelete}
+              onDelete={() => onDelete(task.id)}
               triggerVariant="dropdown"
             />
           </div>

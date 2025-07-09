@@ -22,7 +22,7 @@ const SECTIONS: Section[] = [
 ]
 
 export default function Dashboard() {
-    const { tasks, loading, error, updateTask: updateHook } = useTasks(ApiRoute.TODOS, new URLSearchParams(), false)
+    const { tasks, loading, error, updateTask: updateHook, deleteTask: deleteHook } = useTasks(ApiRoute.TODOS, new URLSearchParams(), false)
     const { invalidateAll } = useTaskQuery()
     const [active, setActive] = useState<boolean[]>(SECTIONS.map(() => true))
 
@@ -68,7 +68,7 @@ export default function Dashboard() {
                                             key={task.id}
                                             task={task}
                                             onUpdate={task => updateHook(task)}
-                                            onDelete={() => invalidateAll()}
+                                            onDelete={id => deleteHook(String(id))}
                                         />
                                     ))}
                                 </div>

@@ -40,7 +40,7 @@ function TasksContainer(
     params.set('to', end.toISOString());
   }
 
-  const { tasks, loading, error, refetch, updateTask: updateHook }: UseTasksResult =
+  const { tasks, loading, error, refetch, updateTask: updateHook, deleteTask: deleteHook }: UseTasksResult =
     useTasks(apiRoute, params, showTasksDone);
 
   useImperativeHandle(ref, () => ({
@@ -64,6 +64,7 @@ function TasksContainer(
 
   const handleDelete = async (task: TodoApiResponse) => {
     try {
+      await deleteHook(String(task.id));
       if (sendTaskDelete) sendTaskDelete(task);
       else await refetch();
       onTagsChanged?.();
