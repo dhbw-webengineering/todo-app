@@ -27,8 +27,8 @@ export default async function fetcher<T = unknown>(
         ? (data as { message?: string }).message ?? res.statusText
         : res.statusText || 'Ein unbekannter Fehler ist aufgetreten.'
 
-    toast.error(errMessage)
-
+    console.error(errMessage)
+    
     const error = new Error(errMessage) as FetchError
     error.status = res.status
     error.data = data

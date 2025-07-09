@@ -1,27 +1,64 @@
-// hooks/useCategories.ts
-import { ApiRoute } from "@/src/utils/ApiRoute";
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
+import { useCategoryContext } from "./CategoryContext";
+import fetcher from "../utils/fetcher";
+import { ApiRoute } from "../utils/ApiRoute";
+import { Category } from "../types/category";
+import { useTaskQuery } from '@/src/state/TaskQueryContext';
 
-export interface Category {
-  id: number;
-  userId: number;
-  name: string;
-}
 
-export function useCategories() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+export const useCategory = () => {
+  const { categories, loading, error, refresh } = useCategoryContext();
+  const { invalidateAll } = useTaskQuery()
 
-  useEffect(() => {
-    fetch(ApiRoute.CATEGORY,
-      {credentials: "include"})
-      .then((res) => res.json())
-      .then((data) => setCategories(data.map((c: Category) => ({
-        ...c,
-        name: c.name.trim(),
-      }))))
-      .finally(() => setLoading(false));
-  }, []);
+  const addCategory = useCallback(
+    async (name: string): Promise<Category> => {
+      console.log("Adding category:", name);
+      const newCat = await fetcher<Category>(ApiRoute.CATEGORY, {
+        method: "POST",
+        body: JSON.stringify({ name }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-  return { categories, loading };
-}
+      await refresh();
+      return newCat;
+    },
+    [refresh]
+  );
+
+  const editCategory = useCallback(
+    async (id: string, name: string): Promise<Category> => {
+      const updated = await fetcher<Category>(`${ApiRoute.CATEGORY}/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ name }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      await refresh();
+      invalidateAll();
+      return updated;
+    },
+    [refresh]
+  );
+
+  const removeCategory = useCallback(
+    async (id: string): Promise<void> => {
+      await fetcher(`${ApiRoute.CATEGORY}/${id}`, {
+        method: "DELETE",
+      });
+      await refresh();
+    },
+    [refresh]
+  );
+
+  return {
+    categories,
+    loading,
+    error,
+    addCategory,
+    editCategory,
+    removeCategory,
+  };
+};
