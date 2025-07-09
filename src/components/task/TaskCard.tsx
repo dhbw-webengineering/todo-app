@@ -51,7 +51,7 @@ export function TaskCard({
               <Badge variant="default" className="text-xs bg-green-200 text-green-800">
                 Erledigt
               </Badge>
-            ) : (new Date(task.dueDate) < new Date()) ? (
+            ) : (new Date(task.dueDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)) ? (
               <Badge variant="destructive" className="text-xs">
                 Überfällig
               </Badge>

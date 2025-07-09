@@ -15,14 +15,25 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react"; // Checkmark mit Kreis
 import { ApiRoute } from "@/src/utils/ApiRoute";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
-type ResetPasswordProps = React.ComponentProps<"div"> & {
-  token: string;
-};
-
-export function ResetPassword({ className, token, ...props }: ResetPasswordProps) {
+export function ResetPassword({ className, ...props }: React.ComponentProps<"div">) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (token) {
+      fetch(`${ApiRoute.RESET_PASSWORD_TOKEN_VERIFY}?token=${token}`)
+        .then((response) => setIsValidToken(response.status === 200))
+        .catch(() => setIsValidToken(false));
+    } else {
+      setIsValidToken(false);
+    }
+  }, [token]);
 
   const handleReset = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -61,6 +72,14 @@ export function ResetPassword({ className, token, ...props }: ResetPasswordProps
       toast.error("Netzwerkfehler. Bitte versuche es später erneut.", { duration: 3000 });
     }
   };
+
+  if (isValidToken === null) return <div>Lade...</div>;
+    if (!isValidToken)
+      return (
+        <div>
+          Link zum Passwort zurücksetzen ist ungültig oder abgelaufen.
+        </div>
+      );
 
   if (success) {
     return (

@@ -1,4 +1,4 @@
-import AccountCard from "@/src/components/AccountCard";
+import AccountCard from "@/src/components/accountCard";
 
 export default function AccountPage() {
   return (

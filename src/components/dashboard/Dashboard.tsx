@@ -4,6 +4,7 @@ import { useTasks } from '@/src/state/useTasks'
 import { useTaskQuery } from '@/src/state/TaskQueryContext'
 import { Button } from '@/src/components/ui/button'
 import { TaskCard } from '@/src/components/task/TaskCard'
+import { ApiRoute } from '@/src/utils/ApiRoute'
 
 type Section = {
     header: string
@@ -14,23 +15,24 @@ const SECTIONS: Section[] = [
     { header: 'Überfällig', range: [undefined, -1] },
     { header: 'Heute', range: [0, 0] },
     { header: 'Morgen', range: [1, 1] },
-    { header: 'Nächste 3 Tage', range: [2, 2] },
-    { header: 'Nächste 7 Tage', range: [3, 6] },
-    { header: 'Nächste 30 Tage', range: [7, 29] },
+    { header: 'Nächste 3 Tage', range: [0, 2] },
+    { header: 'Nächste 7 Tage', range: [0, 6] },
+    { header: 'Nächste Woche', range: [7, 13] },
+    { header: 'Nächste 31 Tage', range: [0, 30] },
 ]
 
 export default function Dashboard() {
-    const { tasks, loading, error } = useTasks(new URLSearchParams(), false)
+    const { tasks, loading, error } = useTasks(ApiRoute.TODOS, new URLSearchParams(), false)
     const { invalidateAll } = useTaskQuery()
     const [active, setActive] = useState<boolean[]>(SECTIONS.map(() => true))
 
 
     const inRange = useCallback((dueDate: string, [from, to]: [number | undefined, number]) => {
-        const today = new Date()
+        const today = new Date(new Date().setHours(0, 0, 0, 0));
 
-        const d = new Date(dueDate)
-        const diff = Math.floor((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-        return (from === undefined || diff >= from) && diff <= to
+        const d = new Date(new Date(dueDate).setHours(0, 0, 0, 0));
+        const diff = Math.floor((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        return (from === undefined || diff >= from) && diff <= to;
     }, [])
 
     const scrollTo = (i: number) => {
