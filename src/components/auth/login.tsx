@@ -16,6 +16,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { useAuth } from "@/src/state/AuthContext"
+import { PasswordField } from "@/src/components/auth/PasswordField"
 
 export function LoginForm({
   className,
@@ -67,27 +68,7 @@ export function LoginForm({
                   }
                 />
               </div>
-              <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Passwort</Label>
-                  <Link
-                    href={`/auth/request-password-reset?email=${encodeURIComponent(
-                      email
-                    )}`}
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Passwort zurücksetzen
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  name="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
+              <PasswordField id="password" name="password" label="Passwort" required value={password} onChange={(e) => setPassword(e.target.value)} resetPasswordLink={{ href: `/auth/request-password-reset?email=${encodeURIComponent(email)}`, text: "Passwort zurücksetzen" }} />
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Lädt..." : "Login"}

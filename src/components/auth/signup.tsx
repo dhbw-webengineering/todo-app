@@ -16,6 +16,7 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { CheckCircle2, ArrowRight } from "lucide-react"
 import { ApiRoute } from "@/src/utils/ApiRoute"
+import { PasswordField } from "@/src/components/auth/PasswordField"
 
 
 export function SignupForm({
@@ -123,14 +124,8 @@ export function SignupForm({
                   required
                 />
               </div>
-              <div className="grid gap-3">
-                <Label htmlFor="password">Passwort</Label>
-                <Input id="password" type="password" name="password" required placeholder="Passwort" />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="password2">Passwort wiederholen</Label>
-                <Input id="password2" type="password" name="password2" placeholder="Passwort wiederholen" required />
-              </div>
+              <PasswordField id="password" name="password" label="Passwort" required placeholder="Passwort" />
+              <PasswordField id="password2" name="password2" label="Passwort wiederholen" required placeholder="Passwort wiederholen" />
               {error && (
                 <div className="text-red-600 text-sm">{error}</div>
               )}
