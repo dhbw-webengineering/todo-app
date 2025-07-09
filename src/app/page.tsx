@@ -1,12 +1,5 @@
-'use client';
+import Dashboard from '@/src/components/dashboard/Dashboard'
 
-import React from 'react';
-import OverviewTasks from '@/src/components/task/OverviewTasks';
-
-export default function HomePage() {
-  return (
-    <main className="p-6">
-      <OverviewTasks />
-    </main>
-  );
+export default function Home() {
+  return <Dashboard />
 }
