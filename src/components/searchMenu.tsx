@@ -5,15 +5,12 @@ import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-type SearchMenuProps = {
-    onSearch: (urlSearchParams: URLSearchParams) => void;
-}
-
-export default function SearchMenu(props: SearchMenuProps) {
-    const { onSearch } = props;
-
+export default function SearchMenu() {
+    const pathname = usePathname();
+    const router = useRouter();
     const searchParams = useSearchParams();
 
     const [searchTitle, setSearchTitle] = useState<string>(searchParams.get("title") ?? "");
@@ -42,7 +39,7 @@ export default function SearchMenu(props: SearchMenuProps) {
         params.set("ignorecase", `${Number(ignorecase)}`)
         params.set("notDone", `${Number(notDone)}`)
 
-        onSearch(params);
+        router.replace(`${pathname}?${params.toString()}`);
     }
 
 

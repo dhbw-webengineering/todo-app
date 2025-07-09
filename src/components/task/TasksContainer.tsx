@@ -6,6 +6,7 @@ import { TaskCard } from './TaskCard';
 import { useTasks, UseTasksResult } from '@/src/state/useTasks';
 import { TodoApiResponse } from '@/src/types/task';
 import { toast } from 'sonner';
+import { ApiRoute } from '@/src/utils/ApiRoute';
 
 export type TasksContainerRef = {
   updateTask: (task: TodoApiResponse) => void;
@@ -13,6 +14,7 @@ export type TasksContainerRef = {
 };
 
 interface TasksContainerProps {
+  apiRoute?: ApiRoute;
   range?: [number, number];
   setHasData?: (hasData: boolean) => void;
   showTasksDone: boolean;
@@ -22,7 +24,7 @@ interface TasksContainerProps {
 }
 
 function TasksContainer(
-  { range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete, onTagsChanged }: TasksContainerProps,
+  { apiRoute = ApiRoute.TODOS, range, setHasData, showTasksDone, sendTaskUpdate, sendTaskDelete, onTagsChanged }: TasksContainerProps,
   ref: Ref<TasksContainerRef | null>
 ) {
   const searchParams = useSearchParams();
@@ -39,7 +41,7 @@ function TasksContainer(
   }
 
   const { tasks, loading, error, refetch, updateTask: updateHook }: UseTasksResult =
-    useTasks(params, showTasksDone);
+    useTasks(apiRoute, params, showTasksDone);
 
   useImperativeHandle(ref, () => ({
     updateTask: handleUpdate,

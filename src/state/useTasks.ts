@@ -13,7 +13,7 @@ export interface UseTasksResult {
   deleteTask: (id: string) => Promise<void>
 }
 
-export function useTasks(params: URLSearchParams, showDone: boolean): UseTasksResult {
+export function useTasks(apiRoute: ApiRoute, params: URLSearchParams, showDone: boolean): UseTasksResult {
   const [tasks, setTasks] = useState<TodoApiResponse[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -26,7 +26,7 @@ export function useTasks(params: URLSearchParams, showDone: boolean): UseTasksRe
     setError(null)
 
     try {
-      const url = queryString ? `${ApiRoute.TODOS}?${queryString}` : ApiRoute.TODOS
+      const url = queryString ? `${apiRoute}?${queryString}` : apiRoute
       const data = await fetcher<TodoApiResponse[]>(url, { method: 'GET' })
       const filtered = showDone ? data : data.filter(t => !t.completedAt)
       setTasks(filtered)
@@ -40,7 +40,7 @@ export function useTasks(params: URLSearchParams, showDone: boolean): UseTasksRe
     } finally {
       setLoading(false)
     }
-  }, [queryString, showDone])
+  }, [apiRoute, queryString, showDone])
 
   useEffect(() => {
     const unsubscribe = subscribe(() => {
