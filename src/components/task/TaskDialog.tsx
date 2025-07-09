@@ -185,12 +185,13 @@ export function TaskDialog({
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div>
-            <label>Titel *</label>
+            <label htmlFor='task-titel'>Titel *</label>
             <Input
               value={title}
               onChange={e => setTitle(e.target.value)}
               aria-invalid={!!errors.title}
               className={errors.title ? "border-red-500" : ""}
+              id='task-titel'
             />
             {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
           </div>
