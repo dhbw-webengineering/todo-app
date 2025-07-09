@@ -1,7 +1,7 @@
 import { e } from "@/env";
 
 export class ApiRoute {
-    static readonly BASE_PATH = e.NEXT_PUBLIC_BACKEND_BASE_PATH || "http://localhost:3001";
+    static readonly BASE_PATH = e.NEXT_PUBLIC_BACKEND_BASE_PATH;
     static readonly TODOS = `${ApiRoute.BASE_PATH}/todos`;
     static readonly LOGIN = `${ApiRoute.BASE_PATH}/login`;
     static readonly LOGOUT = `${ApiRoute.BASE_PATH}/logout`;
