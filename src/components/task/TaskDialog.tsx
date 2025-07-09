@@ -67,6 +67,9 @@ export function TaskDialog({
   const [errors, setErrors] = useState<Partial<Record<keyof z.infer<typeof TaskSchema>, string>>>({});
   const { invalidateAll } = useTaskQuery();
 
+  // State for delete confirmation
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
+
   useEffect(() => {
     if (mode === 'edit' && task) {
       setTitle(task.title);
@@ -165,7 +168,7 @@ export function TaskDialog({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem className='cursor-pointer' onClick={() => setOpen(true)}>Bearbeiten</DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-red-600">Löschen</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowDeleteConfirmation(true)} className="cursor-pointer text-red-600">Löschen</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -174,69 +177,93 @@ export function TaskDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
       {renderTrigger()}
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Task erstellen' : 'Task bearbeiten'}</DialogTitle>
-          <DialogDescription>
-            {mode === 'create' ? 'Bitte Felder ausfüllen.' : 'Änderungen vornehmen.'}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-2">
-          <div>
-            <label>Titel *</label>
-            <Input
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              aria-invalid={!!errors.title}
-              className={errors.title ? "border-red-500" : ""}
-            />
-            {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
+      
+      {/*Todo edit dialog*/}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{mode === 'create' ? 'Task erstellen' : 'Task bearbeiten'}</DialogTitle>
+            <DialogDescription>
+              {mode === 'create' ? 'Bitte Felder ausfüllen.' : 'Änderungen vornehmen.'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label>Titel *</label>
+              <Input
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                aria-invalid={!!errors.title}
+                className={errors.title ? "border-red-500" : ""}
+              />
+              {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
+            </div>
+            <div>
+              <label>Beschreibung</label>
+              <Textarea value={description} onChange={e => setDescription(e.target.value)} />
+            </div>
+            <div>
+              <label>Fälligkeitsdatum *</label>
+              <Popover>
+                <PopoverTrigger asChild className="cursor-pointer">
+                  <Button variant="outline" className={cn("w-full justify-start", errors.dueDate && "border-red-500")}>
+                    {dueDate ? format(dueDate, 'dd.MM.yyyy') : 'Datum wählen'}
+                    <CalendarIcon className="ml-auto" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Calendar
+                    mode="single"
+                    selected={dueDate}
+                    onSelect={date => setDueDate(date || undefined)}
+                    locale={de}
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.dueDate && <p className="text-sm text-red-600">{errors.dueDate}</p>}
+            </div>
+            <div>
+              <label>Kategorie *</label>
+              <CategorySelect data={categories} value={categoryId} onChange={id => setCategoryId(id)} />
+              {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId}</p>}
+            </div>
+            <div>
+              <label>Tags</label>
+              <Input value={tagsStr} onChange={e => setTagsStr(e.target.value)} placeholder="tag1, tag2" />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox id='completed' className='cursor-pointer' checked={completed} onCheckedChange={v => setCompleted(!!v)} />
+              <label htmlFor='completed' className='cursor-pointer'>als Erledigt markieren</label>
+            </div>
           </div>
-          <div>
-            <label>Beschreibung</label>
-            <Textarea value={description} onChange={e => setDescription(e.target.value)} />
-          </div>
-          <div>
-            <label>Fälligkeitsdatum *</label>
-            <Popover>
-              <PopoverTrigger asChild className="cursor-pointer">
-                <Button variant="outline" className={cn("w-full justify-start", errors.dueDate && "border-red-500")}>
-                  {dueDate ? format(dueDate, 'dd.MM.yyyy') : 'Datum wählen'}
-                  <CalendarIcon className="ml-auto" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent>
-                <Calendar
-                  mode="single"
-                  selected={dueDate}
-                  onSelect={date => setDueDate(date || undefined)}
-                  locale={de}
-                />
-              </PopoverContent>
-            </Popover>
-            {errors.dueDate && <p className="text-sm text-red-600">{errors.dueDate}</p>}
-          </div>
-          <div>
-            <label>Kategorie *</label>
-            <CategorySelect data={categories} value={categoryId} onChange={id => setCategoryId(id)} />
-            {errors.categoryId && <p className="text-sm text-red-600">{errors.categoryId}</p>}
-          </div>
-          <div>
-            <label>Tags</label>
-            <Input value={tagsStr} onChange={e => setTagsStr(e.target.value)} placeholder="tag1, tag2" />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id='completed' className='cursor-pointer' checked={completed} onCheckedChange={v => setCompleted(!!v)} />
-            <label htmlFor='completed' className='cursor-pointer'>als Erledigt markieren</label>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" className='cursor-pointer' onClick={() => setOpen(false)}>Abbrechen</Button>
-          <Button onClick={handleSave} className='cursor-pointer'>{mode === 'create' ? 'Erstellen' : 'Speichern'}</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button variant="ghost" className='cursor-pointer' onClick={() => setOpen(false)}>Abbrechen</Button>
+            <Button onClick={handleSave} className='cursor-pointer'>{mode === 'create' ? 'Erstellen' : 'Speichern'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation dialog for task deletion */}
+      <Dialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Todo löschen</DialogTitle>
+            <DialogDescription>
+              Bist du sicher, dass du die Todo &quot;{task?.title}&quot; löschen möchtest?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" className="cursor-pointer" onClick={() => setShowDeleteConfirmation(false)}>
+              Abbrechen
+            </Button>
+            <Button variant="destructive" className="cursor-pointer" onClick={handleDelete}>
+              Löschen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
