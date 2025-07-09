@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
@@ -13,29 +12,55 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/src/components/ui/popover"
+import { useState } from "react"
+import { useSearchParams } from "next/navigation"
+
 
 export function DateRangePicker({
   className,
-  onChange, 
+  onChange,
   value,
 }: {
-   value?: DateRange | undefined,
+  value?: DateRange | undefined,
   className?: string;
-  onChange?: (range: DateRange | undefined) => void; 
+  onChange?: (range: DateRange | undefined) => void;
 }) {
-  
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: value?.from || undefined,
-    to: value?.to || undefined,});
+  const searchParams = useSearchParams();
+
+  const initialRange: DateRange | undefined = (() => {
+    const fromParam = searchParams.get("from");
+    const toParam = searchParams.get("to");
+
+    const fromDate = fromParam ? new Date(fromParam) : undefined;
+    const toDate = toParam ? new Date(toParam) : undefined;
+
+    if (fromDate && !isNaN(fromDate.getTime()) && toDate && !isNaN(toDate.getTime())) {
+      return { from: fromDate, to: toDate };
+    }
+    return undefined;
+  })();
+
+  const [date, setDate] = useState<DateRange | undefined>(initialRange);
 
   const handleSelect = (range: DateRange | undefined) => {
     setDate(range);
     if (onChange) onChange(range);
   };
 
+  const handleClear = () => {
+    setDate(undefined);
+    if (onChange) onChange(undefined);
+    console.log("DateRangePicker", date);
+
+  };
+
+  console.log("DateRangePicker", date);
+
+  const [open, setOpen] = useState(false);
+
   return (
     <div className={cn("grid gap-2 h-[100%]", className)}>
-      <Popover className="h-[100%]">
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild className="h-[100%]">
           <Button
             id="date"
@@ -56,7 +81,7 @@ export function DateRangePicker({
                 format(date.from, "LLL dd, y")
               )
             ) : (
-              <span>Pick a date</span>
+              <span>wähle ein Zeitraum</span>
             )}
           </Button>
         </PopoverTrigger>
@@ -69,6 +94,21 @@ export function DateRangePicker({
             onSelect={handleSelect}
             numberOfMonths={2}
           />
+          <hr />
+          <div className="flex m-1">
+            {date?.to && (
+              <Button variant={"ghost"} onClick={handleClear} className="cursor-pointer w-1/2">
+                Auswahl aufheben
+              </Button>
+            )}
+            <Button
+              variant={"ghost"}
+              className={`cursor-pointer ${date?.to ? "w-1/2 border-l" : "w-full"}`}
+              onClick={() => setOpen(false)}
+            >
+              Schließen
+            </Button>
+          </div>
         </PopoverContent>
       </Popover>
     </div>
