@@ -5,6 +5,10 @@ RUN npm install -g pnpm  # Globale Installation
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
+
+ARG NEXT_PUBLIC_BACKEND_BASE_PATH
+ENV NEXT_PUBLIC_BACKEND_BASE_PATH=$NEXT_PUBLIC_BACKEND_BASE_PATH
+
 RUN pnpm build
 
 # 2. Runtime-Image mit pnpm-Installation
