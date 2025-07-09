@@ -22,6 +22,18 @@ import { format } from 'date-fns';
 import { useState, useEffect } from 'react';
 import { TodoApiResponse, TodoApiCreate, TodoApiEdit } from '@/src/types/task';
 import { useTaskQuery } from '@/src/state/TaskQueryContext';
+import { z } from "zod"
+import { toast } from 'sonner';
+
+
+const TaskSchema = z.object({
+  title: z.string().min(1, "Titel darf nicht leer sein"),
+  dueDate: z.date({ required_error: "Fälligkeitsdatum ist erforderlich" }),
+  categoryId: z.string().min(1, "Kategorie ist erforderlich"),
+  tagsStr: z.string().optional(),
+  description: z.string().optional(),
+  completed: z.boolean(),
+})
 
 
 type TaskDialogProps = {
@@ -73,39 +85,67 @@ export function TaskDialog({
   }, [mode, task]);
 
   const handleSave = async () => {
-    const newErr = { title: !title.trim(), dueDate: !dueDate, category: !categoryId };
-    setErrors(newErr);
-    if (Object.values(newErr).some(e => e)) return;
+    const parsed = TaskSchema.safeParse({
+      title: title.trim(),
+      dueDate,
+      categoryId,
+      tagsStr,
+      description,
+      completed,
+    });
+
+    if (!parsed.success) {
+      const fieldErrors: typeof errors = {};
+      const firstMessage = parsed.error.issues[0]?.message;
+
+      for (const issue of parsed.error.issues) {
+        if (issue.path.includes("title")) fieldErrors.title = true;
+        if (issue.path.includes("dueDate")) fieldErrors.dueDate = true;
+        if (issue.path.includes("categoryId")) fieldErrors.category = true;
+      }
+
+      setErrors(fieldErrors);
+      toast.error(firstMessage || "Bitte fülle alle erforderlichen Felder korrekt aus.");
+      return;
+    }
 
     try {
-      if (mode === 'create') {
+      const tagList = tagsStr
+        ? tagsStr.split(",").map(tag => tag.trim()).filter(Boolean)
+        : undefined;
+
+      if (mode === "create") {
         const data: TodoApiCreate = {
-          title, dueDate: dueDate!.toISOString(),
+          title: title.trim(),
+          dueDate: dueDate!.toISOString(),
           description: description || undefined,
           categoryId: Number(categoryId),
           completedAt: completed ? new Date().toISOString() : null,
-          tags: tagsStr ? tagsStr.split(',').map(n => n.trim()).filter(Boolean) : undefined,
+          tags: tagList,
         };
         await createTodoApi(data);
-        invalidateAll();
       } else {
         const edit: TodoApiEdit = {
           id: task!.id,
-          title,
+          title: title.trim(),
           dueDate: dueDate ? dueDate.toISOString() : undefined,
           description: description || undefined,
           categoryId: Number(categoryId),
-          tags: tagsStr ? tagsStr.split(',').map(n => n.trim()).filter(Boolean) : undefined,
+          tags: tagList,
           completedAt: completed ? (task!.completedAt || new Date().toISOString()) : null,
         };
         await updateTodoApi(edit);
-        invalidateAll();
       }
+
+      invalidateAll();
       setOpen(false);
     } catch (err) {
       console.error(err);
+      toast.error("Speichern fehlgeschlagen. Bitte versuche es erneut.");
     }
   };
+
+
 
   const handleDelete = async () => {
     if (mode === 'edit' && task && onDelete) {
@@ -162,7 +202,7 @@ export function TaskDialog({
           <div>
             <label>Fälligkeitsdatum *</label>
             <Popover>
-              <PopoverTrigger asChild>
+              <PopoverTrigger asChild className="cursor-pointer">
                 <Button variant="outline" className="w-full justify-start">
                   {dueDate ? format(dueDate, 'dd.MM.yyyy') : 'Datum wählen'}
                   <CalendarIcon className="ml-auto" />
@@ -187,13 +227,13 @@ export function TaskDialog({
             <Input value={tagsStr} onChange={e => setTagsStr(e.target.value)} placeholder="tag1, tag2" />
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox checked={completed} onCheckedChange={v => setCompleted(!!v)} />
-            <span>Erledigt</span>
+            <Checkbox id='completed' className='cursor-pointer' checked={completed} onCheckedChange={v => setCompleted(!!v)} />
+            <label htmlFor='completed' className='cursor-pointer'>als Erledigt markieren</label>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Abbrechen</Button>
-          <Button onClick={handleSave}>{mode === 'create' ? 'Erstellen' : 'Speichern'}</Button>
+          <Button variant="ghost" className='cursor-pointer' onClick={() => setOpen(false)}>Abbrechen</Button>
+          <Button onClick={handleSave} className='cursor-pointer'>{mode === 'create' ? 'Erstellen' : 'Speichern'}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

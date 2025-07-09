@@ -20,8 +20,9 @@ export default function TasksPage() {
           id="show-completed"
           checked={showCompleted}
           onCheckedChange={setShowCompleted}
+          className='cursor-pointer'
         />
-        <Label htmlFor="show-completed">Abgeschlossene Tasks anzeigen</Label>
+        <Label htmlFor="show-completed" className='cursor-pointer'>Abgeschlossene Tasks anzeigen</Label>
       </div>
       <TasksContainer showTasksDone={showCompleted} />
     </div>

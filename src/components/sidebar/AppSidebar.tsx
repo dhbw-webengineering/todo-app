@@ -122,17 +122,17 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="flex items-center gap-2">
+                <SidebarMenuButton className="flex items-center gap-2 cursor-pointer">
                   <User2 className="h-4 w-4" />
                   {loading ? "Lädt..." : user?.email ?? "Gast"}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-48">
-                <DropdownMenuItem onSelect={() => router.push("/account")}>
+                <DropdownMenuItem onSelect={() => router.push("/account")} className='cursor-pointer'>
                   Profil
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={handleLogout}>
+                <DropdownMenuItem variant="destructive" onSelect={handleLogout} className='cursor-pointer'>
                   Abmelden
                 </DropdownMenuItem>
               </DropdownMenuContent>
