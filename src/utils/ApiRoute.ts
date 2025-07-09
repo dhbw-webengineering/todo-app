@@ -1,7 +1,11 @@
-import { e } from "@/env";
+const BASE_PATH = process.env.NEXT_PUBLIC_BACKEND_BASE_PATH;
+
+if (!BASE_PATH) {
+    throw new Error("NEXT_PUBLIC_BACKEND_BASE_PATH is not defined");
+}
 
 export class ApiRoute {
-    static readonly BASE_PATH = e.NEXT_PUBLIC_BACKEND_BASE_PATH;
+    static readonly BASE_PATH = BASE_PATH;
     static readonly TODOS = `${ApiRoute.BASE_PATH}/todos`;
     static readonly LOGIN = `${ApiRoute.BASE_PATH}/login`;
     static readonly LOGOUT = `${ApiRoute.BASE_PATH}/logout`;

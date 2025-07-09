@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { ApiRoute } from "../utils/ApiRoute";
 
 export interface Tag {
   id: number;
@@ -11,7 +12,7 @@ export function useTags() {
 
   const fetchTags = useCallback(() => {
     setLoading(true);
-    fetch("http://localhost:3001/tags", { credentials: "include" })
+    fetch(ApiRoute.TAGS, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
