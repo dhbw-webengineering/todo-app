@@ -8,7 +8,7 @@ import { Mail, RectangleEllipsis, User } from "lucide-react"
 import { ApiRoute } from "../utils/ApiRoute"
 import fetcher from "../utils/fetcher"
 import { toast } from "sonner"
-import { useAuth } from "@/src/state/useAuth"
+import { useAuth } from "@/src/state/AuthContext"
 import { z } from "zod"
 import { cn } from "@/src/utils/utils"
 

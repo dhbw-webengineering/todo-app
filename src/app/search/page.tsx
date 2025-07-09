@@ -2,10 +2,12 @@
 
 import SearchMenu from "@/src/components/searchMenu";
 import TasksContainer from "@/src/components/task/TasksContainer";
+import { useProtectedRoute } from "@/src/state/useProtectedRoute";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function SearchPage() {
+    useProtectedRoute()
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -21,10 +23,10 @@ export default function SearchPage() {
             <h1 className="text-2xl font-bold mb-6">Suche</h1>
             <SearchMenu onSearch={onSearch} />
             <div className="mt-[30px]">
-                { !hasData &&
+                {!hasData &&
                     <p className="ml-3">{`Keine Ergebnisse zur Suche \"${searchParams.get("title")}\" gefunden.`}</p>
                 }
-                { searchParams.has("title") &&
+                {searchParams.has("title") &&
                     <TasksContainer
                         showTasksDone={true}
                         setHasData={setHasData}

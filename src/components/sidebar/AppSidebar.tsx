@@ -36,12 +36,12 @@ import { TaskDialog } from "@/src/components/task/TaskDialog";
 import ThemeChanger from "@/src/components/themeChanger";
 import { CategoryManagement } from "./CategoryManagement";
 
-import { useAuth } from "@/src/state/useAuth";
+import { useAuth } from "@/src/state/AuthContext";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export function AppSidebar() {
   const router = useRouter();
-  const { user, loading, logout } = useAuth(); 
+  const { user, loading, logout } = useAuth();
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
 
   const pathname = usePathname();

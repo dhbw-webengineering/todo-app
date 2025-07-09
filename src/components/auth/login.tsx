@@ -15,7 +15,7 @@ import { Label } from "@/src/components/ui/label"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { toast } from "sonner"
-import { useAuth } from "@/src/state/useAuth"
+import { useAuth } from "@/src/state/AuthContext"
 
 export function LoginForm({
   className,

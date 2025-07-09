@@ -8,8 +8,7 @@ import React, {
 import fetcher from "../utils/fetcher";
 import { ApiRoute } from "../utils/ApiRoute";
 import { Category } from "../types/category";
-
-
+import { useAuth } from "./AuthContext"; // <--- wichtig!
 
 interface CategoryContextValue {
     categories: Category[];
@@ -25,6 +24,8 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
+    const { user, loading: authLoading } = useAuth(); // <--- Auth-Status abfragen
+
     const loadCategories = async () => {
         setLoading(true);
         try {
@@ -33,17 +34,23 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
             setError(null);
         } catch (err) {
             setError(err as Error);
+            setCategories([]);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        loadCategories();
-    }, []);
+        // Lade nur, wenn Auth-Status fertig und User eingeloggt
+        if (!authLoading && user) {
+            void loadCategories();
+        }
+    }, [authLoading, user]);
 
     const refresh = async () => {
-        await loadCategories();
+        if (!authLoading && user) {
+            await loadCategories();
+        }
     };
 
     return (

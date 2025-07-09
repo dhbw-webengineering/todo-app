@@ -19,7 +19,6 @@ export function useTasks(params: URLSearchParams, showDone: boolean): UseTasksRe
   const [error, setError] = useState<string | null>(null)
   const { invalidateAll, subscribe } = useTaskQuery()
 
-  // memoize query string so useCallback dependency is static
   const queryString = useMemo(() => params.toString(), [params])
 
   const load = useCallback(async () => {

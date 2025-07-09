@@ -5,9 +5,11 @@ import { FilterBar } from '@/src/components/task/FilterBar';
 import TasksContainer from '@/src/components/task/TasksContainer';
 import { Switch } from '@/src/components/ui/switch';
 import { Label } from '@/src/components/ui/label';
+import { useProtectedRoute } from '@/src/state/useProtectedRoute';
 
 export default function TasksPage() {
   const [showCompleted, setShowCompleted] = useState(true);
+  useProtectedRoute();
 
   return (
     <div className="space-y-6">
