@@ -61,13 +61,20 @@ export default function Dashboard() {
                                 <h2 className="text-xl font-semibold mt-8 mb-4">{sec.header}</h2>
 
                                 <div className="space-y-4">
-                                    {filtered.map(task => (
-                                        <TaskCard
-                                            key={task.id}
-                                            task={task}
-                                            onUpdate={task => updateHook(task)}
-                                            onDelete={id => deleteHook(String(id))}
-                                        />
+                                    {filtered
+                                        .sort((a, b) => {
+                                        const ac = !!a.completedAt, bc = !!b.completedAt;
+                                        if (ac !== bc) return ac ? 1 : -1;
+                                        if (!a.dueDate || !b.dueDate) return a.dueDate ? -1 : b.dueDate ? 1 : 0;
+                                        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+                                        })
+                                        .map(task => (
+                                            <TaskCard
+                                                key={task.id}
+                                                task={task}
+                                                onUpdate={task => updateHook(task)}
+                                                onDelete={id => deleteHook(String(id))}
+                                            />
                                     ))}
                                 </div>
                             </section>
