@@ -72,7 +72,11 @@ function TasksContainer(
   };
 
   if (loading) return <div className="text-center py-4">Lade...</div>;
-  if (error)   return <div className="text-center py-4 text-red-500">Error: {error}</div>;
+  if (error) return <div className="text-center py-4 text-red-500">Error: {error}</div>;
+
+  if (tasks.length === 0) {
+    return <div className="text-center py-4">Keine Aufgaben gefunden</div>;
+  }
 
   return (
     <div className="space-y-4">
@@ -89,7 +93,6 @@ function TasksContainer(
             task={task}
             onUpdate={handleUpdate}
             onDelete={() => handleDelete(task)}
-            onTagsChanged={onTagsChanged}
           />
         ))}
     </div>

@@ -18,15 +18,15 @@ export default function OverviewTasks() {
   const sectionsIdStart = 'dashboard-section-';
 
   const [displaysData, setDisplaysData] = useState<DisplayData[]>([
-    { header: 'Heute',          range: [0, 0],    containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
-    { header: 'Morgen',         range: [1, 1],    containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
-    { header: 'Nächste 3 Tage', range: [0, 2],    containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
-    { header: 'Nächste 7 Tage', range: [0, 6],    containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
-    { header: 'In 1 Woche',     range: [7, 13],   containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
-    { header: 'In 2 Wochen',    range: [14, 20],  containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
-    { header: 'In 3 Wochen',    range: [21, 27],  containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
-    { header: 'In 4 Wochen',    range: [28, 34],  containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
-    { header: 'Nächste 30 Tage',range: [0, 29],   containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'Heute', range: [0, 0], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'Morgen', range: [1, 1], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'Nächste 3 Tage', range: [0, 2], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'Nächste 7 Tage', range: [0, 6], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'In 1 Woche', range: [7, 13], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'In 2 Wochen', range: [14, 20], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'In 3 Wochen', range: [21, 27], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'In 4 Wochen', range: [28, 34], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
+    { header: 'Nächste 30 Tage', range: [0, 29], containerRef: useRef<TasksContainerRef | null>(null), hasData: undefined },
   ]);
 
   const updateTask = (task: TodoApiResponse) => {
@@ -58,7 +58,7 @@ export default function OverviewTasks() {
   return (
     <>
       <div className={styles.quickJump}>
-        {displaysData.filter(e => e.hasData || e.hasData === undefined).length === 0 && (
+        {displaysData.every(e => e.hasData === false) && (
           <div className="text-center text-gray-500 py-8">
             Keine Daten verfügbar.
           </div>
