@@ -1,7 +1,6 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { useTasks } from '@/src/state/useTasks'
-import { useTaskQuery } from '@/src/state/TaskQueryContext'
 import { Button } from '@/src/components/ui/button'
 import { TaskCard } from '@/src/components/task/TaskCard'
 import { ApiRoute } from '@/src/utils/ApiRoute'
@@ -23,7 +22,6 @@ const SECTIONS: Section[] = [
 
 export default function Dashboard() {
     const { tasks, loading, error, updateTask: updateHook, deleteTask: deleteHook } = useTasks(ApiRoute.TODOS, new URLSearchParams(), false)
-    const { invalidateAll } = useTaskQuery()
     const [active, setActive] = useState<boolean[]>(SECTIONS.map(() => true))
 
 
