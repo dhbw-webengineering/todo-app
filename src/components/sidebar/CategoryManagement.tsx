@@ -58,7 +58,6 @@ function EditableCategoryInput({
         autoFocus={autoFocus}
       />
       <Button
-        type="submit"
         variant={"ghost"}
         onClick={onConfirm}
         className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-green-500 hover:bg-green-500/10 cursor-pointer"
@@ -67,7 +66,6 @@ function EditableCategoryInput({
         <CheckCircle2 className="h-4 w-4" />
       </Button>
       <Button
-        type="button"
         variant={"ghost"}
         onClick={onCancel}
         className="flex h-6 w-6 items-center justify-center rounded-full p-0 text-red-500 hover:bg-red-500/10 cursor-pointer"
@@ -246,25 +244,21 @@ export function CategoryManagement() {
                             >
                               Kategorie bearbeiten
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Tooltip>
-                                <TooltipTrigger disabled={categories.length <= 1}>
-                                  <Button
-                                    variant={"ghost"}
-                                    onClick={() => handleConfirmDelete(cat)}
-                                    disabled={categories.length <= 1}
-                                    className="text-red-600"
-                                  >
+                            <Tooltip>
+                              <TooltipTrigger className="w-[100%]">
+                                <DropdownMenuItem
+                                  onClick={() => handleConfirmDelete(cat)}
+                                  disabled={categories.length <= 1}
+                                  className={`${categories.length > 1 && "cursor-pointer"} text-red-600`}>
                                     Kategorie löschen
-                                  </Button>
-                                </TooltipTrigger>
-                                {categories.length <= 1 && (
-                                  <TooltipContent>
-                                    Die letzte Kategorie kann nicht gelöscht werden
-                                  </TooltipContent>
-                                )}
-                              </Tooltip>
-                            </DropdownMenuItem>
+                                </DropdownMenuItem>
+                              </TooltipTrigger>
+                              {categories.length <= 1 && (
+                                <TooltipContent>
+                                  Die letzte Kategorie kann nicht gelöscht werden
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </Fragment>
@@ -278,7 +272,7 @@ export function CategoryManagement() {
 
       <Dialog
         open={!!deletingCategory}
-        onOpenChange={(open) => !open && setDeletingCategory(null)}
+        onOpenChange={(open: boolean | "intermediate") => !open && setDeletingCategory(null)}
       >
         <DialogContent>
           <DialogHeader>
@@ -291,10 +285,10 @@ export function CategoryManagement() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeletingCategory(null)}>
+            <Button variant="outline" onClick={() => setDeletingCategory(null)} className="cursor-pointer">
               Abbrechen
             </Button>
-            <Button variant="destructive" onClick={handleDeleteCategory}>
+            <Button variant="destructive" onClick={handleDeleteCategory} className="cursor-pointer">
               Löschen
             </Button>
           </DialogFooter>
