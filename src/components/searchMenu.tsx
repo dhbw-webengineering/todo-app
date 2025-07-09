@@ -12,7 +12,7 @@ type SearchMenuProps = {
 }
 
 export default function SearchMenu(props: SearchMenuProps) {
-    const {onSearch} = props;
+    const { onSearch } = props;
 
     const searchParams = useSearchParams();
 
@@ -41,7 +41,7 @@ export default function SearchMenu(props: SearchMenuProps) {
         params.set("title", searchTitle.trim());
         params.set("ignorecase", `${Number(ignorecase)}`)
         params.set("notDone", `${Number(notDone)}`)
-        
+
         onSearch(params);
     }
 
@@ -64,9 +64,9 @@ export default function SearchMenu(props: SearchMenuProps) {
                     checked={!ignorecase}
                     onCheckedChange={() => setIgnorecase(!ignorecase)}
                     className="cursor-pointer"
-                    label="Groß-/Kleinschreibung beachten"
+                    id="task-case-sensitive"
                 />
-                <label htmlFor="task-completed" className="text-sm ml-[5px]">
+                <label htmlFor="task-case-sensitive" className="text-sm ml-[5px]">
                     Groß-/Kleinschreibung beachten
                 </label>
             </div>
@@ -75,7 +75,7 @@ export default function SearchMenu(props: SearchMenuProps) {
                     checked={notDone}
                     onCheckedChange={() => setNotDone(!notDone)}
                     className="cursor-pointer"
-                    label="Abgeschlossene ausblenden"
+                    id="task-completed"
                 />
                 <label htmlFor="task-completed" className="text-sm ml-[5px]">
                     Abgeschlossene ausblenden

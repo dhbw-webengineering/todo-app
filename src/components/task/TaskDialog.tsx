@@ -131,8 +131,8 @@ export function TaskDialog({
             <MoreVertical className="cursor-pointer" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setOpen(true)}>Bearbeiten</DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-red-600">Löschen</DropdownMenuItem>
+            <DropdownMenuItem className='cursor-pointer' onClick={() => setOpen(true)}>Bearbeiten</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-red-600">Löschen</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

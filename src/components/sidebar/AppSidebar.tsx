@@ -4,9 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { usePathname } from "next/navigation";
+
 
 import {
-  Calendar,
   Home,
   Search,
   SquareCheckBig,
@@ -29,15 +30,9 @@ import {
   SidebarTrigger,
 } from "@/src/components/ui/sidebar";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+
 
 import { TaskDialog } from "@/src/components/task/TaskDialog";
-import SearchMenu from "../searchMenu";
 import ThemeChanger from "@/src/components/themeChanger";
 import { CategoryManagement } from "./CategoryManagement";
 
@@ -50,11 +45,12 @@ export function AppSidebar() {
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [openSearchDialog, setOpenSearchDialog] = useState(false);
 
-  // Menüeinträge
+  const pathname = usePathname();
+
   const items = [
     { title: "Dashboard", url: "/", icon: Home },
-    { title: "Alle Tasks", url: "/tasks", icon: SquareCheckBig },
-    { title: "Suche", icon: Search, onClick: () => setOpenSearchDialog(true) },
+    { title: "Tasks", url: "/tasks", icon: SquareCheckBig },
+    { title: "Suche", icon: Search, url: "/search", onClick: () => setOpenSearchDialog(true) },
   ];
 
   // Logout über Hook
@@ -87,10 +83,10 @@ export function AppSidebar() {
         <div className="p-2">
           <button
             onClick={() => setOpenCreateDialog(true)}
-            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/10 text-primary hover:bg-primary/20"
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-primary/20 hover:bg-primary/20 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
-            <span>Task erstellen</span>
+            <span className="">Task erstellen</span>
           </button>
         </div>
 
@@ -101,20 +97,12 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    {item.url ? (
-                      <Link href={item.url} className="flex items-center gap-2">
+                    {
+                      <Link href={item.url} className={`flex items-center gap-2 ${pathname === item.url ? 'bg-secondary font-semibold' : ''}`}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>
-                    ) : (
-                      <div
-                        onClick={item.onClick}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </div>
-                    )}
+                    }
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -142,10 +130,10 @@ export function AppSidebar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-48">
                 <DropdownMenuItem onSelect={() => router.push("/account")}>
-                  Account
+                  Profil
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={handleLogout}>
-                  Sign out
+                  Abmelden
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -161,15 +149,6 @@ export function AppSidebar() {
         hideTrigger
       />
 
-      {/* Such-Dialog */}
-      <Dialog open={openSearchDialog} onOpenChange={setOpenSearchDialog}>
-        <DialogContent>
-          <DialogHeader className="mb-3">
-            <DialogTitle>Suchen</DialogTitle>
-          </DialogHeader>
-          <SearchMenu onSearch={onSearch} />
-        </DialogContent>
-      </Dialog>
     </Sidebar>
   );
 }
