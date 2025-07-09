@@ -61,14 +61,6 @@ export function SignupForm({
       })
 
       if (response.ok) {
-        // Create default "Allgemein" category for the new user
-        try {
-          await createCategory("Allgemein");
-        } catch (error) {
-          console.error("Failed to create default category:", error);
-          // Continue with registration even if category creation fails
-        }
-
         setSuccess(true)
         setEmail(emailValue)
         toast.success("Erfolgreich registriert", { duration: 3000 })
