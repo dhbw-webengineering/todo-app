@@ -5,7 +5,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { MultiSelect } from '@/src/components/multiselect';
 import { DateRangePicker } from '@/src/components/dateRangePicker';
 import { DateRange } from 'react-day-picker';
-import { useCategories } from '@/src/state/useCategory';
+import { useCategory } from '@/src/state/useCategory';
 import { useTags } from '@/src/state/useTags';
 import type { Category } from '@/src/types/category';
 
@@ -17,7 +17,7 @@ export function FilterBar() {
     const searchParams = useSearchParams();
 
     // Fetch Kategorien und Tags
-    const { categories } = useCategories();
+    const { categories } = useCategory();
     const { tags } = useTags();
 
     // Map to MultiSelect-Optionen
@@ -109,7 +109,7 @@ export function FilterBar() {
         <div>
             <p className='mb-2'>Filter</p>
             <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className="w-1/5">
+                <div className="w-1/4 max-w-xs">
                     <MultiSelect
                         options={categoryOptions}
                         value={selectedCategories}
@@ -118,7 +118,7 @@ export function FilterBar() {
                         variant="inverted"
                     />
                 </div>
-                <div className="w-1/5">
+                <div className="w-1/3 max-w-sm">
                     <MultiSelect
                         options={tagOptions}
                         value={selectedTags}
@@ -127,7 +127,7 @@ export function FilterBar() {
                         variant="secondary"
                     />
                 </div>
-                <div className="w-1/6">
+                <div className="w-1/3 max-w-xs">
                     <DateRangePicker
                         value={dateRange}
                         onChange={onDateChange}

@@ -16,7 +16,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem
 } from '@/src/components/ui/dropdown-menu';
 import { createTodoApi, updateTodoApi } from '@/src/utils/TasksAPI';
-import { useCategories } from '@/src/state/useCategory';
+import { useCategory } from '@/src/state/useCategory';
 import { CategorySelect } from '@/src/components/categorySelect';
 import { format } from 'date-fns';
 import { useState, useEffect } from 'react';
@@ -61,7 +61,7 @@ export function TaskDialog({
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState<Date | undefined>();
   const [categoryId, setCategoryId] = useState('');
-  const { categories } = useCategories();
+  const { categories } = useCategory();
   const [tagsStr, setTagsStr] = useState('');
   const [completed, setCompleted] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof z.infer<typeof TaskSchema>, string>>>({});
