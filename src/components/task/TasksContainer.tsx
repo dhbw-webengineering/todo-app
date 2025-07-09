@@ -14,7 +14,7 @@ export type TasksContainerRef = {
 };
 
 interface TasksContainerProps {
-  apiRoute?: ApiRoute;
+  apiRoute?: string;
   range?: [number, number];
   setHasData?: (hasData: boolean) => void;
   showTasksDone: boolean;

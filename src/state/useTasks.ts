@@ -13,7 +13,7 @@ export interface UseTasksResult {
   deleteTask: (id: string) => Promise<void>
 }
 
-export function useTasks(apiRoute: ApiRoute, params: URLSearchParams, showDone: boolean): UseTasksResult {
+export function useTasks(apiRoute: string, params: URLSearchParams, showDone: boolean): UseTasksResult {
   const [tasks, setTasks] = useState<TodoApiResponse[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
