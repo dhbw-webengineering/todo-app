@@ -26,14 +26,25 @@ beforeEach(() => {
       return Promise.resolve({
         ok: true,
         json: async () => ([{ id: 1, userId: 1, name: 'Allgemein' }]),
+        headers: {
+          get: () => 'application/json',
+        },
+        text: async () => '',
+        status: 200,
       })
     }
     return Promise.resolve({
       ok: true,
       json: async () => ([]),
+      headers: {
+        get: () => 'application/json',
+      },
+      text: async () => '',
+      status: 200,
     })
-  })
-)})
+  }))
+})
+
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -43,15 +54,16 @@ function renderWithProviders(ui: React.ReactElement) {
   return render(
     <AuthProvider>
       <TagsProvider>
-      <CategoryProvider>
-        <TaskQueryProvider>
-          {ui}
-        </TaskQueryProvider>
-      </CategoryProvider>
+        <CategoryProvider>
+          <TaskQueryProvider>
+            {ui}
+          </TaskQueryProvider>
+        </CategoryProvider>
       </TagsProvider>
     </AuthProvider>
   )
 }
+
 
 describe('TaskDialog (Create Mode)', () => {
   it('zeigt eine Fehlermeldung, wenn der Titel fehlt', async () => {
@@ -91,3 +103,4 @@ describe('TaskDialog (Create Mode)', () => {
     expect(await screen.findByText(/kategorie ist erforderlich/i)).toBeInTheDocument()
   })
 })
+
