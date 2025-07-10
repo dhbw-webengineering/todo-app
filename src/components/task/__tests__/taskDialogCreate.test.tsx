@@ -2,6 +2,22 @@ import { beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { TaskDialog } from '@/src/components/task/TaskDialog'
 import { TaskQueryProvider } from '@/src/state/TaskQueryContext'
+import { CategoryProvider } from '@/src/state/CategoryContext'
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+  }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+}))
+
+
+import { AuthProvider } from '@/src/state/AuthContext'
 
 beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn().mockImplementation((url) => {
@@ -24,9 +40,13 @@ afterEach(() => {
 
 function renderWithProviders(ui: React.ReactElement) {
   return render(
-    <TaskQueryProvider>
-      {ui}
-    </TaskQueryProvider>
+    <AuthProvider>
+      <CategoryProvider>
+        <TaskQueryProvider>
+          {ui}
+        </TaskQueryProvider>
+      </CategoryProvider>
+    </AuthProvider>
   )
 }
 

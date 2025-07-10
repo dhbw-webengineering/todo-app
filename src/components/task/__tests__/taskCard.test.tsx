@@ -2,6 +2,23 @@ import { beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { TaskCard } from '@/src/components/task/TaskCard'
 import { TaskQueryProvider } from '@/src/state/TaskQueryContext'
+import { CategoryProvider } from '@/src/state/CategoryContext'
+import { AuthProvider } from '@/src/state/AuthContext'
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+  }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+}))
+
+
+
 import { TodoApiResponse } from '@/src/types/task'
 
 beforeEach(() => {
@@ -25,9 +42,13 @@ afterEach(() => {
 
 function renderWithProviders(ui: React.ReactElement) {
   return render(
-    <TaskQueryProvider>
-      {ui}
-    </TaskQueryProvider>
+    <AuthProvider>
+      <CategoryProvider>
+        <TaskQueryProvider>
+          {ui}
+        </TaskQueryProvider>
+      </CategoryProvider>
+    </AuthProvider>
   )
 }
 
@@ -101,6 +122,7 @@ describe('TaskCard', () => {
       completedAt: expect.any(String)
     }))
   })
+
   it('zeigt "keine Tags" an, wenn keine Tags vorhanden sind', () => {
     renderWithProviders(
       <TaskCard task={mockTask} onUpdate={() => {}} onDelete={() => {}} />
