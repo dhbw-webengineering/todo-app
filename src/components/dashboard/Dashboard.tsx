@@ -86,12 +86,11 @@ export default function Dashboard() {
             </div>
             <div
                 className={clsx(
-                    "w-full fixed bottom-0 h-fit flex flex-wrap gap-2 justify-center px-2 left-0 bg-zinc-900 p-1",
+                    "w-full fixed bottom-0 h-fit flex flex-wrap gap-2 justify-center px-2 left-0 bg-gray-50 dark:bg-zinc-900 p-1",
                     open ? "md:left-[var(--sidebar-width)]" : "md:left-0",
                     open ? "md:w-[calc(100%-var(--sidebar-width))]" : "",
                     "lg:w-auto lg:bottom-3 lg:right-0 lg:justify-end lg:overflow-visible lg:flex-col lg:top-1/2 lg:-translate-y-1/2 lg:bottom-auto lg:pr-5 lg:left-auto lg:bg-transparent"
                 )}
-
             >
                 {SECTIONS.map((sec, i) =>
                     active[i] && (
