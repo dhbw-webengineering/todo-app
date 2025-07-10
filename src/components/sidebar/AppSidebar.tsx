@@ -66,7 +66,9 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center justify-between p-4">
-          <h1 className="text-lg font-bold">Todo-Webapp</h1>
+          <Link href="/">
+            <h1 className="text-lg font-bold">Todo-Webapp</h1>
+          </Link>
           <SidebarTrigger className="cursor-pointer" />
         </div>
         <div className="border-b border-gray-200 dark:border-gray-700" />

@@ -72,7 +72,7 @@ export function RequestPasswordReset({
               Wenn die E-Mail-Adresse registriert ist, erhältst du in Kürze eine E-Mail mit weiteren Anweisungen.
             </p>
             <div className="mt-6 flex justify-end w-full">
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button variant="outline" className="gap-2">
                   <span>Zum Login</span>
                   <ArrowRight className="w-4 h-4" />

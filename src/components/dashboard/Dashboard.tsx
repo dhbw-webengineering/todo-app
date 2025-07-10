@@ -4,6 +4,8 @@ import { useTasks } from '@/src/state/useTasks'
 import { Button } from '@/src/components/ui/button'
 import { TaskCard } from '@/src/components/task/TaskCard'
 import { ApiRoute } from '@/src/utils/ApiRoute'
+import { useSidebar } from '../ui/sidebar'
+import clsx from 'clsx'
 
 type Section = {
     header: string
@@ -23,7 +25,7 @@ const SECTIONS: Section[] = [
 export default function Dashboard() {
     const { tasks, loading, error, updateTask: updateHook, deleteTask: deleteHook } = useTasks(ApiRoute.TODOS, new URLSearchParams(), false)
     const [active, setActive] = useState<boolean[]>(SECTIONS.map(() => true))
-
+    const { open } = useSidebar()
 
     const inRange = useCallback((dueDate: string, [from, to]: [number | undefined, number]) => {
         const today = new Date(new Date().setHours(0, 0, 0, 0));
@@ -47,8 +49,8 @@ export default function Dashboard() {
 
     return (
         <div className="p-6 pr-0 lg:pr-48">
-            <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-            <div className="flex flex-col w-full">
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <div className="flex flex-col w-full mb-10 lg:mb-0">
                 {loading && <p>Lade alle Aufgaben…</p>}
                 {error && <p className="text-red-600">Fehler: {error}</p>}
 
@@ -63,10 +65,10 @@ export default function Dashboard() {
                                 <div className="space-y-4">
                                     {filtered
                                         .sort((a, b) => {
-                                        const ac = !!a.completedAt, bc = !!b.completedAt;
-                                        if (ac !== bc) return ac ? 1 : -1;
-                                        if (!a.dueDate || !b.dueDate) return a.dueDate ? -1 : b.dueDate ? 1 : 0;
-                                        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+                                            const ac = !!a.completedAt, bc = !!b.completedAt;
+                                            if (ac !== bc) return ac ? 1 : -1;
+                                            if (!a.dueDate || !b.dueDate) return a.dueDate ? -1 : b.dueDate ? 1 : 0;
+                                            return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
                                         })
                                         .map(task => (
                                             <TaskCard
@@ -75,7 +77,7 @@ export default function Dashboard() {
                                                 onUpdate={task => updateHook(task)}
                                                 onDelete={id => deleteHook(String(id))}
                                             />
-                                    ))}
+                                        ))}
                                 </div>
                             </section>
                         )
@@ -83,22 +85,12 @@ export default function Dashboard() {
                 })}
             </div>
             <div
-                className="
-    fixed 
-    flex 
-    gap-2 
-    w-full 
-    justify-center 
-    bottom-6
-
-    sm:w-auto sm:bottom-6 sm:right-6 
-    sm:justify-end
-
-    lg:flex-col 
-    lg:top-1/2 
-    lg:-translate-y-1/2 
-    lg:bottom-auto
-  "
+                className={clsx(
+                    "w-full fixed bottom-0 h-fit flex flex-wrap gap-2 justify-center px-2 left-0 bg-gray-50 dark:bg-zinc-900 p-1",
+                    open ? "md:left-[var(--sidebar-width)]" : "md:left-0",
+                    open ? "md:w-[calc(100%-var(--sidebar-width))]" : "",
+                    "lg:w-auto lg:bottom-3 lg:right-0 lg:justify-end lg:overflow-visible lg:flex-col lg:top-1/2 lg:-translate-y-1/2 lg:bottom-auto lg:pr-5 lg:left-auto lg:bg-transparent"
+                )}
             >
                 {SECTIONS.map((sec, i) =>
                     active[i] && (
