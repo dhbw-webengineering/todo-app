@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { MultiSelect } from '@/src/components/multiselect';
 import { DateRangePicker } from '@/src/components/dateRangePicker';

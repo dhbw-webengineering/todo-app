@@ -25,7 +25,7 @@ export function useTags() {
 
   useEffect(() => {
     fetchTags();
-  }, []);
+  }, [fetchTags]);
 
   return { tags, loading, refetch: fetchTags };
 }

@@ -2,7 +2,7 @@
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { AppSidebar } from "@/src/components/sidebar/AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/src/components/ui/sidebar";
+import { SidebarProvider } from "@/src/components/ui/sidebar";
 import { SidebarMenu } from "@/src/components/sidebar/SidebarMenu";
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
@@ -12,12 +12,10 @@ import ErrorBanner from "@/src/components/ErrorBanner";
 import { TaskQueryProvider } from "../state/TaskQueryContext";
 import { CategoryProvider } from "../state/CategoryContext";
 import { AuthProvider } from "@/src/state/AuthContext";
-import { useIsMobile } from "../state/useMobile";
 import { TagsProvider } from "../state/TagsContext";
 export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const showSidebar = !pathname.includes("/auth");
-  const isMobile = useIsMobile()
   return (
     <html lang="de" suppressHydrationWarning>
       <body className="flex min-h-screen bg-gray-50 dark:bg-zinc-900">
