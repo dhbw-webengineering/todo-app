@@ -30,7 +30,7 @@ export const useCategory = () => {
   const editCategory = useCallback(
     async (id: string, name: string): Promise<Category> => {
       const updated = await fetcher<Category>(`${ApiRoute.CATEGORY}/${id}`, {
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify({ name }),
         headers: {
           "Content-Type": "application/json",
