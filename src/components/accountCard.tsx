@@ -38,7 +38,7 @@ export default function AccountCard() {
       const validated = AccountSchema.parse({ email, password, confirmPassword })
 
       await fetcher(ApiRoute.USER, {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },

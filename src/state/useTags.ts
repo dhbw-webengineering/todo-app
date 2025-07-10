@@ -1,30 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
+import { ApiRoute } from "../utils/ApiRoute";
+import fetcher from "../utils/fetcher";
 
-export interface Tag {
-  id: number;
-  name: string;
-}
+export interface Tag { id: number; name: string; }
 
 export function useTags() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchTags = useCallback(() => {
+  const fetchTags = useCallback(async () => {
     setLoading(true);
-    fetch("http://localhost:3001/tags", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setTags(data.map((t: Tag) => ({
-            id: t.id,
-            name: t.name.trim(),
-          })));
-        } else {
-          setTags([]);
-          console.error("Fehler beim Laden der Tags:", data);
-        }
-      })
-      .finally(() => setLoading(false));
+    try {
+      const data = await fetcher<Tag[]>(ApiRoute.TAGS);
+      if (Array.isArray(data)) {
+        setTags(data.map((t: Tag) => ({ id: t.id, name: t.name.trim() })));
+      } else {
+        console.error("Fehler beim Laden der Tags:", data);
+        setTags([]);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

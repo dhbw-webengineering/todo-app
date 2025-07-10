@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       headers: { 'Content-Type': 'application/json' },
     })
     await refresh()
-    router.push('/tasks')
+    router.push('/')
   }, [refresh, router])
 
   const logout = useCallback(async () => {

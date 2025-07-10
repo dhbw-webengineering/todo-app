@@ -25,6 +25,8 @@ import { useTaskQuery } from '@/src/state/TaskQueryContext';
 import { z } from "zod"
 import { toast } from 'sonner';
 import { cn } from '@/src/utils/utils';
+import { useTags } from "@/src/state/TagsContext";
+
 
 const TaskSchema = z.object({
   title: z.string().min(1, "Titel darf nicht leer sein"),
@@ -66,6 +68,7 @@ export function TaskDialog({
   const [completed, setCompleted] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof z.infer<typeof TaskSchema>, string>>>({});
   const { invalidateAll } = useTaskQuery();
+  const { refetch: refetchTags } = useTags();
 
   // State for delete confirmation
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
@@ -110,7 +113,7 @@ export function TaskDialog({
     try {
       const tagList = tagsStr
         ? tagsStr.split(",").map(tag => tag.trim()).filter(Boolean)
-        : undefined;
+        : [];
 
       if (mode === "create") {
         const data: TodoApiCreate = {
@@ -136,6 +139,7 @@ export function TaskDialog({
       }
 
       invalidateAll();
+      refetchTags();
       setOpen(false);
     } catch (err) {
       console.error(err);
@@ -179,7 +183,7 @@ export function TaskDialog({
   return (
     <>
       {renderTrigger()}
-      
+
       {/*Todo edit dialog*/}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -191,12 +195,13 @@ export function TaskDialog({
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <label>Titel *</label>
+              <label htmlFor='task-titel'>Titel *</label>
               <Input
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 aria-invalid={!!errors.title}
                 className={errors.title ? "border-red-500" : ""}
+                id='task-titel'
               />
               {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
             </div>
