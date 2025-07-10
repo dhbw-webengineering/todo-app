@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { TaskDialog } from '@/src/components/task/TaskDialog'
 import { TaskQueryProvider } from '@/src/state/TaskQueryContext'
 import { CategoryProvider } from '@/src/state/CategoryContext'
+import { TagsProvider } from '@/src/state/TagsContext'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -25,14 +26,25 @@ beforeEach(() => {
       return Promise.resolve({
         ok: true,
         json: async () => ([{ id: 1, userId: 1, name: 'Allgemein' }]),
+        headers: {
+          get: () => 'application/json',
+        },
+        text: async () => '',
+        status: 200,
       })
     }
     return Promise.resolve({
       ok: true,
       json: async () => ([]),
+      headers: {
+        get: () => 'application/json',
+      },
+      text: async () => '',
+      status: 200,
     })
-  })
-)})
+  }))
+})
+
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -41,14 +53,17 @@ afterEach(() => {
 function renderWithProviders(ui: React.ReactElement) {
   return render(
     <AuthProvider>
-      <CategoryProvider>
-        <TaskQueryProvider>
-          {ui}
-        </TaskQueryProvider>
-      </CategoryProvider>
+      <TagsProvider>
+        <CategoryProvider>
+          <TaskQueryProvider>
+            {ui}
+          </TaskQueryProvider>
+        </CategoryProvider>
+      </TagsProvider>
     </AuthProvider>
   )
 }
+
 
 describe('TaskDialog (Create Mode)', () => {
   it('zeigt eine Fehlermeldung, wenn der Titel fehlt', async () => {
@@ -88,3 +103,4 @@ describe('TaskDialog (Create Mode)', () => {
     expect(await screen.findByText(/kategorie ist erforderlich/i)).toBeInTheDocument()
   })
 })
+
