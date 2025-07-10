@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { TaskDialog } from '@/src/components/task/TaskDialog'
 import { TaskQueryProvider } from '@/src/state/TaskQueryContext'
 
