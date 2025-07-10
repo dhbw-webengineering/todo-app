@@ -6,7 +6,7 @@ import { MultiSelect } from '@/src/components/multiselect';
 import { DateRangePicker } from '@/src/components/dateRangePicker';
 import { DateRange } from 'react-day-picker';
 import { useCategory } from '@/src/state/useCategory';
-import { useTags } from '@/src/state/useTags';
+import { useTags } from "@/src/state/TagsContext";
 import type { Category } from '@/src/types/category';
 
 
@@ -49,23 +49,6 @@ export function FilterBar() {
         }
         return undefined;
     });
-
-    useEffect(() => {
-        setSelectedCategories(searchParams.getAll('category'));
-        setSelectedTags(searchParams.getAll('tag'));
-
-        const from = searchParams.get('from');
-        const to = searchParams.get('to');
-        if (from && to) {
-            const f = new Date(from);
-            const t = new Date(to);
-            if (!isNaN(f.getTime()) && !isNaN(t.getTime())) {
-                setDateRange({ from: f, to: t });
-                return;
-            }
-        }
-        setDateRange(undefined);
-    }, [searchParams]);
 
     const updateParamList = (
         key: string,
