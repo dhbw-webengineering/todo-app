@@ -4,6 +4,7 @@ import { TaskCard } from '@/src/components/task/TaskCard'
 import { TaskQueryProvider } from '@/src/state/TaskQueryContext'
 import { CategoryProvider } from '@/src/state/CategoryContext'
 import { AuthProvider } from '@/src/state/AuthContext'
+import { TagsProvider } from '@/src/state/TagsContext'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -43,12 +44,14 @@ afterEach(() => {
 function renderWithProviders(ui: React.ReactElement) {
   return render(
     <AuthProvider>
-      <CategoryProvider>
-        <TaskQueryProvider>
-          {ui}
-        </TaskQueryProvider>
-      </CategoryProvider>
-    </AuthProvider>
+       <TagsProvider>
+       <CategoryProvider>
+         <TaskQueryProvider>
+           {ui}
+         </TaskQueryProvider>
+       </CategoryProvider>
+       </TagsProvider>
+     </AuthProvider>
   )
 }
 
